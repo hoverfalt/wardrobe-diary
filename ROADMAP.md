@@ -10,6 +10,15 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
+## Where we left off (2026-10-08)
+
+- Category listing is done and live on the signed-in Dashboard (wardrobediary.web.app); the live site is untouched.
+- **Waiting for Olof:** D-1 (what public pages expose), D-2 (span semantics), Q-7 (blank Socks
+  categories in the Sheet), Q-8 (Boss Modern black 15/16 divest date), plus new remarks.
+- **Next for Claude:** triage the new remarks into this file; after any Sheet fixes run
+  `tools/sync.sh --write --dump ../reference/sheet.json`; continue R-09 with "Active items by category
+  (over time)", the first chart (load the dataviz skill first; Observable Plot is the suggested library).
+
 ## Inbox
 
 _(empty)_
