@@ -11,3 +11,4 @@ reference/*.csv
 tools/*.json
 .firebase/
 .DS_Store
+.claude/settings.local.json

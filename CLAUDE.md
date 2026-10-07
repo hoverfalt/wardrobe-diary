@@ -90,7 +90,8 @@ Finnish locale formatting (`1.7.2017`, `50,00`).
 cd web && npm install && npm run dev      # Node 20+
 cd web && npm test                         # vitest
 cd tools && pip install -r requirements.txt && pytest
-python tools/migrate_sheet.py --help
+tools/sync.sh                              # Sheet → Firestore dry run (validates)
+tools/sync.sh --write                      # Sheet → Firestore sync (Sheet is source of truth)
 cd web && npm run deploy                     # hosting:app (wardrobediary.web.app, never the live site) + firestore rules
 ```
 
