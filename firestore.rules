@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user owns everything under their own document.
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    // Precomputed aggregates for the public portfolio page.
+    match /users/{uid}/public/{doc} {
+      allow read: if true;
+    }
+  }
+}

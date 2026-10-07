@@ -1,0 +1,65 @@
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from sheet_transform import parse_sheet, serial_to_iso, validate_times_used  # noqa: E402
+
+HEADER = [
+    "Category", "Item", "Details", "Photo", "Photo placeholder", "Price", "Date purchased",
+    "Date divested", "Times used init", "Materials", "Weight", "Times used", "Cost per wear",
+    43101, 43102, 43103,  # 2018-01-01 … 2018-01-03 as Sheets serials
+]
+
+
+def make_rows():
+    return [
+        HEADER,
+        [],  # separator row
+        ["Jackets and hoodies", "North Bend black vest", "", "Jackets_and_hoodies-006", "",
+         50.0, 42917, "", 2, "Shell: 100% polyamide", 305, 4, 12.5, True, False, True],
+        ["Jackets and hoodies", "Suit Supply gray body warmer", "BW16503", "Jackets_and_hoodies-008", "",
+         149.0, 43196, 45000, 0, "Fabric 100% linen", 578, 1, 149.0, False, True, False],
+        ["Jackets and hoodies", "No photo jacket", "", "", "", "10,50", "16.11.2018", "", "", "", "", 0, ""],
+    ]
+
+
+def test_serial_to_iso():
+    assert serial_to_iso(43101) == "2018-01-01"
+    assert serial_to_iso("7.10.2026") == "2026-10-07"
+    assert serial_to_iso("") is None
+
+
+def test_parse_garments_and_days():
+    data = parse_sheet(make_rows())
+    assert [g.id for g in data.garments] == [
+        "Jackets_and_hoodies-006",
+        "Jackets_and_hoodies-008",
+        "Jackets_and_hoodies-No_photo_jacket",
+    ]
+    vest = data.garments[0]
+    assert vest.purchased == "2017-07-01"
+    assert vest.divested is None
+    assert vest.timesUsedInit == 2
+    assert data.garments[2].price == 10.5
+    assert data.garments[2].purchased == "2018-11-16"
+    assert data.days == {
+        "2018-01-01": ["Jackets_and_hoodies-006"],
+        "2018-01-02": ["Jackets_and_hoodies-008"],
+        "2018-01-03": ["Jackets_and_hoodies-006"],
+    }
+    assert any("no Photo id" in w for w in data.warnings)
+
+
+def test_validate_times_used():
+    data = parse_sheet(make_rows())
+    assert validate_times_used(data) == []
+    data.sheet_times_used["Jackets_and_hoodies-006"] = 99
+    assert validate_times_used(data) == ["Jackets_and_hoodies-006: sheet says 99, computed 4"]
+
+
+def test_missing_header():
+    with pytest.raises(ValueError):
+        parse_sheet([["foo"]])
