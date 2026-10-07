@@ -5,7 +5,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sheet_transform import parse_sheet, serial_to_iso, validate_times_used  # noqa: E402
+from sheet_transform import (  # noqa: E402
+    parse_sheet,
+    serial_to_iso,
+    validate_day_columns,
+    validate_times_used,
+)
 
 HEADER = [
     "Category", "Item", "Details", "Photo", "Photo placeholder", "Price", "Date purchased",
@@ -58,6 +63,16 @@ def test_validate_times_used():
     assert validate_times_used(data) == []
     data.sheet_times_used["Jackets_and_hoodies-006"] = 99
     assert validate_times_used(data) == ["Jackets_and_hoodies-006: sheet says 99, computed 4"]
+
+
+def test_validate_day_columns():
+    data = parse_sheet(make_rows())
+    assert validate_day_columns(data) == []
+    rows = make_rows()
+    rows[0][14] = -614335  # 0218-01-02: year typo for 2018-01-02
+    problems = validate_day_columns(parse_sheet(rows))
+    assert len(problems) == 2
+    assert problems[0].startswith("day column 0218-01-02 follows 2018-01-01")
 
 
 def test_missing_header():

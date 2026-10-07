@@ -17,7 +17,7 @@ import os
 import sys
 from pathlib import Path
 
-from sheet_transform import parse_sheet, validate_times_used
+from sheet_transform import parse_sheet, validate_day_columns, validate_times_used
 
 BATCH_SIZE = 400
 
@@ -76,6 +76,12 @@ def main() -> int:
     for w in data.warnings:
         print(f"WARNING {w}")
 
+    day_problems = validate_day_columns(data)
+    if day_problems:
+        print(f"\n{len(day_problems)} problems in the day column headers:")
+        for line in day_problems:
+            print(f"  {line}")
+
     problems = validate_times_used(data)
     if problems:
         print(f"\n{len(problems)} garments where 'Times used' does not match:")
@@ -97,7 +103,7 @@ def main() -> int:
     if not args.write:
         print("\nDry run, nothing written. Re-run with --write to write to Firestore.")
         return 0
-    if problems:
+    if problems or day_problems:
         print("Refusing to write while validation fails.", file=sys.stderr)
         return 1
     write_firestore(args.uid, data)

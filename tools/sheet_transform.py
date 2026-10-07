@@ -162,6 +162,21 @@ def parse_sheet(rows: List[List[Any]]) -> SheetData:
     return out
 
 
+def validate_day_columns(data: SheetData) -> List[str]:
+    """Check that the day columns run one day apart, in Sheet order, with no gaps or duplicates.
+
+    Catches header typos such as 0204-02-19 for 2024-02-19.
+    """
+    problems = []
+    prev: Optional[date] = None
+    for iso in data.days:  # insertion order = column order
+        d = date.fromisoformat(iso)
+        if prev is not None and d != prev + timedelta(days=1):
+            problems.append(f"day column {iso} follows {prev.isoformat()} (expected {prev + timedelta(days=1)})")
+        prev = d
+    return problems
+
+
 def validate_times_used(data: SheetData) -> List[str]:
     """Check that timesUsedInit + checked days reproduces the Sheet's 'Times used' column."""
     counts: Dict[str, int] = {}
