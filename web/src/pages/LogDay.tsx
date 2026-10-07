@@ -35,7 +35,7 @@ export function LogDay({ uid }: { uid: string }) {
           <div className="grid">
             {items.map((g) => {
               const on = worn.has(g.id);
-              const src = photoUrl(g.photo);
+              const src = photoUrl(g.photo, true);
               return (
                 <button
                   key={g.id}

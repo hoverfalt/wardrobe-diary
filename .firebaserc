@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "threddit-297417"
+  },
+  "targets": {
+    "threddit-297417": {
+      "hosting": {
+        "app": [
+          "wardrobediary"
+        ]
+      }
+    }
   }
 }

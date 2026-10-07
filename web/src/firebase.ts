@@ -20,7 +20,11 @@ export const db = initializeFirestore(app, {
 export const signIn = () => signInWithPopup(auth, new GoogleAuthProvider());
 export const signOutUser = () => signOut(auth);
 
-export function photoUrl(photo: string): string | null {
-  const base = import.meta.env.VITE_PHOTO_BASE_URL;
-  return photo && base ? `${base}${photo}.jpg` : null;
+// Garment photos are public PNGs in the Storage bucket root (<id>.png), with 112×112 thumbnails
+// under thumbs/<id>_112x112.png. Same assets the live site uses.
+export function photoUrl(photo: string, thumb = false): string | null {
+  const bucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET;
+  if (!photo || !bucket) return null;
+  const path = thumb ? `thumbs/${photo}_112x112.png` : `${photo}.png`;
+  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`;
 }
