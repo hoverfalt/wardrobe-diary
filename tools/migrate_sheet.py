@@ -1,4 +1,5 @@
-"""Migrate the Wardrobe Diary Google Sheet into Firestore.
+"""Sync the Wardrobe Diary Google Sheet into Firestore. Safe to re-run: the Sheet is the source
+of truth, and docs no longer in it (deleted garments, fully unticked days) are removed.
 
 Dry run by default: reads the Sheet, validates, prints a summary.
 Pass --write to actually write to Firestore.
@@ -42,18 +43,31 @@ def write_firestore(uid: str, data) -> None:
     db = firestore.client()
     user = db.collection("users").document(uid)
 
-    writes = [(user.collection("garments").document(g.id), g.to_firestore()) for g in data.garments]
-    writes += [
-        (user.collection("days").document(day), {"worn": worn})
-        for day, worn in data.days.items()
-        if worn
+    garments, days = user.collection("garments"), user.collection("days")
+    writes = [(garments.document(g.id), g.to_firestore()) for g in data.garments]
+    writes += [(days.document(day), {"worn": worn}) for day, worn in data.days.items() if worn]
+
+    # Sync, not just insert: drop docs that no longer exist in the Sheet
+    # (deleted garments, days whose checkboxes were all unticked).
+    keep = {ref.path for ref, _ in writes}
+    stale = [
+        ref
+        for col in (garments, days)
+        for ref in col.list_documents()
+        if ref.path not in keep
     ]
-    for i in range(0, len(writes), BATCH_SIZE):
+    ops = [(ref, doc) for ref, doc in writes] + [(ref, None) for ref in stale]
+    print(f"  {len(writes)} docs to write, {len(stale)} stale docs to delete")
+
+    for i in range(0, len(ops), BATCH_SIZE):
         batch = db.batch()
-        for ref, doc in writes[i : i + BATCH_SIZE]:
-            batch.set(ref, doc)
+        for ref, doc in ops[i : i + BATCH_SIZE]:
+            if doc is None:
+                batch.delete(ref)
+            else:
+                batch.set(ref, doc)
         batch.commit()
-        print(f"  committed {min(i + BATCH_SIZE, len(writes))}/{len(writes)}")
+        print(f"  committed {min(i + BATCH_SIZE, len(ops))}/{len(ops)}")
 
 
 def main() -> int:
