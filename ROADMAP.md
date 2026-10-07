@@ -16,18 +16,45 @@ _(empty)_
 
 ## Now
 
-- **R-08 Public views: inventory.** Go through wardrobediary.io and list every chart and table with
-  its metric, so they can be rebuilt one by one. Output: a checklist under R-09.
+- **R-09 Public views: rebuild** from the Firestore data, each view checked against the live site's
+  numbers. Checklist from the R-08 inventory of wardrobediary.io; suggested order is top to bottom.
+
+  Portfolio page (`portfolio.html`):
+  - [ ] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
+        (share of days), Yearly cost, Inventory turnover; plus a Total row
+  - [ ] Active items by category (over time)
+  - [ ] Inventory value by category (over time)
+  - [ ] Total inventory value (over time, stacked)
+  - [ ] Average cost per wear and category frequency of use
+  - [ ] Average yearly cost and category frequency of use
+  - [ ] Daily cost (cost of all items worn on a day; "all divested" = final)
+  - [ ] Daily cost animated by date (GIF on the live site; could become an interactive date slider)
+  - [ ] Monthly cost and comparison to other consumption (needs Q-4)
+
+  One page per category (13: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks,
+  Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear):
+  - [ ] Item listing table: Item, Price, Times worn, Cost per wear, Wears per month, Status
+  - [ ] Times worn per item
+  - [ ] Cost per wear and times worn
+  - [ ] Cost per wear and frequency of use
+  - [ ] Times worn, animated by date
+  - [ ] Cost per wear and frequency of use, animated by date
+  - [ ] Daily cost for the category
+
+  Other pages: front page (`index.html`, text, press links, images) and `track_your_wardrobe.html`
+  (text). They are static content: port as-is when doing R-16.
+
+  Reference values: the live site's tables are saved in `reference/live/*.csv` (git-ignored). The
+  snapshot's "Days used" shares fit exactly 3,168 days, so the live data runs to about 2026-09-02;
+  compare against that date, not today.
 
 ## Next
 
-1. **R-09 Public views: rebuild charts** from the Firestore data, starting with the simplest (cost per
-   wear per garment, active items by category), each checked against the live site's numbers.
-2. **R-10 Reference data from R.** Export golden CSVs from the Threddit R pipeline into `reference/`
+1. **R-10 Reference data from R.** Export golden CSVs from the Threddit R pipeline into `reference/`
    and add tests comparing the TypeScript metrics to them.
-3. **R-11 Public data document.** Have the sync also write `users/{uid}/public/summary`, so public
+2. **R-11 Public data document.** Have the sync also write `users/{uid}/public/summary`, so public
    pages need one document read. Blocked by D-1.
-4. **R-12 Resolve the metric questions** (Q-1 to Q-4 below) against the Threddit `02-`/`03-` scripts.
+3. **R-12 Resolve the metric questions** (Q-1 to Q-6 below) against the Threddit `02-`/`03-` scripts.
 
 ## Later
 
@@ -56,6 +83,9 @@ _(empty)_
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-3** How cost per wear handles 0 uses (the TypeScript code currently returns null).
 - **Q-4** Data source of the external consumption benchmarks in the monthly comparison.
+- **Q-5** Definitions of "Yearly cost" and "Inventory turnover" in the category listing.
+- **Q-6** Shoes' inventory value has a fractional sum (2019.918…), unlike the other categories: is one
+  price computed, e.g. converted from another currency or split between items?
 
 ## Decisions made
 
@@ -75,3 +105,5 @@ _(empty)_
   web app registered; Google sign-in working.
 - **R-06** 2026-10-07 First full sync to Firestore (649 garments, 3,192 days, 31,514 wear events).
 - **R-07** 2026-10-07 Re-runnable sync (`tools/sync.sh`) that removes stale docs.
+- **R-08** 2026-10-07 Inventory of the live site's views (checklist under R-09); live tables saved
+  to `reference/live/`.

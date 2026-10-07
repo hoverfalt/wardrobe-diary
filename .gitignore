@@ -7,7 +7,7 @@ __pycache__/
 .pytest_cache/
 service-account*.json
 *-firebase-adminsdk-*.json
-reference/*.csv
+reference/**/*.csv
 tools/*.json
 .firebase/
 .DS_Store
