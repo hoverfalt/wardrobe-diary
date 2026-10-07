@@ -91,7 +91,7 @@ cd web && npm install && npm run dev      # Node 20+
 cd web && npm test                         # vitest
 cd tools && pip install -r requirements.txt && pytest
 python tools/migrate_sheet.py --help
-firebase deploy --only hosting:app,firestore   # "app" = wardrobediary.web.app, never the live site
+cd web && npm run deploy                     # hosting:app (wardrobediary.web.app, never the live site) + firestore rules
 ```
 
 ## Conventions
