@@ -20,8 +20,9 @@ _(empty)_
   numbers. Checklist from the R-08 inventory of wardrobediary.io; suggested order is top to bottom.
 
   Portfolio page (`portfolio.html`):
-  - [ ] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
-        (share of days), Yearly cost, Inventory turnover; plus a Total row
+  - [x] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
+        (share of days), Yearly cost, Inventory turnover; plus a Total row. On the signed-in Dashboard
+        with a from/to date range; matches the live site except where the live site is wrong (see R pipeline bugs)
   - [ ] Active items by category (over time)
   - [ ] Inventory value by category (over time)
   - [ ] Total inventory value (over time, stacked)
@@ -54,7 +55,7 @@ _(empty)_
    and add tests comparing the TypeScript metrics to them.
 2. **R-11 Public data document.** Have the sync also write `users/{uid}/public/summary`, so public
    pages need one document read. Blocked by D-1.
-3. **R-12 Resolve the metric questions** (Q-1 to Q-6 below) against the Threddit `02-`/`03-` scripts.
+3. **R-12 Resolve the remaining metric questions** (Q-1, Q-2, Q-4) against the Threddit R scripts.
 
 ## Later
 
@@ -74,20 +75,43 @@ _(empty)_
 
 - **D-1 What do public pages expose?** Either (a) one public document with the full compact daily
   log, so all metrics are computed in the browser with the existing TypeScript code, or (b) aggregates
-  only, which shows less detail but means duplicating some metric logic in Python. Recommendation: (a),
-  unless the day-by-day log should stay private.
+  only, which shows less detail but means duplicating some metric logic in Python. Recommendation: (a).
+  User-chosen time spans (see Decisions made, 2026-10-08) practically require it: with (b), every span
+  a visitor could pick would have to be precomputed.
+- **D-2 What do metrics mean for a span that starts after 2018-01-01?** The R metrics are all
+  "from the start of tracking up to a date". Current provisional rule: only wears inside the span count,
+  "Times used init" counts only for spans starting 2018-01-01, and a garment's full price counts in
+  every span it was owned in (so short spans show high cost per wear). Alternatives: spread the price
+  over the ownership period, or show "cost so far" as of the end date. To decide when building the
+  first view where it matters.
 
 ## Open questions
 
-- **Q-1** Exact daily-cost formula in R.
+- **Q-1** Exact daily-cost formula in R (the "Daily cost" chart, `calculate_daily_cost`).
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
-- **Q-3** How cost per wear handles 0 uses (the TypeScript code currently returns null).
-- **Q-4** Data source of the external consumption benchmarks in the monthly comparison.
-- **Q-5** Definitions of "Yearly cost" and "Inventory turnover" in the category listing.
-- **Q-6** Shoes' inventory value has a fractional sum (2019.918…), unlike the other categories: is one
-  price computed, e.g. converted from another currency or split between items?
+- **Q-4** Data source of the external consumption benchmarks in the monthly comparison
+  (R reads a "Comparison" tab from the Sheet).
+- **Q-7** 13 Socks rows have an empty Category cell in the Sheet (`Socks-100`…`107`, `Socks-142`…`146`).
+  R dropped them; the app shows them as "Uncategorised". Fix: fill in "Socks" in the Sheet.
+- **Q-8** 15 garments have wears outside their purchase-to-divest period; the metrics ignore those wears
+  (as R did), and `tools/sync.sh` lists them. Mostly single wears just after the divest date, but
+  *Boss Modern black 15* and *16* have about 60 wears each after a divest date of 2023-05-05,
+  one day after purchase. Is that divest date a typo?
+
+### R pipeline bugs found while porting (the new code does not reproduce them)
+
+- R matched garments by item name, so names used twice in the Sheet collide: *Urban Classics dark camo
+  07–10* (Underwear boxers) are missing from the live site.
+- The live Sportswear category row shows an inventory value 210 € above the sum of the live Sportswear
+  item table.
 
 ## Decisions made
+
+- **2026-10-08** Metrics must work for any user-chosen time span, not just "since 2018-01-01". All metric
+  functions take a date range; the per-day data stays available to the client rather than being
+  pre-aggregated for fixed periods. The current data model already supports this.
+- **2026-10-08** Prices are rounded to whole cents in the sync (some Sheet prices are formulas,
+  e.g. a pack price divided by six), so no value shows fractions of a cent (was Q-6).
 
 - **2026-10-07** Use the existing Firebase project `threddit-297417` rather than a new one: photos and
   domain are already there. The live site is protected by a separate Hosting site plus the `app` deploy target.
@@ -105,5 +129,9 @@ _(empty)_
   web app registered; Google sign-in working.
 - **R-06** 2026-10-07 First full sync to Firestore (649 garments, 3,192 days, 31,514 wear events).
 - **R-07** 2026-10-07 Re-runnable sync (`tools/sync.sh`) that removes stale docs.
+- **R-19** 2026-10-08 Ported the category listing metrics from R (Q-3, Q-5 answered: see CLAUDE.md
+  Metrics); tests compare every category and item with the live site.
+- **R-20** 2026-10-08 Sync skips "ADD NEXT" placeholder rows, rounds prices to cents, warns about empty
+  categories and wears outside ownership.
 - **R-08** 2026-10-07 Inventory of the live site's views (checklist under R-09); live tables saved
   to `reference/live/`.

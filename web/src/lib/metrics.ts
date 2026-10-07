@@ -1,65 +1,219 @@
-// Port of the Threddit R metrics. Keep these pure and tested.
-// Definitions marked TODO must be confirmed against the R scripts (02-, 03-).
+// Port of the Threddit R metrics (github.com/hoverfalt/Threddit: 01-, 02-, 03-Calculate_plot_data.R).
+// Keep these pure and tested.
+//
+// Every metric takes a DateRange. With range.from = TRACKING_START the results match the R pipeline,
+// which always measured "from the start of tracking up to a date". Later starts are provisional
+// (see ROADMAP D-2): wears are counted inside the range only, and "Times used init" (wears before
+// tracking began) counts only when the range starts at TRACKING_START.
 import type { Day, Garment, IsoDate } from "../types";
 
-export function wearCounts(days: Day[]): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const day of days) {
-    for (const id of day.worn) counts.set(id, (counts.get(id) ?? 0) + 1);
-  }
-  return counts;
+export const TRACKING_START: IsoDate = "2018-01-01";
+const FOREVER: IsoDate = "9999-12-31";
+
+export interface DateRange {
+  from: IsoDate;
+  to: IsoDate;
 }
 
-export function timesUsed(g: Garment, counts: Map<string, number>): number {
-  return g.timesUsedInit + (counts.get(g.id) ?? 0);
+/** Category order used on the live site; categories not listed here sort after, alphabetically. */
+export const CATEGORY_ORDER = [
+  "Jackets and hoodies",
+  "Blazers and vests",
+  "Knits",
+  "Shirts",
+  "T-shirts and tanks",
+  "Pants",
+  "Shorts",
+  "Belts",
+  "Socks",
+  "Shoes",
+  "Underwear shirts",
+  "Underwear boxers",
+  "Sportswear",
+];
+export const UNCATEGORISED = "Uncategorised";
+
+export function categoryOf(g: Garment): string {
+  return g.category || UNCATEGORISED;
 }
 
-/** Price / times used. TODO: confirm how R handles 0 uses (here: null). */
-export function costPerWear(g: Garment, counts: Map<string, number>): number | null {
-  const n = timesUsed(g, counts);
-  if (g.price == null || n === 0) return null;
-  return g.price / n;
+export function compareCategories(a: string, b: string): number {
+  const ia = CATEGORY_ORDER.indexOf(a);
+  const ib = CATEGORY_ORDER.indexOf(b);
+  if (ia >= 0 && ib >= 0) return ia - ib;
+  if (ia >= 0 || ib >= 0) return ia >= 0 ? -1 : 1;
+  return a.localeCompare(b);
+}
+
+const max = (a: IsoDate, b: IsoDate) => (a > b ? a : b);
+const min = (a: IsoDate, b: IsoDate) => (a < b ? a : b);
+
+/** Number of days from a to b inclusive (ISO dates, no timezones). */
+export function daysInclusive(a: IsoDate, b: IsoDate): number {
+  return Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000) + 1;
+}
+
+/** First day the garment counts as owned within tracking (purchase date, at the earliest TRACKING_START). */
+export function ownedFrom(g: Garment): IsoDate {
+  return max(g.purchased ?? TRACKING_START, TRACKING_START);
+}
+
+/** Last day the garment counts as owned. The divest day itself still counts, as in R. */
+export function ownedUntil(g: Garment): IsoDate {
+  return g.divested ?? FOREVER;
 }
 
 export function isActive(g: Garment, date: IsoDate): boolean {
-  if (!g.purchased || g.purchased > date) return false;
-  return !g.divested || date < g.divested;
+  return ownedFrom(g) <= date && date <= ownedUntil(g);
 }
 
-export interface CategorySummary {
-  category: string;
-  activeItems: number;
-  inventoryValue: number;
-  avgCostPerWear: number | null;
-  /** Share of logged days on which at least one item of the category was worn. */
-  frequency: number;
+/** Whether the garment was owned at any point in the range. */
+export function ownedDuring(g: Garment, range: DateRange): boolean {
+  return ownedFrom(g) <= range.to && ownedUntil(g) >= range.from;
 }
 
-export function categorySummary(garments: Garment[], days: Day[], date: IsoDate): CategorySummary[] {
-  const counts = wearCounts(days);
-  const categoryOf = new Map(garments.map((g) => [g.id, g.category]));
-  const daysWithCategory = new Map<string, number>();
+/** Sorted wear dates per garment. Build once and pass to the metric functions. */
+export type WearIndex = Map<string, IsoDate[]>;
+
+export function wearIndex(days: Day[]): WearIndex {
+  const index: WearIndex = new Map();
   for (const day of days) {
-    const cats = new Set(day.worn.map((id) => categoryOf.get(id)).filter(Boolean) as string[]);
-    for (const c of cats) daysWithCategory.set(c, (daysWithCategory.get(c) ?? 0) + 1);
+    for (const id of day.worn) {
+      const list = index.get(id);
+      if (list) list.push(day.date);
+      else index.set(id, [day.date]);
+    }
   }
+  for (const list of index.values()) list.sort();
+  return index;
+}
 
+/** Days the garment was worn within the range, ignoring wears outside its ownership period (as R does). */
+export function wearDatesIn(g: Garment, wears: WearIndex, range: DateRange): IsoDate[] {
+  const from = max(range.from, ownedFrom(g));
+  const to = min(range.to, ownedUntil(g));
+  return (wears.get(g.id) ?? []).filter((d) => d >= from && d <= to);
+}
+
+/** Times worn in the range, plus pre-tracking wears when the range starts at TRACKING_START. */
+export function timesWorn(g: Garment, wears: WearIndex, range: DateRange): number {
+  const init = range.from <= TRACKING_START ? g.timesUsedInit : 0;
+  return init + wearDatesIn(g, wears, range).length;
+}
+
+/** Price / times worn. An unworn garment's cost per wear is its full price (as in R). */
+export function costPerWear(g: Garment, wears: WearIndex, range: DateRange): number | null {
+  if (g.price == null) return null;
+  const n = timesWorn(g, wears, range);
+  return n === 0 ? g.price : g.price / n;
+}
+
+/** Days owned up to range.to (frozen at the divest date). Counts from purchase for pre-tracking items
+ *  when the range starts at TRACKING_START, since their pre-tracking wears are included too. */
+export function daysOwned(g: Garment, range: DateRange): number {
+  const start =
+    range.from <= TRACKING_START ? (g.purchased ?? TRACKING_START) : max(range.from, ownedFrom(g));
+  const end = min(range.to, ownedUntil(g));
+  return Math.max(0, daysInclusive(start, end));
+}
+
+export interface ItemRow {
+  garment: Garment;
+  category: string;
+  timesWorn: number;
+  costPerWear: number | null;
+  wearsPerMonth: number;
+  monthsOwned: number;
+  active: boolean;
+}
+
+/** Per-garment listing (category pages): garments owned at any point in the range. */
+export function itemListing(garments: Garment[], days: Day[], range: DateRange): ItemRow[] {
+  const wears = wearIndex(days);
+  return garments
+    .filter((g) => ownedDuring(g, range))
+    .map((g) => {
+      const n = timesWorn(g, wears, range);
+      const owned = daysOwned(g, range);
+      return {
+        garment: g,
+        category: categoryOf(g),
+        timesWorn: n,
+        costPerWear: costPerWear(g, wears, range),
+        wearsPerMonth: owned > 0 ? n / (owned / 30.5) : 0,
+        monthsOwned: owned / 30.5,
+        active: isActive(g, range.to),
+      };
+    });
+}
+
+export interface CategoryRow {
+  category: string;
+  /** Garments active on range.to. */
+  activeItems: number;
+  /** Sum of purchase prices of garments active on range.to. */
+  inventoryValue: number;
+  /** Value of all garments owned during the range / their total wears (the live site's "Cost per wear"). */
+  costPerWear: number | null;
+  /** Share of days in the range on which any garment of the category was worn ("Days used"). */
+  daysUsed: number | null;
+  /** costPerWear × 365 × daysUsed: what a year of using the category costs at this rate. */
+  yearlyCost: number | null;
+  /** yearlyCost / inventoryValue: share of the active inventory's value "used up" per year. */
+  turnover: number | null;
+}
+
+/** The live site's category listing, plus a Total row first. */
+export function categoryListing(garments: Garment[], days: Day[], range: DateRange): CategoryRow[] {
+  const wears = wearIndex(days);
   const byCategory = new Map<string, Garment[]>();
   for (const g of garments) {
-    const list = byCategory.get(g.category) ?? [];
-    list.push(g);
-    byCategory.set(g.category, list);
+    if (!ownedDuring(g, range)) continue;
+    const c = categoryOf(g);
+    byCategory.set(c, [...(byCategory.get(c) ?? []), g]);
   }
 
-  return [...byCategory.entries()].map(([category, items]) => {
-    const active = items.filter((g) => isActive(g, date));
-    const cpws = active.map((g) => costPerWear(g, counts)).filter((v): v is number => v != null);
-    return {
-      category,
-      activeItems: active.length,
-      inventoryValue: active.reduce((sum, g) => sum + (g.price ?? 0), 0),
-      avgCostPerWear: cpws.length ? cpws.reduce((a, b) => a + b, 0) / cpws.length : null,
-      frequency: days.length ? (daysWithCategory.get(category) ?? 0) / days.length : 0,
-    };
-  });
+  const rows = [...byCategory.entries()]
+    .sort(([a], [b]) => compareCategories(a, b))
+    .map(([category, items]): CategoryRow => {
+      const active = items.filter((g) => isActive(g, range.to));
+      const inventoryValue = sum(active.map((g) => g.price ?? 0));
+      const value = sum(items.map((g) => g.price ?? 0));
+      const uses = sum(items.map((g) => timesWorn(g, wears, range)));
+      const costPerWear = uses > 0 ? value / uses : null;
+
+      // Category days counted from when the category's first garment was owned (as in R).
+      const start = max(range.from, items.map(ownedFrom).reduce(min));
+      const used = new Set(items.flatMap((g) => wearDatesIn(g, wears, { from: start, to: range.to })));
+      const span = daysInclusive(start, range.to);
+      const daysUsed = span > 0 ? used.size / span : null;
+
+      const yearlyCost = costPerWear != null && daysUsed != null ? costPerWear * 365 * daysUsed : null;
+      return {
+        category,
+        activeItems: active.length,
+        inventoryValue,
+        costPerWear,
+        daysUsed,
+        yearlyCost,
+        turnover: yearlyCost != null && inventoryValue > 0 ? yearlyCost / inventoryValue : null,
+      };
+    });
+
+  const inventoryValue = sum(rows.map((r) => r.inventoryValue));
+  const yearlyCost = sum(rows.map((r) => r.yearlyCost ?? 0));
+  const total: CategoryRow = {
+    category: "Total",
+    activeItems: sum(rows.map((r) => r.activeItems)),
+    inventoryValue,
+    costPerWear: null,
+    daysUsed: null,
+    yearlyCost,
+    turnover: inventoryValue > 0 ? yearlyCost / inventoryValue : null,
+  };
+  return [total, ...rows];
+}
+
+function sum(values: number[]): number {
+  return values.reduce((a, b) => a + b, 0);
 }

@@ -10,6 +10,7 @@ from sheet_transform import (  # noqa: E402
     serial_to_iso,
     validate_day_columns,
     validate_times_used,
+    wears_outside_ownership,
 )
 
 HEADER = [
@@ -21,7 +22,7 @@ HEADER = [
 
 def make_rows():
     return [
-        HEADER,
+        list(HEADER),
         [],  # separator row
         ["Jackets and hoodies", "North Bend black vest", "", "Jackets_and_hoodies-006", "",
          50.0, 42917, "", 2, "Shell: 100% polyamide", 305, 4, 12.5, True, False, True],
@@ -73,6 +74,22 @@ def test_validate_day_columns():
     problems = validate_day_columns(parse_sheet(rows))
     assert len(problems) == 2
     assert problems[0].startswith("day column 0218-01-02 follows 2018-01-01")
+
+
+def test_skips_placeholders_and_rounds_prices():
+    rows = make_rows()
+    rows.append(["Shoes", "ADD NEXT", "", "Shoes-014", "", "", "", "", "", "", "", 0, ""])
+    rows[2][5] = 32.46835443037975
+    data = parse_sheet(rows)
+    assert "Shoes-014" not in [g.id for g in data.garments]
+    assert data.garments[0].price == 32.47
+
+
+def test_wears_outside_ownership():
+    data = parse_sheet(make_rows())
+    # Body warmer (purchased 2018-04-06) is worn on 2018-01-02, before its purchase date.
+    [problem] = wears_outside_ownership(data)
+    assert problem.startswith("Jackets_and_hoodies-008 (Suit Supply gray body warmer): 1 wears outside 2018-04-06")
 
 
 def test_missing_header():

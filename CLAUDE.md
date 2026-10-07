@@ -69,10 +69,12 @@ users/{uid}/public/summary  // precomputed data for public pages, world-readable
   `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
   if either check fails.
 - Is a **sync, not an insert**: garments and days not in the Sheet are deleted from Firestore.
-  ⚠️ So while the Sheet is the source of truth, anything logged via the app's LogDay page is
+- Skips "ADD NEXT" placeholder rows, rounds prices to whole cents, and warns about empty categories and
+  wears outside a garment's ownership period.
+  ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
   overwritten or removed by the next sync.
 
-First full sync: 2026-10-07 (649 garments, 3,192 days with wears, 31,514 wear events).
+Last full sync: 2026-10-08 (645 garments, 3,192 days with wears, 31,512 wear events).
 
 ## Source Google Sheet layout
 
@@ -98,17 +100,28 @@ continuing a few days into the future. Day cells are checkboxes (TRUE = garment 
 Read the Sheet with `UNFORMATTED_VALUE` + `SERIAL_NUMBER` dates (serial epoch 1899-12-30) to avoid
 Finnish locale formatting (`1.7.2017`, `50,00`).
 
-## Metrics (port from R; definitions to confirm against Threddit `02-`/`03-` scripts)
+## Metrics (ported from R: `03-Calculate_plot_data.R`)
 
-- Times used = timesUsedInit + days worn
-- Cost per wear = price / times used
-- Active on date d = purchased ≤ d and (divested empty or d < divested)
-- Active items / inventory value by category (over time)
-- Category frequency = share of days at least one item of the category was worn
-- Average cost per wear and average yearly cost by category
-- Daily cost, monthly cost and comparison to external consumption benchmarks
+Implemented in `web/src/lib/metrics.ts`. **Every metric takes a `DateRange {from, to}`**: users will be
+able to choose time spans, so nothing may assume "since 2018-01-01", and the client needs the per-day
+data rather than precomputed fixed-period totals. With `from = 2018-01-01` the results match R.
 
-Open questions about these are tracked in ROADMAP.md.
+- Ownership: from `max(purchased, 2018-01-01)` to `divested` **inclusive** (the divest day counts).
+  Wears outside ownership are ignored.
+- Times worn = wears in range (+ `timesUsedInit` if the range starts 2018-01-01).
+- Garment cost per wear = price / times worn; **an unworn garment costs its full price**.
+- Wears per month = times worn / (days owned / 30.5); days owned count from purchase, frozen at divest.
+- Category listing (the live site's portfolio table):
+  - Active items, Inventory value: garments active on `to`, and the sum of their prices.
+  - Cost per wear = Σ price of all garments owned during the range (incl. divested) / Σ their times worn.
+  - Days used = share of days from the category's first ownership day to `to` with ≥ 1 wear in the category.
+  - Yearly cost = cost per wear × 365 × days used.
+  - Inventory turnover = yearly cost / inventory value. Total row: sums, turnover = Σ yearly / Σ value.
+- Validation: `metrics.reference.test.ts` compares with the live site's tables in the git-ignored
+  `reference/` folder (snapshot date 2026-09-03; refresh `reference/sheet.json` with
+  `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors are listed in ROADMAP.md.
+
+Still to port: daily cost, monthly cost and the benchmark comparison (questions in ROADMAP.md).
 
 ## Commands
 

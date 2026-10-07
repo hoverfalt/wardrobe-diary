@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/firebase.ts","./src/main.tsx","./src/types.ts","./src/data/repo.ts","./src/lib/dates.ts","./src/lib/metrics.test.ts","./src/lib/metrics.ts","./src/pages/dashboard.tsx","./src/pages/logday.tsx","./vite.config.ts"],"version":"5.9.3"}

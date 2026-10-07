@@ -7,8 +7,10 @@ __pycache__/
 .pytest_cache/
 service-account*.json
 *-firebase-adminsdk-*.json
-reference/**/*.csv
+reference/*
+!reference/README.md
 tools/*.json
 .firebase/
 .DS_Store
 .claude/settings.local.json
+*.tsbuildinfo

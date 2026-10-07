@@ -20,6 +20,10 @@ button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent);
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td { font-weight: 600; }
+.range { display: flex; flex-wrap: wrap; gap: 12px; }
+.range input { margin-left: 6px; }
+section { overflow-x: auto; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; font-size: 13px; }
 .tile img { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }

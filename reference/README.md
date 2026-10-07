@@ -1,8 +1,10 @@
-# Reference outputs from the R pipeline
+# Reference data for validating the metrics
 
-Export the tables the Threddit R scripts produce (e.g. per-garment times used and cost per wear,
-per-category active items, inventory value, average cost per wear, daily and monthly cost) as CSV
-into this folder. Tests in `web/` compare the TypeScript metrics against them, which proves the port is correct.
+Everything in this folder except this README is git-ignored, since it contains personal data.
 
-CSV files here are git-ignored by default since they contain personal data; remove that line from
-`.gitignore` if you want them versioned.
+- `sheet.json`: the parsed Sheet, written by `tools/sync.sh --dump ../reference/sheet.json`.
+- `live/*.csv`: the tables published on wardrobediary.io by the old R pipeline (portfolio category
+  listing and the 13 category item listings), snapshot date 2026-09-03.
+
+`web/src/lib/metrics.reference.test.ts` compares the TypeScript metrics with these tables and is
+skipped when the files are missing.

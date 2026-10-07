@@ -18,7 +18,12 @@ import os
 import sys
 from pathlib import Path
 
-from sheet_transform import parse_sheet, validate_day_columns, validate_times_used
+from sheet_transform import (
+    parse_sheet,
+    validate_day_columns,
+    validate_times_used,
+    wears_outside_ownership,
+)
 
 BATCH_SIZE = 400
 
@@ -94,6 +99,12 @@ def main() -> int:
     if day_problems:
         print(f"\n{len(day_problems)} problems in the day column headers:")
         for line in day_problems:
+            print(f"  {line}")
+
+    outside = wears_outside_ownership(data)
+    if outside:
+        print(f"\n{len(outside)} garments have wears outside their ownership period (ignored by metrics):")
+        for line in outside:
             print(f"  {line}")
 
     problems = validate_times_used(data)
