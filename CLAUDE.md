@@ -24,7 +24,7 @@ live site, which must not be touched until cut-over.
 | Live site (do not deploy to) | Hosting site `threddit-297417` → wardrobediary.io |
 | New app | Hosting site `wardrobediary` → https://wardrobediary.web.app (deploy target `app`) |
 | Firestore | `(default)` database, Native mode (switched from empty Datastore mode), location `eur3` |
-| Storage bucket | `threddit-297417.appspot.com`: garment photos `<photoId>.png`, thumbnails `thumbs/<photoId>_112x112.png`, publicly readable. Shared with the live site; **never deploy `storage.rules`** without first matching the current live rules |
+| Storage bucket | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (always use these originals, not the `thumbs/` copies), publicly readable. Shared with the live site; **never deploy `storage.rules`** without first matching the current live rules |
 | Owner uid | `0q0I90W7W3RAcgFN1c1JX6pZupG3` |
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
