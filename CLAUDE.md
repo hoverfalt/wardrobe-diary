@@ -74,7 +74,7 @@ users/{uid}/public/summary  // precomputed data for public pages, world-readable
   ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
   overwritten or removed by the next sync.
 
-Last full sync: 2026-10-08 (632 garments, 3,192 days with wears, 31,512 wear events).
+Last full sync: 2026-10-08 (632 garments, 3,194 days with wears, 31,527 wear events).
 
 ## Source Google Sheet layout
 
