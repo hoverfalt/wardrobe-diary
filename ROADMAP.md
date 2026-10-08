@@ -30,7 +30,7 @@ _(empty)_
   Portfolio page (`portfolio.html`):
   - [x] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
         (share of days), Yearly cost, Inventory turnover; plus a Total row. On the signed-in Dashboard
-        with a from/to date range; matches the live site except where the live site is wrong (see R pipeline bugs)
+        with a from/to date range, category images and data bars (same colours and max logic); matches the live site except where the live site is wrong (see R pipeline bugs)
   - [ ] Active items by category (over time)
   - [ ] Inventory value by category (over time)
   - [ ] Total inventory value (over time, stacked)
