@@ -69,12 +69,12 @@ users/{uid}/public/summary  // precomputed data for public pages, world-readable
   `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
   if either check fails.
 - Is a **sync, not an insert**: garments and days not in the Sheet are deleted from Firestore.
-- Skips "ADD NEXT" placeholder rows, rounds prices to whole cents, and warns about empty categories and
-  wears outside a garment's ownership period.
+- Skips "ADD NEXT" placeholder rows and rows with an empty Category (both as in R), rounds prices to
+  whole cents, and warns about wears outside a garment's ownership period.
   ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
   overwritten or removed by the next sync.
 
-Last full sync: 2026-10-08 (645 garments, 3,192 days with wears, 31,512 wear events).
+Last full sync: 2026-10-08 (632 garments, 3,192 days with wears, 31,512 wear events).
 
 ## Source Google Sheet layout
 

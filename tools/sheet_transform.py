@@ -14,6 +14,7 @@ SHEETS_EPOCH = date(1899, 12, 30)
 TRACKING_START = "2018-01-01"
 
 # Placeholder rows in the Sheet for the next item to be added (the R pipeline skips them too).
+# Rows with an empty Category are skipped as well, also as in R.
 PLACEHOLDER_ITEM = "ADD NEXT"
 
 COLUMNS = {
@@ -133,11 +134,9 @@ def parse_sheet(rows: List[List[Any]]) -> SheetData:
 
     for r_i, row in enumerate(rows[header_idx + 1 :], start=header_idx + 2):
         item = _str(cell(row, col["item"]))
-        if not item or item.upper() == PLACEHOLDER_ITEM:
-            continue
         category = _str(cell(row, col["category"]))
-        if not category:
-            out.warnings.append(f"Row {r_i}: {item!r} has no Category")
+        if not item or not category or item.upper() == PLACEHOLDER_ITEM:
+            continue
         photo = _str(cell(row, col["photo"]))
         gid = photo or f"{slugify(category)}-{slugify(item)}"
         if not photo:

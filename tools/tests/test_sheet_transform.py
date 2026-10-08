@@ -79,9 +79,12 @@ def test_validate_day_columns():
 def test_skips_placeholders_and_rounds_prices():
     rows = make_rows()
     rows.append(["Shoes", "ADD NEXT", "", "Shoes-014", "", "", "", "", "", "", "", 0, ""])
+    rows.append(["", "Uncategorised socks", "", "Socks-100", "", 2.5, "", "", 0, "", "", 1, "", True])
     rows[2][5] = 32.46835443037975
     data = parse_sheet(rows)
     assert "Shoes-014" not in [g.id for g in data.garments]
+    assert "Socks-100" not in [g.id for g in data.garments]
+    assert "Socks-100" not in data.days["2018-01-01"]
     assert data.garments[0].price == 32.47
 
 

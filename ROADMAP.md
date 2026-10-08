@@ -13,8 +13,7 @@ How this file works:
 ## Where we left off (2026-10-08)
 
 - Category listing is done and live on the signed-in Dashboard (wardrobediary.web.app); the live site is untouched.
-- **Waiting for Olof:** D-1 (what public pages expose), D-2 (span semantics), Q-7 (blank Socks
-  categories in the Sheet), Q-8 (Boss Modern black 15/16 divest date), plus new remarks.
+- **Waiting for Olof:** D-1 (what public pages expose), D-2 (span semantics), Q-8 (Boss Modern black 15/16 divest date), plus new remarks.
 - **Next for Claude:** triage the new remarks into this file; after any Sheet fixes run
   `tools/sync.sh --write --dump ../reference/sheet.json`; continue R-09 with "Active items by category
   (over time)", the first chart (load the dataviz skill first; Observable Plot is the suggested library).
@@ -100,8 +99,6 @@ _(empty)_
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Data source of the external consumption benchmarks in the monthly comparison
   (R reads a "Comparison" tab from the Sheet).
-- **Q-7** 13 Socks rows have an empty Category cell in the Sheet (`Socks-100`…`107`, `Socks-142`…`146`).
-  R dropped them; the app shows them as "Uncategorised". Fix: fill in "Socks" in the Sheet.
 - **Q-8** 15 garments have wears outside their purchase-to-divest period; the metrics ignore those wears
   (as R did), and `tools/sync.sh` lists them. Mostly single wears just after the divest date, but
   *Boss Modern black 15* and *16* have about 60 wears each after a divest date of 2023-05-05,
@@ -115,6 +112,9 @@ _(empty)_
   item table.
 
 ## Decisions made
+
+- **2026-10-08** Sheet rows with an empty Category are skipped by the sync, like "ADD NEXT" rows and as
+  in R (was Q-7: 13 Socks rows, `Socks-100`…`107` and `Socks-142`…`146`).
 
 - **2026-10-08** Metrics must work for any user-chosen time span, not just "since 2018-01-01". All metric
   functions take a date range; the per-day data stays available to the client rather than being

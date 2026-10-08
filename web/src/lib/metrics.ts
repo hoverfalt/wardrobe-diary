@@ -31,12 +31,6 @@ export const CATEGORY_ORDER = [
   "Underwear boxers",
   "Sportswear",
 ];
-export const UNCATEGORISED = "Uncategorised";
-
-export function categoryOf(g: Garment): string {
-  return g.category || UNCATEGORISED;
-}
-
 export function compareCategories(a: string, b: string): number {
   const ia = CATEGORY_ORDER.indexOf(a);
   const ib = CATEGORY_ORDER.indexOf(b);
@@ -137,7 +131,7 @@ export function itemListing(garments: Garment[], days: Day[], range: DateRange):
       const owned = daysOwned(g, range);
       return {
         garment: g,
-        category: categoryOf(g),
+        category: g.category,
         timesWorn: n,
         costPerWear: costPerWear(g, wears, range),
         wearsPerMonth: owned > 0 ? n / (owned / 30.5) : 0,
@@ -169,7 +163,7 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
   const byCategory = new Map<string, Garment[]>();
   for (const g of garments) {
     if (!ownedDuring(g, range)) continue;
-    const c = categoryOf(g);
+    const c = g.category;
     byCategory.set(c, [...(byCategory.get(c) ?? []), g]);
   }
 
