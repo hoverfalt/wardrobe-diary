@@ -31,11 +31,12 @@ th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line
 tr.total td { font-weight: 600; }
 th.num { text-align: right; }
 td.img { width: 28px; padding: 2px 4px; }
-.category-image { display: block; width: 28px; height: 28px; transition: transform 0.15s; transform-origin: left center; }
+.category-image { display: block; width: 28px; height: 28px; transition: transform 0.15s; }
 .category-image:hover { transform: scale(4); position: relative; z-index: 1; }
+/* Scroll wide tables only on narrow screens: a scroll container would clip the hover zoom. */
+@media (max-width: 760px) { .table-wrap { overflow-x: auto; } }
 .range { display: flex; flex-wrap: wrap; gap: 12px; }
 .range input { margin-left: 6px; }
-section { overflow-x: auto; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; font-size: 13px; }
 .tile img { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }

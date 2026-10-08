@@ -61,33 +61,35 @@ export function Dashboard({ uid }: { uid: string }) {
           Ranges starting after {TRACKING_START} are provisional: only wears inside the range count.
         </p>
       )}
-      <table>
-        <thead>
-          <tr>
-            <th aria-label="Image" />
-            <th>Category</th>
-            {COLUMNS.map((c) => (
-              <th key={c.key} className="num">{c.title}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => {
-            const img = r.category === "Total" ? null : categoryImageUrl(r.category);
-            return (
-              <tr key={r.category} className={r.category === "Total" ? "total" : undefined}>
-                <td className="img">{img && <img className="category-image" src={img} alt="" />}</td>
-                <td>{r.category}</td>
-                {COLUMNS.map((c) => (
-                  <td key={c.key} className="num" style={barStyle(r[c.key], maxima[c.key], c.bar)}>
-                    {c.format(r[c.key])}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th aria-label="Image" />
+              <th>Category</th>
+              {COLUMNS.map((c) => (
+                <th key={c.key} className="num">{c.title}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => {
+              const img = r.category === "Total" ? null : categoryImageUrl(r.category);
+              return (
+                <tr key={r.category} className={r.category === "Total" ? "total" : undefined}>
+                  <td className="img">{img && <img className="category-image" src={img} alt="" />}</td>
+                  <td>{r.category}</td>
+                  {COLUMNS.map((c) => (
+                    <td key={c.key} className="num" style={barStyle(r[c.key], maxima[c.key], c.bar)}>
+                      {c.format(r[c.key])}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
