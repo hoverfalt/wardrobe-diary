@@ -6,6 +6,7 @@
 // (see ROADMAP D-2): wears are counted inside the range only, and "Times used init" (wears before
 // tracking began) counts only when the range starts at TRACKING_START.
 import type { Day, Garment, IsoDate } from "../types";
+import { compareCategories } from "./categories";
 
 export const TRACKING_START: IsoDate = "2018-01-01";
 const FOREVER: IsoDate = "9999-12-31";
@@ -13,30 +14,6 @@ const FOREVER: IsoDate = "9999-12-31";
 export interface DateRange {
   from: IsoDate;
   to: IsoDate;
-}
-
-/** Category order used on the live site; categories not listed here sort after, alphabetically. */
-export const CATEGORY_ORDER = [
-  "Jackets and hoodies",
-  "Blazers and vests",
-  "Knits",
-  "Shirts",
-  "T-shirts and tanks",
-  "Pants",
-  "Shorts",
-  "Belts",
-  "Socks",
-  "Shoes",
-  "Underwear shirts",
-  "Underwear boxers",
-  "Sportswear",
-];
-export function compareCategories(a: string, b: string): number {
-  const ia = CATEGORY_ORDER.indexOf(a);
-  const ib = CATEGORY_ORDER.indexOf(b);
-  if (ia >= 0 && ib >= 0) return ia - ib;
-  if (ia >= 0 || ib >= 0) return ia >= 0 ? -1 : 1;
-  return a.localeCompare(b);
 }
 
 const max = (a: IsoDate, b: IsoDate) => (a > b ? a : b);

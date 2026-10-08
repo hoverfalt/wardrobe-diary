@@ -140,6 +140,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 
 - Dates are ISO strings `YYYY-MM-DD` everywhere (no timezones).
 - Metric logic lives in pure functions in `web/src/lib/metrics.ts`, with tests.
+- Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),
+  never alphabetically: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants,
+  Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear.
 - Never commit `.env.local` or service-account JSON.
 - Git: run `git add`, `git commit` and `git push` as separate commands (not chained with `&&`); the local
   permission rules in `.claude/settings.local.json` allow commit, push and `tools/sync.sh` only individually.

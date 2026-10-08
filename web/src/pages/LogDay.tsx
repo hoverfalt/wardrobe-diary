@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { setWorn, useDays, useGarments } from "../data/repo";
 import { photoUrl } from "../firebase";
 import { formatFi, todayIso } from "../lib/dates";
+import { compareCategories } from "../lib/categories";
 import { isActive } from "../lib/metrics";
 import type { Garment } from "../types";
 
@@ -17,7 +18,7 @@ export function LogDay({ uid }: { uid: string }) {
       if (!isActive(g, date)) continue;
       map.set(g.category, [...(map.get(g.category) ?? []), g]);
     }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+    return [...map.entries()].sort(([a], [b]) => compareCategories(a, b));
   }, [garments, date]);
 
   if (!garments || !days) return <p>Loading…</p>;
