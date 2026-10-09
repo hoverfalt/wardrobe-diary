@@ -3,6 +3,7 @@ import type { Day, Garment } from "../types";
 import {
   activeItemsOverTime,
   dailyCost,
+  divestedAverages,
   rollingMean,
   quantile,
   inventoryValueOverTime,
@@ -203,5 +204,31 @@ describe("quantile", () => {
     expect(quantile(v, 0.32)).toBeCloseTo(2.28);
     expect(quantile(v, 0.95)).toBeCloseTo(8.8);
     expect(quantile([], 0.5)).toBeNull();
+  });
+});
+
+describe("itemListing as of a date", () => {
+  const shirt = garment({ id: "shirt", category: "Shirts", price: 30, divested: "2018-01-03" });
+  const days: Day[] = [
+    { date: "2018-01-01", worn: ["shirt"] },
+    { date: "2018-01-02", worn: ["shirt"] },
+    { date: "2018-01-03", worn: ["shirt"] },
+  ];
+  const range = { from: "2018-01-01", to: "2018-01-31" };
+
+  it("uses only wears up to asOf and is active until divested", () => {
+    const [then] = itemListing([shirt], days, range, "2018-01-02");
+    expect([then.timesWorn, then.lifetimeWears, then.costPerWear, then.active]).toEqual([2, 2, 15, true]);
+    const [now] = itemListing([shirt], days, range);
+    expect([now.timesWorn, now.lifetimeWears, now.costPerWear, now.active]).toEqual([3, 3, 10, false]);
+  });
+
+  it("averages divested items owned at least 30 days", () => {
+    const long = garment({ id: "long", price: 100, purchased: "2018-01-01", divested: "2018-03-01" });
+    const longDays: Day[] = Array.from({ length: 10 }, (_, i) => ({ date: `2018-01-${String(i + 1).padStart(2, "0")}`, worn: ["long"] }));
+    const rows = itemListing([long, shirt], longDays, { from: "2018-01-01", to: "2018-12-31" });
+    const avg = divestedAverages(rows)!; // shirt (3 days owned) left out
+    expect(avg.costPerWear).toBe(10);
+    expect(avg.wearsPerMonth).toBeCloseTo((10 / 60) * 30.5);
   });
 });

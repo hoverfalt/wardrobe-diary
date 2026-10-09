@@ -17,8 +17,9 @@ How this file works:
 - Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
 - Portfolio page rebuilt except "Monthly cost and comparison", postponed until the comparison data is in
   the Sheet (Q-4, waiting for Olof).
-- Category pages started: Jackets and hoodies has the item table and the Times worn chart, for review.
-- **Next for Claude:** refine the category page from Olof's feedback, then the remaining category charts.
+- All 13 category pages are complete (table + 6 charts), generic, reviewed on Jackets and hoodies.
+- Remaining from the live site: monthly cost comparison (Q-4, waiting for Olof) and the static front/info
+  pages (with R-16).
 
 ## Inbox
 
@@ -55,11 +56,12 @@ _(empty)_
         active first, then by times worn), item photos
   - [x] Times worn per item: one row per item (no overlapping photos), divested items' 5–95 % and
         32–68 % bands
-  - [ ] Cost per wear and times worn
-  - [ ] Cost per wear and frequency of use
-  - [ ] Times worn, animated by date
-  - [ ] Cost per wear and frequency of use, animated by date
-  - [ ] Daily cost for the category
+  - [x] Cost per wear and times worn: photos, grey trails (price / n per item), blue price guides
+  - [x] Cost per wear and frequency of use: divested items' averages as dotted lines (matches the live
+        site: jackets 1.9 wears/month, 1.36 €/wear)
+  - [x] Times worn, animated by date: "as of" player; rows keep their spacing
+  - [x] Cost per wear and frequency of use, animated by date: fixed scales while playing
+  - [x] Daily cost for the category: scale fitted to the category
 
   Other pages: front page (`index.html`, text, press links, images) and `track_your_wardrobe.html`
   (text). They are static content: port as-is when doing R-16.

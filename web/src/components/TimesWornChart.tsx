@@ -29,7 +29,13 @@ export function divestedBands(rows: ItemRow[]) {
       ];
 }
 
-export function TimesWornChart({ rows }: { rows: ItemRow[] }) {
+export function TimesWornChart({ rows, minRows = 0, xMax }: {
+  rows: ItemRow[];
+  /** Keep at least this many rows of height (stops the animation from resizing as items appear). */
+  minRows?: number;
+  /** Fixed scale maximum (the animation keeps the final scale). */
+  xMax?: number;
+}) {
   const ordered = useMemo(() => timesWornOrder(rows), [rows]);
   const bands = useMemo(() => divestedBands(rows), [rows]);
   const options = useCallback(
@@ -42,23 +48,26 @@ export function TimesWornChart({ rows }: { rows: ItemRow[] }) {
         src: photoUrl(r.garment.photo) ?? "",
       }));
       const r = ROW / 2 - 2;
-      const labels = bands.flatMap((b) => [b.x1, b.x2]).map((v) => ({ v, text: String(Math.round(v)) }));
+      // Outer band (90 %) labels on the upper line, inner band (36 %) labels below, so they can't collide.
+      const labels = bands.flatMap((b, i) => [b.x1, b.x2].map((v) => ({ v, text: String(Math.round(v)), dy: i === 0 ? -22 : -8 })));
       return {
         width,
-        height: data.length * ROW + 60,
+        height: Math.max(data.length, minRows) * ROW + 70,
         marginLeft: names ? 220 : 8,
         marginRight: r + 12,
-        marginTop: 24,
+        marginTop: 34,
         x: {
           label: "Times worn",
           labelAnchor: "right",
           grid: true,
           nice: true,
-          domain: [0, Math.max(1, ...data.map((d) => d.timesWorn))],
+          domain: [0, xMax ?? Math.max(1, ...data.map((d) => d.timesWorn))],
           tickFormat: (v: number) => FI.format(v),
         },
         y: {
           domain: data.map((d) => d.id),
+          // Fixed row height: in the animation, rows keep their spacing and free space stays below.
+          range: [34, 34 + data.length * ROW],
           label: null,
           axis: names ? "left" : null,
           tickFormat: (id: string) => {
@@ -69,7 +78,8 @@ export function TimesWornChart({ rows }: { rows: ItemRow[] }) {
         },
         marks: [
           Plot.rectX(bands, { x1: "x1", x2: "x2", fill: DIVESTED, fillOpacity: 0.12 }),
-          Plot.text(labels, { x: "v", text: "text", frameAnchor: "top", dy: -14, fill: DIVESTED, fontWeight: 600 }),
+          Plot.text(labels.filter((l) => l.dy === -22), { x: "v", text: "text", frameAnchor: "top", dy: -22, fill: DIVESTED, fontWeight: 600 }),
+          Plot.text(labels.filter((l) => l.dy === -8), { x: "v", text: "text", frameAnchor: "top", dy: -8, fill: DIVESTED, fontWeight: 600 }),
           Plot.ruleY(data, {
             y: "id",
             x1: 0,
@@ -92,7 +102,7 @@ export function TimesWornChart({ rows }: { rows: ItemRow[] }) {
         ],
       };
     },
-    [ordered, bands],
+    [ordered, bands, minRows, xMax],
   );
   if (rows.length === 0) return null;
   return (

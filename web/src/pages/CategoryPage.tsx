@@ -1,6 +1,9 @@
 // One page per category (live site: jackets.html etc.): item listing and charts per item.
 import { useMemo, type ReactNode } from "react";
 import { formatEur2 } from "../components/CategoryCharts";
+import { CostVsFrequencyAnimation, TimesWornAnimation } from "../components/CategoryAnimations";
+import { DailyCostChart } from "../components/DailyCostCharts";
+import { CostVsFrequencyChart, CostVsWearsChart } from "../components/ItemCharts";
 import { TimesWornChart } from "../components/TimesWornChart";
 import { categoryImageUrl, photoUrl } from "../firebase";
 import { categoryFromSlug } from "../lib/categories";
@@ -29,14 +32,17 @@ export function CategoryPage({
   rangeControl: ReactNode;
 }) {
   const category = categoryFromSlug(slug);
+  const garments = useMemo(
+    () => (wardrobe && category ? wardrobe.garments.filter((g) => g.category === category) : []),
+    [wardrobe, category],
+  );
   const rows = useMemo(() => {
     if (!wardrobe || !category) return [];
-    const garments = wardrobe.garments.filter((g) => g.category === category);
     // As on the live site: active items first, then by times worn.
     return itemListing(garments, wardrobe.days, range).sort(
       (a, b) => Number(b.active) - Number(a.active) || b.timesWorn - a.timesWorn,
     );
-  }, [wardrobe, category, range]);
+  }, [wardrobe, category, garments, range]);
   const maxima = useMemo(() => COLUMNS.map((c) => barMax(rows.map(c.value))), [rows]);
 
   const back = (
@@ -97,6 +103,42 @@ export function CategoryPage({
         details.
       </p>
       <TimesWornChart rows={rows} />
+      {rangeControl}
+
+      <h3>Cost per wear and times worn</h3>
+      <p className="muted">
+        Each item at its total times worn and current cost per wear (log scale). The grey trail behind an item
+        shows how its cost per wear fell with every wear; the blue guides show the same for set prices.
+      </p>
+      <CostVsWearsChart rows={rows} />
+      {rangeControl}
+
+      <h3>Cost per wear and frequency of use</h3>
+      <p className="muted">
+        Cost per wear (log scale) against how often the item is worn. The dotted lines mark the divested
+        items' averages (items owned at least 30 days).
+      </p>
+      <CostVsFrequencyChart rows={rows} />
+      {rangeControl}
+
+      <h3>Times worn – animated by date</h3>
+      <p className="muted">Times worn as of the chosen date. Press play to watch the items being worn.</p>
+      <TimesWornAnimation garments={garments} days={wardrobe.days} range={range} />
+      {rangeControl}
+
+      <h3>Cost per wear and frequency of use – animated by date</h3>
+      <p className="muted">
+        Cost per wear and frequency of use as of the chosen date, counting only the wears logged by then.
+      </p>
+      <CostVsFrequencyAnimation garments={garments} days={wardrobe.days} range={range} />
+      {rangeControl}
+
+      <h3>Daily cost</h3>
+      <p className="muted">
+        Daily cost of the {category.toLowerCase()} used on a particular day: the sum of their cost per wear.
+        “All divested” means the daily cost is final and no longer decreases with future use.
+      </p>
+      <DailyCostChart garments={garments} days={wardrobe.days} range={range} yMax="auto" />
       {rangeControl}
     </section>
   );

@@ -1,14 +1,16 @@
 // "Daily cost" (R: calculate_daily_cost / setup_daily_cost_plot) and its animated version, where an
 // "as of" date replays how the daily costs looked when only the wears up to that date were known.
 import * as Plot from "@observablehq/plot";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { addDays, dayIndex, formatFi } from "../lib/dates";
+import { useCallback, useMemo } from "react";
+import { formatFi } from "../lib/dates";
+import { useAsOf } from "./AsOfControl";
 import { dailyCost, type DailyCostPoint, type DateRange } from "../lib/metrics";
 import type { Day, Garment } from "../types";
 import { formatEur2 } from "./CategoryCharts";
 import { PlotFigure } from "./PlotFigure";
 
-// As on the live site: a fixed 0–40 € scale (so the animation doesn't jump), summers shaded.
+// As on the live site: a fixed 0–40 € scale on the portfolio page (so the animation doesn't jump),
+// summers shaded. Category pages size the scale to the category (R hard-coded one per category).
 const Y_MAX = 40;
 const STILL_DECREASING = "#E8615F"; // live site: indianred1
 const FINAL = "#3CB371"; // live site: mediumseagreen
@@ -27,7 +29,15 @@ function summers(range: DateRange) {
   return out;
 }
 
-function chartOptions(points: DailyCostPoint[], range: DateRange, width: number): Plot.PlotOptions {
+/** A round scale maximum covering 99 % of the days. */
+export function autoYMax(points: DailyCostPoint[]): number {
+  const sorted = points.map((p) => p.cost).sort((a, b) => a - b);
+  const p99 = sorted[Math.floor(sorted.length * 0.99)] ?? 1;
+  const step = p99 > 20 ? 10 : p99 > 5 ? 2 : p99 > 2 ? 1 : 0.5;
+  return Math.max(step, Math.ceil(p99 / step) * step);
+}
+
+function chartOptions(points: DailyCostPoint[], range: DateRange, width: number, yMax: number): Plot.PlotOptions {
   const data = points.map((p) => ({ ...p, x: utc(p.date) }));
   const pending = data.filter((d) => !d.final);
   const final = data.filter((d) => d.final);
@@ -38,7 +48,7 @@ function chartOptions(points: DailyCostPoint[], range: DateRange, width: number)
     marginLeft: 44,
     clip: true,
     x: { type: "utc", domain: [utc(range.from), utc(range.to)], label: null },
-    y: { domain: [0, Y_MAX], label: null, grid: true, tickFormat: (v: number) => `${v} €` },
+    y: { domain: [0, yMax], label: null, grid: true, tickFormat: (v: number) => `${String(v).replace(".", ",")} €` },
     marks: [
       Plot.rectX(summers(range), { x1: "x1", x2: "x2", fill: "#f5d76e", fillOpacity: 0.15 }),
       // Secondary encoding besides colour: still-decreasing days hollow, final days filled.
@@ -77,82 +87,53 @@ function Legend() {
   );
 }
 
-function Clipped({ points }: { points: DailyCostPoint[] }) {
-  const n = points.filter((p) => p.cost > Y_MAX).length;
+function Clipped({ points, yMax }: { points: DailyCostPoint[]; yMax: number }) {
+  const n = points.filter((p) => p.cost > yMax).length;
   return n > 0 ? (
     <p className="muted">
-      {n} {n === 1 ? "day" : "days"} above {Y_MAX} € not shown (the scale is fixed at {Y_MAX} €, as on wardrobediary.io).
+      {n} {n === 1 ? "day" : "days"} above {String(yMax).replace(".", ",")} € not shown, to keep the typical days readable.
     </p>
   ) : null;
 }
 
 /** Daily cost over the range, with lifetime cost per wear (D-2). */
-export function DailyCostChart({ garments, days, range }: { garments: Garment[]; days: Day[]; range: DateRange }) {
+export function DailyCostChart({
+  garments,
+  days,
+  range,
+  yMax = Y_MAX,
+}: {
+  garments: Garment[];
+  days: Day[];
+  range: DateRange;
+  /** Scale maximum in €, or "auto" to fit the data (category pages). */
+  yMax?: number | "auto";
+}) {
   const points = useMemo(() => dailyCost(garments, days, range), [garments, days, range]);
-  const options = useCallback((width: number) => chartOptions(points, range, width), [points, range]);
+  const max = yMax === "auto" ? autoYMax(points) : yMax;
+  const options = useCallback((width: number) => chartOptions(points, range, width, max), [points, range, max]);
   return (
     <figure className="chart">
       <Legend />
       <PlotFigure options={options} />
-      <Clipped points={points} />
+      <Clipped points={points} yMax={max} />
     </figure>
   );
 }
 
-const STEP_DAYS = 7;
-const FRAME_MS = 60;
-
 /** Daily cost "as of" a date: drag the slider or press play to watch the costs of past days fall as
  *  the garments worn on them get more use (the live site's animated GIF, made interactive). */
 export function DailyCostAnimation({ garments, days, range }: { garments: Garment[]; days: Day[]; range: DateRange }) {
-  const span = Math.max(0, dayIndex(range.from, range.to));
-  const [step, setStep] = useState(span);
-  const [playing, setPlaying] = useState(false);
-  const at = Math.min(step, span);
-  const asOf = addDays(range.from, at);
-
-  useEffect(() => setStep((s) => Math.min(s, span)), [span]);
-  useEffect(() => {
-    if (!playing) return;
-    const timer = setInterval(() => {
-      setStep((s) => {
-        if (s >= span) {
-          setPlaying(false);
-          return span;
-        }
-        return Math.min(span, s + STEP_DAYS);
-      });
-    }, FRAME_MS);
-    return () => clearInterval(timer);
-  }, [playing, span]);
-
+  const { asOf, control } = useAsOf(range);
   const points = useMemo(
     () => dailyCost(garments, days, range, asOf),
     [garments, days, range, asOf],
   );
-  const options = useCallback((width: number) => chartOptions(points, range, width), [points, range]);
+  const options = useCallback((width: number) => chartOptions(points, range, width, Y_MAX), [points, range]);
 
   return (
     <figure className="chart">
-      <div className="as-of">
-        <button
-          onClick={() => {
-            if (!playing && at >= span) setStep(0);
-            setPlaying(!playing);
-          }}
-          aria-label={playing ? "Pause" : "Play"}
-        >
-          {playing ? "❚❚ Pause" : "▶ Play"}
-        </button>
-        <label>
-          As of <strong>{formatFi(asOf)}</strong>
-          <input type="range" min={0} max={span} value={at} aria-valuetext={formatFi(asOf)}
-            onChange={(e) => {
-              setPlaying(false);
-              setStep(Number(e.target.value));
-            }} />
-        </label>
-      </div>
+      {control}
       <Legend />
       <PlotFigure options={options} />
     </figure>

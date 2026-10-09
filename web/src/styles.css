@@ -83,6 +83,7 @@ td.img { width: 28px; padding: 2px 4px; }
 .chart-legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .chart-legend .dot.hollow { border: 1.5px solid; background: none; width: 6px; height: 6px; }
 .chart-legend .line { width: 16px; height: 2px; display: inline-block; }
+.chart-legend .line.dotted { height: 0; background: none; border-top: 2px dotted; }
 .chart-legend .box { width: 12px; height: 10px; display: inline-block; background: rgba(245, 215, 110, 0.35); }
 .as-of { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
 .as-of label { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 240px; }

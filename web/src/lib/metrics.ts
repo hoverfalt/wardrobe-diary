@@ -98,31 +98,55 @@ export function daysOwned(g: Garment, range: DateRange): number {
 export interface ItemRow {
   garment: Garment;
   category: string;
+  /** Wears in the range (+ pre-tracking wears when the range starts at TRACKING_START). */
   timesWorn: number;
+  /** All wears over the garment's whole ownership, as known on `asOf` (default: all logged wears). */
+  lifetimeWears: number;
+  /** Price / lifetimeWears (D-2); the full price if unworn. */
   costPerWear: number | null;
   wearsPerMonth: number;
   monthsOwned: number;
   active: boolean;
 }
 
-/** Per-garment listing (category pages): garments owned at any point in the range. */
-export function itemListing(garments: Garment[], days: Day[], range: DateRange): ItemRow[] {
+/** Per-garment listing (category pages): garments owned at any point in the range.
+ *
+ *  With `asOf`, everything is as it was known on that date (for the animations): the range ends at
+ *  `asOf` at the latest, cost per wear counts only wears up to then, and "active" means not yet divested. */
+export function itemListing(garments: Garment[], days: Day[], range: DateRange, asOf: IsoDate = FOREVER): ItemRow[] {
   const wears = wearIndex(days);
+  const r: DateRange = { from: range.from, to: min(range.to, asOf) };
+  const known: DateRange = { from: TRACKING_START, to: asOf };
   return garments
-    .filter((g) => ownedDuring(g, range))
+    .filter((g) => ownedDuring(g, r))
     .map((g) => {
-      const n = timesWorn(g, wears, range);
-      const owned = daysOwned(g, range);
+      const n = timesWorn(g, wears, r);
+      const lifetime = timesWorn(g, wears, known);
+      const owned = daysOwned(g, r);
       return {
         garment: g,
         category: g.category,
         timesWorn: n,
-        costPerWear: costPerWear(g, wears),
+        lifetimeWears: lifetime,
+        costPerWear: g.price == null ? null : lifetime === 0 ? g.price : g.price / lifetime,
         wearsPerMonth: owned > 0 ? n / (owned / 30.5) : 0,
         monthsOwned: owned / 30.5,
-        active: isActive(g, range.to),
+        active: isActive(g, r.to),
       };
     });
+}
+
+/** Averages over divested garments owned ≥ 30 days (R: avg_*_divested): wears per month (Σ wears /
+ *  Σ days owned × 30.5) and use-weighted cost per wear (Σ cost per wear × wears / Σ wears). */
+export function divestedAverages(rows: ItemRow[]): { wearsPerMonth: number; costPerWear: number } | null {
+  const divested = rows.filter((r) => !r.active && r.monthsOwned * 30.5 >= 30 && r.costPerWear != null);
+  const wears = divested.reduce((s, r) => s + r.timesWorn, 0);
+  const days = divested.reduce((s, r) => s + r.monthsOwned * 30.5, 0);
+  if (divested.length === 0 || wears === 0 || days === 0) return null;
+  return {
+    wearsPerMonth: (wears / days) * 30.5,
+    costPerWear: divested.reduce((s, r) => s + r.costPerWear! * r.timesWorn, 0) / wears,
+  };
 }
 
 export interface CategoryRow {
