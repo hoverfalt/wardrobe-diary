@@ -8,6 +8,9 @@ describe("routes", () => {
     expect(parseRoute("/log")).toEqual({ page: "log" });
     expect(parseRoute("/category/jackets-and-hoodies")).toEqual({ page: "category", slug: "jackets-and-hoodies" });
     expect(routePath({ page: "category", slug: "socks" })).toBe("/category/socks");
+    expect(parseRoute("/manage")).toEqual({ page: "manage" });
+    expect(parseRoute("/manage/Socks-012")).toEqual({ page: "manage", id: "Socks-012" });
+    expect(routePath({ page: "manage", id: "Socks-012" })).toBe("/manage/Socks-012");
   });
 
   it("maps categories to slugs and back", () => {

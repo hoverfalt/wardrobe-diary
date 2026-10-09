@@ -1,0 +1,173 @@
+// Edit one garment (R-27 phase a, owner only). Details are stored in Firestore (D-4); every save keeps
+// the previous version in the garment's history, which can be restored into the form.
+import { useEffect, useMemo, useState } from "react";
+import { formatEur2 } from "../components/CategoryCharts";
+import { Link } from "../components/Link";
+import { saveGarment, useGarment, useGarmentHistory } from "../data/repo";
+import { photoUrl } from "../firebase";
+import { CATEGORY_ORDER } from "../lib/categories";
+import { formatFi, todayIso } from "../lib/dates";
+import { changedFields, parseGarmentForm, toForm, type FormErrors, type GarmentForm } from "../lib/garmentForm";
+import { itemListing, TRACKING_START } from "../lib/metrics";
+import type { Wardrobe } from "../lib/publicData";
+
+const LABELS: Record<keyof GarmentForm | "photo", string> = {
+  category: "Category",
+  item: "Name",
+  details: "Details",
+  photo: "Photo",
+  price: "Price (€)",
+  purchased: "Purchased",
+  divested: "Divested",
+  timesUsedInit: "Times used before tracking",
+  materials: "Materials",
+  weightG: "Weight (g)",
+};
+
+export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string; wardrobe: Wardrobe | null }) {
+  const stored = useGarment(uid, id);
+  const history = useGarmentHistory(uid, id);
+  const [form, setForm] = useState<GarmentForm | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  // Fill the form once the stored garment has loaded (and again after navigating to another garment).
+  useEffect(() => setForm(null), [id]);
+  useEffect(() => {
+    if (stored && form === null) setForm(toForm(stored));
+  }, [stored, form]);
+
+  const stats = useMemo(() => {
+    if (!wardrobe) return null;
+    const g = wardrobe.garments.find((x) => x.id === id);
+    if (!g) return null;
+    const [row] = itemListing([g], wardrobe.days, { from: TRACKING_START, to: todayIso() });
+    return row ?? null;
+  }, [wardrobe, id]);
+
+  if (stored === undefined || (stored && !form)) return <p>Loading…</p>;
+  const back = <Link to={{ page: "manage" }}>← All garments</Link>;
+  if (stored === null || !form) return <section>{back}<p>No garment with id {id}.</p></section>;
+
+  const parsed = parseGarmentForm(form, stored.photo);
+  const dirty = parsed.ok ? changedFields(stored, parsed.fields).length > 0 : true;
+  const set = (k: keyof GarmentForm) => (e: { target: { value: string } }) => {
+    setForm({ ...form, [k]: e.target.value });
+    setStatus("idle");
+  };
+
+  async function save() {
+    const r = parseGarmentForm(form!, stored!.photo);
+    if (!r.ok) {
+      setErrors(r.errors);
+      return;
+    }
+    setErrors({});
+    setStatus("saving");
+    try {
+      await saveGarment(uid, id, r.fields);
+      setForm(toForm(r.fields));
+      setStatus("saved");
+    } catch (e) {
+      setStatus("error");
+      setMessage(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  const field = (k: keyof GarmentForm, input: React.ReactNode, hint?: string) => (
+    <label className={errors[k] ? "field invalid" : "field"}>
+      <span>{LABELS[k]}</span>
+      {input}
+      {errors[k] ? <small className="error">{errors[k]}</small> : hint ? <small className="muted">{hint}</small> : null}
+    </label>
+  );
+  const src = photoUrl(stored.photo);
+
+  return (
+    <section className="edit">
+      {back}
+      <div className="edit-head">
+        {src && <img src={src} alt="" />}
+        <div>
+          <h2>{stored.item}</h2>
+          <p className="muted">
+            {id}
+            {stats && <> · worn {stats.lifetimeWears} times · {stats.costPerWear == null ? "–" : formatEur2(stats.costPerWear)} per wear</>}
+          </p>
+        </div>
+      </div>
+
+      <form
+        className="garment-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void save();
+        }}
+      >
+        {field("category",
+          <select value={form.category} onChange={set("category")}>
+            {!CATEGORY_ORDER.includes(form.category) && <option value={form.category}>{form.category || "—"}</option>}
+            {CATEGORY_ORDER.map((c) => <option key={c}>{c}</option>)}
+          </select>)}
+        {field("item", <input value={form.item} onChange={set("item")} />)}
+        {field("details", <input value={form.details} onChange={set("details")} />, "Size, model code, etc.")}
+        {field("price", <input inputMode="decimal" value={form.price} onChange={set("price")} />)}
+        {field("purchased", <input type="date" value={form.purchased} onChange={set("purchased")} />)}
+        {field("divested",
+          <div className="row">
+            <input type="date" value={form.divested} onChange={set("divested")} />
+            {form.divested ? (
+              <button type="button" onClick={() => setForm({ ...form, divested: "" })}>Undo divest</button>
+            ) : (
+              <button type="button" onClick={() => setForm({ ...form, divested: todayIso() })}>Divest today</button>
+            )}
+          </div>,
+          "Empty = still active. The divest day still counts as owned.")}
+        {field("timesUsedInit", <input inputMode="numeric" value={form.timesUsedInit} onChange={set("timesUsedInit")} />, "Wears before tracking began on 1.1.2018.")}
+        {field("materials", <input value={form.materials} onChange={set("materials")} />)}
+        {field("weightG", <input inputMode="decimal" value={form.weightG} onChange={set("weightG")} />)}
+
+        <div className="actions">
+          <button type="submit" className="primary" disabled={!dirty || status === "saving"}>
+            {status === "saving" ? "Saving…" : "Save"}
+          </button>
+          <button type="button" disabled={!dirty} onClick={() => { setForm(toForm(stored)); setErrors({}); }}>
+            Discard changes
+          </button>
+          {status === "saved" && !dirty && <span className="ok">Saved. Public pages are updated.</span>}
+          {status === "error" && <span className="error">Saving failed: {message}</span>}
+        </div>
+      </form>
+
+      <h3>History</h3>
+      {history === null ? (
+        <p className="muted">Loading…</p>
+      ) : history.length === 0 ? (
+        <p className="muted">No changes made in the app yet.</p>
+      ) : (
+        <ul className="history">
+          {history.map((h) => (
+            <li key={h.id}>
+              <span>{h.savedAt ? h.savedAt.toLocaleString("fi-FI") : "just now"}</span>
+              <span className="muted">
+                {changedFields(h.before, h.after)
+                  .map((k) => `${LABELS[k]}: ${show(h.before[k])} → ${show(h.after[k])}`)
+                  .join("; ") || "no changes"}
+              </span>
+              <button type="button" onClick={() => { setForm(toForm(h.before)); setStatus("idle"); }}>
+                Restore previous values
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function show(v: unknown): string {
+  if (v == null || v === "") return "—";
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return formatFi(v);
+  return String(v);
+}

@@ -12,8 +12,9 @@ session; update it when work is finished, started, or newly identified (see its 
 Replace "Google Sheet → R scripts → static PNG/GIF on Firebase Hosting" with:
 data entry, storage, tables and charts all live in one Firebase-backed web app.
 
-**Current phase:** the Google Sheet stays the source of truth for data entry. `tools/sync.sh --write`
-copies it into Firestore. The new public app at https://wardrobediary.web.app rebuilds everything on the
+**Current phase:** garment details (Sheet columns A–K) are edited in the app at `/manage` and stored in
+Firestore (decision D-4); the Google Sheet remains the source of truth only for the daily wear ticks, which
+`tools/sync.sh --write` copies into Firestore. The new public app at https://wardrobediary.web.app rebuilds everything on the
 live site (portfolio page + 13 category pages) except the monthly cost comparison (waiting for data, Q-4)
 and the static text pages. The live site must not be touched until cut-over (ROADMAP R-16).
 
@@ -49,9 +50,11 @@ Python is not used for the core metrics.
 ## Firestore data model
 
 ```
-users/{uid}/garments/{garmentId}
+users/{uid}/garments/{garmentId}          // source of truth for garment details (D-4)
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
   timesUsedInit, materials, weightG
+users/{uid}/garments/{garmentId}/history/{autoId}
+  savedAt, before, after                  // every save in the app keeps the previous version
 users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
 users/{uid}/public/data     // world-readable copy for public pages (decision D-1), written by the sync:
@@ -69,15 +72,21 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
 - The app reads `VITE_OWNER_UID` (in `web/.env.local`) to know whose public data to show.
 - Security rules: owner-only read/write under `users/{uid}`, world-readable `public/*`.
 
-## Sheet → Firestore sync
+## Sheet → Firestore sync (wear log only)
 
-`tools/sync.sh` (dry run) / `tools/sync.sh --write`. It wraps `migrate_sheet.py` + `sheet_transform.py`:
+`tools/sync.sh` (dry run) / `tools/sync.sh --write`. It wraps `migrate_sheet.py` + `sheet_transform.py`.
+Since D-4 (2026-10-09) it **never updates or deletes garments**: it reads the stored garments from
+Firestore, takes only the wear ticks from the Sheet (rows matched by Photo id), and rebuilds `public/data`.
+A Sheet row whose Photo id has no garment yet is created once (the way to add garments until R-27 phase b);
+garments without a Sheet row are reported, since their wears can't be logged there.
 - Validates that day columns run consecutively (catches header typos like `0204-02-19`) and that
   `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
   if either check fails.
-- Is a **sync, not an insert**: garments and days not in the Sheet are deleted from Firestore.
-- Skips "ADD NEXT" placeholder rows and rows with an empty Category (both as in R), rounds prices to
-  whole cents, and warns about wears outside a garment's ownership period.
+- Days are a full sync: day docs whose checkboxes were all unticked are deleted.
+- The "Times used" check is Sheet-internal (column L vs the Sheet's own column I + ticks), so it stays valid
+  even when details are edited in the app. Wears outside ownership are checked against the stored dates.
+- Skips "ADD NEXT" placeholder rows and rows with an empty Category (both as in R), rounds prices to whole
+  cents.
   ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
   overwritten or removed by the next sync.
 
@@ -153,6 +162,9 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/LogDay.tsx` | Signed-in daily logging (not for real use before cut-over) |
+| `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx` | `/manage` (owner only): garment list with filters; `/manage/<id>` edit form, divest, history |
+| `lib/garmentForm.ts` | Garment form ↔ stored fields: validation and normalisation (tested) |
+| `data/repo.ts` | Firestore access; `saveGarment` = one transaction: history + garment + its entry in `public/data` |
 | `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` |
 | `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
@@ -180,7 +192,7 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
-- Pages: `/` Dashboard, `/category/<slug>` category pages, `/log`; routing in `web/src/lib/route.ts` (no library).
+- Pages: `/` Dashboard, `/category/<slug>` category pages, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.

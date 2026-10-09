@@ -11,6 +11,7 @@ import { barMax, barStyle } from "../lib/dataBars";
 import { itemListing, type DateRange, type ItemRow } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
 import { navigate } from "../lib/route";
+import { Link } from "../components/Link";
 
 // Columns with data bars, as on the live site (bar maximum = the column's largest value).
 const COLUMNS: { title: string; value: (r: ItemRow) => number | null; format: (v: number | null) => string; bar: string }[] = [
@@ -25,8 +26,11 @@ export function CategoryPage({
   wardrobe,
   range,
   rangeControl,
+  canEdit = false,
 }: {
   slug: string;
+  /** Signed in as the owner: show an Edit link per item. */
+  canEdit?: boolean;
   wardrobe: Wardrobe | null;
   range: DateRange;
   rangeControl: ReactNode;
@@ -78,7 +82,10 @@ export function CategoryPage({
               return (
                 <tr key={r.garment.id} className={r.active ? undefined : "divested"}>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>
-                  <td>{r.garment.item}</td>
+                  <td>
+                    {r.garment.item}
+                    {canEdit && <> <Link className="edit-link" to={{ page: "manage", id: r.garment.id }}>Edit</Link></>}
+                  </td>
                   {COLUMNS.map((c, i) => (
                     <td key={c.title} className="num" style={barStyle(c.value(r), maxima[i], c.bar)}>
                       {c.format(c.value(r))}

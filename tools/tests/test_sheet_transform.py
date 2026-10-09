@@ -6,6 +6,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sheet_transform import (  # noqa: E402
+    Garment,
+    merge_with_stored,
     firestore_size,
     public_document,
     parse_sheet,
@@ -105,6 +107,21 @@ def test_public_document():
     ]
     assert doc["days"] == {"2018-01-01": [0], "2018-01-02": [1], "2018-01-03": [0]}
     assert firestore_size({"ab": [1, 2], "c": "xy"}) == (3 + 16) + (2 + 3)
+
+
+def test_merge_with_stored_keeps_app_edits():
+    sheet = parse_sheet(make_rows())
+    vest = sheet.garments[0]
+    edited = Garment.from_firestore(vest.id, {**vest.to_firestore(), "item": "Renamed in app", "price": 55.0})
+    app_only = Garment.from_firestore("Shoes-099", {**vest.to_firestore(), "item": "Not in Sheet", "unknown": 1})
+    merged, new = merge_with_stored(sheet, {vest.id: edited, "Shoes-099": app_only})
+
+    by_id = {g.id: g for g in merged.garments}
+    assert by_id[vest.id].item == "Renamed in app" and by_id[vest.id].price == 55.0  # app wins
+    assert [g.id for g in new] == ["Jackets_and_hoodies-008", "Jackets_and_hoodies-No_photo_jacket"]
+    assert "Shoes-099" in by_id
+    assert any("Shoes-099" in w and "no row in the Sheet" in w for w in merged.warnings)
+    assert merged.days == sheet.days  # wears still come from the Sheet
 
 
 def test_missing_header():

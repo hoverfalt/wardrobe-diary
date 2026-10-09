@@ -95,3 +95,25 @@ td.img { width: 28px; padding: 2px 4px; }
 .category-title img { width: 40px; height: 40px; border-radius: 50%; }
 tr.divested td:nth-child(2) { color: var(--muted); }
 td a { color: inherit; }
+
+/* Garment management */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.filters input[type="search"] { flex: 1; min-width: 220px; }
+input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: inherit; }
+.edit-head { display: flex; gap: 16px; align-items: center; margin: 12px 0; }
+.edit-head img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; }
+.edit-head h2 { margin: 0; }
+.garment-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px 20px; max-width: 900px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field > span { font-size: 13px; color: var(--muted); }
+.field.invalid input, .field.invalid select { border-color: var(--accent); }
+.field .row { display: flex; gap: 8px; }
+.field .row input { flex: 1; }
+.error { color: var(--accent); }
+.ok { color: #2e8b57; }
+.actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+button:disabled { opacity: 0.5; cursor: default; }
+.history { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.history li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.edit-link { font-size: 12px; margin-left: 6px; color: var(--accent); }

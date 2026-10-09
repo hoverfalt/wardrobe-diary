@@ -6,9 +6,9 @@ value_render_option=UNFORMATTED_VALUE and date_time_render_option=SERIAL_NUMBER.
 from __future__ import annotations
 
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields, replace
 from datetime import date, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 SHEETS_EPOCH = date(1899, 12, 30)
 TRACKING_START = "2018-01-01"
@@ -51,6 +51,11 @@ class Garment:
         d = asdict(self)
         d.pop("id")
         return d
+
+    @classmethod
+    def from_firestore(cls, gid: str, doc: Dict[str, Any]) -> "Garment":
+        names = {f.name for f in fields(cls)} - {"id"}
+        return cls(id=gid, **{k: v for k, v in doc.items() if k in names})
 
 
 @dataclass
@@ -171,6 +176,24 @@ def parse_sheet(rows: List[List[Any]]) -> SheetData:
                 out.days[iso].append(gid)
 
     return out
+
+
+def merge_with_stored(sheet: SheetData, stored: Dict[str, Garment]) -> Tuple[SheetData, List[Garment]]:
+    """Decision D-4: garment details live in Firestore (edited in the app); the Sheet supplies only the
+    daily wear ticks. Returns the data to sync (stored garments + the Sheet's days) and the garments that
+    are new in the Sheet: rows whose Photo id has no garment yet are created once, never updated later.
+    """
+    new = [g for g in sheet.garments if g.id not in stored]
+    in_sheet = {g.id for g in sheet.garments}
+    ordered = [stored[g.id] for g in sheet.garments if g.id in stored]
+    ordered += [g for gid, g in sorted(stored.items()) if gid not in in_sheet]
+    warnings = [
+        f"{gid} ({g.item}) has no row in the Sheet, so its wears can't be logged there"
+        for gid, g in sorted(stored.items())
+        if gid not in in_sheet
+    ]
+    merged = replace(sheet, garments=ordered + new, warnings=sheet.warnings + warnings)
+    return merged, new
 
 
 # Firestore's document limit is 1 MiB; warn well before it.
