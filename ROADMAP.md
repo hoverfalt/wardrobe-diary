@@ -14,8 +14,8 @@ How this file works:
 
 - D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
   the single `public/data` document.
-- **Next for Claude:** R-09 "Active items by category (over time)", the first chart (load the dataviz
-  skill first; Observable Plot is the suggested library).
+- Active items chart built in two variants (A/B) for Olof to choose (D-3).
+- **Next for Claude:** apply the D-3 choice, then R-09 "Inventory value by category" in the same style.
 
 ## Inbox
 
@@ -31,7 +31,9 @@ _(empty)_
         (share of days), Yearly cost, Inventory turnover; plus a Total row. On the public Dashboard with
         a from/to date range, category images and data bars (same colours and max logic). Cost per wear,
         Yearly cost and Turnover follow D-2; the rest matches the live site except where it is wrong
-  - [ ] Active items by category (over time)
+  - [ ] Active items by category (over time). Two variants on the Dashboard for Olof to choose (D-3):
+        A = one chart, 12 lines in the live site's colours, legend highlight + crosshair tooltip;
+        B = small multiples on a shared scale with category images. Sportswear left out, as on the live site
   - [ ] Inventory value by category (over time)
   - [ ] Total inventory value (over time, stacked)
   - [ ] Average cost per wear and category frequency of use
@@ -79,7 +81,9 @@ _(empty)_
 
 ## Decisions needed
 
-_(none open)_
+- **D-3 Active items chart: A (one chart, original colours) or B (small multiples)?** Both are on the
+  Dashboard to try. The original palette fails colour-blind and contrast checks with 12 lines; B avoids
+  relying on colour. The choice likely sets the pattern for the other multi-category charts.
 
 ## Open questions
 

@@ -203,3 +203,61 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
 function sum(values: number[]): number {
   return values.reduce((a, b) => a + b, 0);
 }
+
+export interface CountPoint {
+  date: IsoDate;
+  count: number;
+}
+
+export interface CategorySeries {
+  category: string;
+  /** Change points: the count holds from each date until the next point (step-after); the first point
+   *  is range.from and the last is range.to. */
+  points: CountPoint[];
+}
+
+/** Next calendar day. */
+export function nextDay(date: IsoDate): IsoDate {
+  return new Date(Date.parse(date) + 86_400_000).toISOString().slice(0, 10);
+}
+
+/** Number of active garments per category over the range ("Active items by category"), in the standard
+ *  category order. Categories with no garment owned during the range are left out. */
+export function activeItemsOverTime(garments: Garment[], range: DateRange): CategorySeries[] {
+  const deltas = new Map<string, Map<IsoDate, number>>();
+  for (const g of garments) {
+    if (!ownedDuring(g, range)) continue;
+    const byDate = deltas.get(g.category) ?? new Map<IsoDate, number>();
+    deltas.set(g.category, byDate);
+    const start = max(ownedFrom(g), range.from);
+    byDate.set(start, (byDate.get(start) ?? 0) + 1);
+    if (ownedUntil(g) < range.to) {
+      const end = nextDay(ownedUntil(g));
+      byDate.set(end, (byDate.get(end) ?? 0) - 1);
+    }
+  }
+  return [...deltas.entries()]
+    .sort(([a], [b]) => compareCategories(a, b))
+    .map(([category, byDate]) => {
+      const points: CountPoint[] = [{ date: range.from, count: 0 }];
+      let count = 0;
+      for (const date of [...byDate.keys()].sort()) {
+        count += byDate.get(date)!;
+        const last = points[points.length - 1];
+        if (last.date === date) last.count = count;
+        else points.push({ date, count });
+      }
+      if (points[points.length - 1].date !== range.to) points.push({ date: range.to, count });
+      return { category, points };
+    });
+}
+
+/** The count of a step series on a date. */
+export function countOn(points: CountPoint[], date: IsoDate): number {
+  let count = 0;
+  for (const p of points) {
+    if (p.date > date) break;
+    count = p.count;
+  }
+  return count;
+}

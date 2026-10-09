@@ -41,3 +41,15 @@ td.img { width: 28px; padding: 2px 4px; }
 .tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; font-size: 13px; }
 .tile img { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }
 .tile.on { border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+/* Charts */
+.chart { margin: 0 0 24px; }
+.plot svg { overflow: visible; }
+.legend { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.legend button { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; font-size: 13px; }
+.legend button.dim { opacity: 0.45; }
+.swatch { display: inline-block; width: 12px; height: 3px; border-radius: 2px; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px 24px; margin-bottom: 24px; }
+.multiple { margin: 0; }
+.multiple figcaption { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 4px; }
+.multiple figcaption .muted { margin-left: auto; font-variant-numeric: tabular-nums; }

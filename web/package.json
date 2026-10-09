@@ -15,6 +15,7 @@
     "deploy": "npm run build && firebase deploy --only hosting:app,firestore"
   },
   "dependencies": {
+    "@observablehq/plot": "^0.6.17",
     "firebase": "^12.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

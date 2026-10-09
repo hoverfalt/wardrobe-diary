@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Day, Garment } from "../types";
 import {
+  activeItemsOverTime,
+  countOn,
   categoryListing,
   costPerWear,
   daysOwned,
@@ -98,5 +100,34 @@ describe("categoryListing", () => {
     expect(total.category).toBe("Total");
     expect(total.activeItems).toBe(1);
     expect(total.yearlyCost).toBe(jackets.yearlyCost);
+  });
+});
+
+describe("activeItemsOverTime", () => {
+  const a = garment({ id: "a", purchased: "2018-01-02", divested: "2018-01-03" });
+  const b = garment({ id: "b", purchased: "2017-05-01" });
+  const shirt = garment({ id: "s", category: "Shirts", purchased: "2018-01-04" });
+  const range = { from: "2018-01-01", to: "2018-01-06" };
+
+  it("steps up on purchase and down the day after divesting", () => {
+    const [jackets, shirts] = activeItemsOverTime([a, b, shirt], range);
+    expect(jackets.category).toBe("Jackets and hoodies");
+    expect(jackets.points).toEqual([
+      { date: "2018-01-01", count: 1 },
+      { date: "2018-01-02", count: 2 },
+      { date: "2018-01-04", count: 1 },
+      { date: "2018-01-06", count: 1 },
+    ]);
+    expect(shirts.points).toEqual([
+      { date: "2018-01-01", count: 0 },
+      { date: "2018-01-04", count: 1 },
+      { date: "2018-01-06", count: 1 },
+    ]);
+  });
+
+  it("agrees with isActive on every day", () => {
+    const [jackets] = activeItemsOverTime([a, b], range);
+    for (const date of ["2018-01-01", "2018-01-02", "2018-01-03", "2018-01-04", "2018-01-05", "2018-01-06"])
+      expect(countOn(jackets.points, date)).toBe([a, b].filter((g) => isActive(g, date)).length);
   });
 });
