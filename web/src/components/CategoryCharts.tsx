@@ -10,9 +10,11 @@ import { PlotFigure, useDarkMode } from "./PlotFigure";
 
 export type Format = (v: number) => string;
 export const formatCount: Format = (v) => String(v);
-export const formatEur: Format = (v) =>
-  v.toLocaleString("fi-FI", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-export const formatEur2: Format = (v) => v.toLocaleString("fi-FI", { style: "currency", currency: "EUR" });
+// Formatters are created once: toLocaleString builds a new one on every call, which is slow.
+const eur0 = new Intl.NumberFormat("fi-FI", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const eur2 = new Intl.NumberFormat("fi-FI", { style: "currency", currency: "EUR" });
+export const formatEur: Format = (v) => eur0.format(v);
+export const formatEur2: Format = (v) => eur2.format(v);
 
 interface DayRow {
   date: Date;
@@ -63,12 +65,13 @@ function stepChart(opts: {
       Plot.areaY(data, { x: "date", y: "value", curve: "step-after", fill: opts.color, fillOpacity: 0.12 }),
       Plot.line(data, { x: "date", y: "value", curve: "step-after", stroke: opts.color, strokeWidth: 1.5 }),
       Plot.ruleX(opts.rows, Plot.pointerX({ x: "date", stroke: "currentColor", strokeOpacity: 0.3 })),
+      // Tooltip text is formatted only for the hovered day (`format`), not built for every day up front.
       Plot.tip(
         opts.rows,
         Plot.pointerX({
-          x: "date",
-          y: (r: DayRow) => r.values[opts.index],
-          title: (r: DayRow) => `${formatFi(r.iso)}: ${opts.format(r.values[opts.index])}`,
+          x: { value: "date", label: "" },
+          y: { value: (r: DayRow) => r.values[opts.index], label: "" },
+          format: { x: (d: Date) => formatFi(d.toISOString().slice(0, 10)), y: opts.format },
         }),
       ),
     ],

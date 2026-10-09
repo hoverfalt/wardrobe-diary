@@ -24,9 +24,9 @@ import {
 } from "../lib/metrics";
 
 const eur0 = (v: number | null) =>
-  v == null ? "–" : v.toLocaleString("fi-FI", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  v == null ? "–" : formatEur(v);
 const eur2 = (v: number | null) =>
-  v == null ? "–" : v.toLocaleString("fi-FI", { style: "currency", currency: "EUR" });
+  v == null ? "–" : formatEur2(v);
 const pct = (v: number | null) => (v == null ? "–" : `${(v * 100).toFixed(0)} %`);
 
 // Columns with data bars, as on the live site: colour, and the bar maximum (the largest category value,
