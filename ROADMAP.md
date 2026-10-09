@@ -76,6 +76,9 @@ _(empty)_
   export as backup.
 - **R-16 Domain switch:** point wardrobediary.io at the new app once it covers the live site.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
+- **R-22 Faster recalculation:** a date-range change takes ~0.5 s of computing (mostly re-rendering
+  25 charts, each with a 3,200-day tooltip table). Options: compute tooltip values on hover instead of
+  per day, and build the wear index once rather than per call.
 - **R-18 Housekeeping:** code-split the web bundle (> 500 kB warning); move `tools/.venv` to
   Python ≥ 3.10 (3.9 is end of life); review `storage.rules` against the live rules before it is ever
   deployed.
@@ -146,6 +149,8 @@ _(none open)_
   Metrics); tests compare every category and item with the live site.
 - **R-20** 2026-10-08 Sync skips "ADD NEXT" placeholder rows, rounds prices to cents, warns about empty
   categories and wears outside ownership.
+- **R-23** 2026-10-09 Date range: half-typed years (0002, 0202 …) no longer hang the tab; the charts
+  update only for valid dates, 0.3 s after typing stops, as a low-priority update.
 - **R-11** 2026-10-09 Public data document `public/data` (full log, one read) written by the sync;
   Dashboard reads it and no longer needs sign-in.
 - **R-21** 2026-10-09 D-2 cost per wear implemented (lifetime garment cost per wear, use-weighted

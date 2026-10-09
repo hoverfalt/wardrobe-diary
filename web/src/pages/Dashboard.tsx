@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
-import { todayIso } from "../lib/dates";
+import { formatFi, isValidRange, todayIso } from "../lib/dates";
 import {
   CategoryScatter,
   CategorySmallMultiples,
@@ -51,14 +51,26 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
   const wardrobe = usePublicWardrobe(ownerUid);
   const garments = wardrobe?.garments;
   const days = wardrobe?.days;
-  const [range, setRange] = useState<DateRange>({ from: TRACKING_START, to: todayIso() });
+  const today = todayIso();
+  // The inputs edit `draft`; the charts follow `range`, which takes a draft only once it is a valid range
+  // and the user has paused for a moment. Recomputing everything takes ~0.5 s, and half-typed years
+  // (0002, 0202 …) would otherwise make ranges thousands of years long and hang the tab.
+  const [draft, setDraft] = useState<DateRange>({ from: TRACKING_START, to: today });
+  const [range, setRange] = useState<DateRange>(draft);
+  const draftValid = isValidRange(draft, TRACKING_START, today);
+  useEffect(() => {
+    if (!draftValid || (draft.from === range.from && draft.to === range.to)) return;
+    const timer = setTimeout(() => startTransition(() => setRange(draft)), 300);
+    return () => clearTimeout(timer);
+  }, [draft, draftValid, range]);
+
   const rows = useMemo(
-    () => (garments && days && range.from <= range.to ? categoryListing(garments, days, range) : []),
+    () => (garments && days ? categoryListing(garments, days, range) : []),
     [garments, days, range],
   );
   // As on the live site, the charts over time leave out Sportswear.
   const charts = useMemo(() => {
-    if (!garments || range.from > range.to) return null;
+    if (!garments) return null;
     const notSportswear = garments.filter((g) => g.category !== "Sportswear");
     return {
       activeItems: activeItemsOverTime(notSportswear, range),
@@ -88,17 +100,17 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
       <h2>Category listing</h2>
       <p className="range">
         <label>
-          From <input type="date" value={range.from} min={TRACKING_START} max={range.to}
-            onChange={(e) => e.target.value && setRange({ ...range, from: e.target.value })} />
+          From <input type="date" value={draft.from} min={TRACKING_START} max={today}
+            onChange={(e) => setDraft({ ...draft, from: e.target.value })} />
         </label>
         <label>
-          To <input type="date" value={range.to} min={range.from}
-            onChange={(e) => e.target.value && setRange({ ...range, to: e.target.value })} />
+          To <input type="date" value={draft.to} min={TRACKING_START} max={today}
+            onChange={(e) => setDraft({ ...draft, to: e.target.value })} />
         </label>
       </p>
-      {range.from > TRACKING_START && (
+      {!draftValid && (
         <p className="muted">
-          Ranges starting after {TRACKING_START} are provisional: only wears inside the range count.
+          Choose dates between {formatFi(TRACKING_START)} and {formatFi(today)}, with From before To.
         </p>
       )}
       <div className="table-wrap">
