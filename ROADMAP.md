@@ -12,14 +12,13 @@ How this file works:
 
 ## Where we left off (2026-10-09)
 
-- D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
-  the single `public/data` document.
-- Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
-- Portfolio page rebuilt except "Monthly cost and comparison", postponed until the comparison data is in
-  the Sheet (Q-4, waiting for Olof).
-- All 13 category pages are complete (table + 6 charts), generic, reviewed on Jackets and hoodies.
-- Remaining from the live site: monthly cost comparison (Q-4, waiting for Olof) and the static front/info
-  pages (with R-16).
+- **Scope "rebuild the live site's views" (R-09) is complete:** the public app at
+  https://wardrobediary.web.app has the portfolio page (category listing + 7 charts) and all 13 category
+  pages (item listing + 6 charts each), with an app-wide date range, all checked against the live site.
+- Two pieces of the live site remain: the monthly cost comparison (R-26, waiting for Olof's data, Q-4) and
+  the static front / "Track your own wardrobe" pages (part of R-16).
+- **Next:** Olof picks the next scope. Natural candidates, in rough order: R-14 automatic sync, R-16 domain
+  switch (incl. the static pages), R-13 logging UI and R-15 cut-over, or R-18 housekeeping.
 
 ## Inbox
 
@@ -27,54 +26,16 @@ _(empty)_
 
 ## Now
 
-- **R-09 Public views: rebuild** from the Firestore data, each view checked against the live site's
-  numbers. Checklist from the R-08 inventory of wardrobediary.io; suggested order is top to bottom.
-
-  Portfolio page (`portfolio.html`):
-  - [x] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
-        (share of days), Yearly cost, Inventory turnover; plus a Total row. On the public Dashboard with
-        a from/to date range, category images and data bars (same colours and max logic). Cost per wear,
-        Yearly cost and Turnover follow D-2; the rest matches the live site except where it is wrong
-  - [x] Active items by category (over time): small multiples (D-3). Sportswear left out, as on the live site
-  - [x] Inventory value by category (over time): small multiples (D-3)
-  - [x] Total inventory value (over time): one total line. The live site stacks the categories; with D-3
-        the per-category split is shown by the small multiples above instead
-  - [x] Average cost per wear and category frequency of use: scatter, one category image per point in
-        its colour ring (as on the live site), Sportswear included; values from the category listing (D-2)
-  - [x] Average yearly cost and category frequency of use: same scatter, y = yearly cost (D-2)
-  - [x] Daily cost (cost of all items worn on a day; "all divested" = final): dots + 30-day centred average,
-        summers shaded, fixed 0–40 € scale with a note on days above it; hollow/filled dots as well as colour
-  - [x] Daily cost animated by date: interactive "as of" slider with play/pause instead of a GIF
-  - [ ] Monthly cost and comparison to other consumption. **Postponed until Olof has entered the
-        comparison data in the Google Sheet (Q-4)**; then import that tab in the sync and build the chart
-
-  One page per category (13: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks,
-  Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear), at
-  `/category/<slug>`, linked from the Dashboard table. **Built generically, first reviewed on Jackets and
-  hoodies;** every category page works the same way:
-  - [x] Item listing table: Item, Price, Times worn, Cost per wear, Wears per month, Status (data bars,
-        active first, then by times worn), item photos
-  - [x] Times worn per item: one row per item (no overlapping photos), divested items' 5–95 % and
-        32–68 % bands
-  - [x] Cost per wear and times worn: photos, grey trails (price / n per item), blue price guides
-  - [x] Cost per wear and frequency of use: divested items' averages as dotted lines (matches the live
-        site: jackets 1.9 wears/month, 1.36 €/wear)
-  - [x] Times worn, animated by date: "as of" player; rows keep their spacing
-  - [x] Cost per wear and frequency of use, animated by date: fixed scales while playing
-  - [x] Daily cost for the category: scale fitted to the category
-
-  Other pages: front page (`index.html`, text, press links, images) and `track_your_wardrobe.html`
-  (text). They are static content: port as-is when doing R-16.
-
-  Reference values: the live site's tables are saved in `reference/live/*.csv` (git-ignored). The
-  snapshot's "Days used" shares fit exactly 3,168 days, so the live data runs to about 2026-09-02;
-  compare against that date, not today.
+_(nothing in progress; waiting for the next scope)_
 
 ## Next
 
-1. **R-10 Reference data from R.** Export golden CSVs from the Threddit R pipeline into `reference/`
-   and add tests comparing the TypeScript metrics to them.
-2. **R-12 Resolve the remaining metric questions** (Q-2, Q-4) against the Threddit R scripts.
+1. **R-26 Monthly cost and comparison to other consumption** (the last live-site chart). **Blocked:** waiting
+   for Olof to enter the comparison data in the Google Sheet (Q-4). Then import that tab in the sync, add it
+   to `public/data`, port R's monthly cost (`yearly_cost / 12` per category, `Threddit.R`) and build the chart.
+2. **R-12 Remaining open questions** (Q-2; Q-4 is covered by R-26).
+3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
+   the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
 
@@ -84,7 +45,8 @@ _(empty)_
   Cloud Function), instead of running `tools/sync.sh --write` by hand.
 - **R-15 Cut-over:** stop entering in the Sheet, make Firestore the source of truth, scheduled Firestore
   export as backup.
-- **R-16 Domain switch:** point wardrobediary.io at the new app once it covers the live site.
+- **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
+  text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 - **R-18 Housekeeping:** code-split the web bundle (> 500 kB warning); move `tools/.venv` to
   Python ≥ 3.10 (3.9 is end of life); review `storage.rules` against the live rules before it is ever
@@ -98,12 +60,15 @@ _(none open)_
 
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Comparison data for the monthly cost chart (external consumption benchmarks). **Waiting for
-  Olof** to enter it in the Google Sheet (R read it from a "Comparison" tab).
-- **Q-10** *G Star Raw black short jacket* (Jackets and hoodies) has no photo in Storage, so its image is
-  blank (also on the live site).
+  Olof** to enter it in the Google Sheet (R read it from a "Comparison" tab). Blocks R-26.
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.
+- **Q-10** *G Star Raw black short jacket* (Jackets and hoodies) has no photo in Storage, so its image is
+  blank (also on the live site).
+
+Reference values: the live site's tables are saved in `reference/live/*.csv` (git-ignored, snapshot
+2026-09-03: the "Days used" shares fit exactly 3,168 days); compare against that date, not today.
 
 ### R pipeline bugs found while porting (the new code does not reproduce them)
 
@@ -150,6 +115,14 @@ _(none open)_
 
 ## Done
 
+- **R-25** 2026-10-09 Category pages, all 13, generic (`/category/<slug>`, linked from the Dashboard): item
+  listing with photos and data bars; Times worn (one row per item, divested percentile bands); cost per
+  wear vs times worn (trails + price guides) and vs frequency of use (divested averages); both animated
+  "as of" a date; category daily cost. Reviewed on Jackets and hoodies.
+- **R-09** 2026-10-09 Portfolio page rebuilt on the public Dashboard: category listing (images, data bars,
+  date range), active items and inventory value by category (small multiples, D-3), total inventory value,
+  cost per wear and yearly cost vs frequency of use (category scatters), daily cost and its "as of"
+  animation. Only the monthly cost comparison remains (R-26).
 - **R-01** 2026-10-07 Skeleton: Vite/React app, Firestore rules, Sheet migration tools.
 - **R-02** 2026-10-07 Git repo, pushed to github.com/hoverfalt/wardrobe-diary (private).
 - **R-03** 2026-10-07 Sheet access via service account; dry run reproduces "Times used" for all 649 garments.

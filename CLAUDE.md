@@ -13,8 +13,9 @@ Replace "Google Sheet → R scripts → static PNG/GIF on Firebase Hosting" with
 data entry, storage, tables and charts all live in one Firebase-backed web app.
 
 **Current phase:** the Google Sheet stays the source of truth for data entry. `tools/sync.sh --write`
-copies it into Firestore, and the new public views are built from that data, in parallel with the
-live site, which must not be touched until cut-over.
+copies it into Firestore. The new public app at https://wardrobediary.web.app rebuilds everything on the
+live site (portfolio page + 13 category pages) except the monthly cost comparison (waiting for data, Q-4)
+and the static text pages. The live site must not be touched until cut-over (ROADMAP R-16).
 
 ## Environment
 
@@ -40,7 +41,7 @@ live site, which must not be touched until cut-over.
 | Data | Cloud Firestore |
 | Photos | Firebase Storage (existing photo assets, see above) |
 | Hosting | Firebase Hosting, separate site per above |
-| Python | `tools/`: Sheet → Firestore sync, validation against R outputs, later optional Cloud Functions for precomputed public summaries |
+| Python | `tools/`: Sheet → Firestore sync (also writes the public data document) |
 
 Analytics run **client-side in TypeScript**: data volume is small (~3,200 days, ~650 garments).
 Python is not used for the core metrics.
@@ -80,7 +81,7 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
   ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
   overwritten or removed by the next sync.
 
-Last full sync: 2026-10-08 (632 garments, 3,194 days with wears, 31,527 wear events).
+Last full sync: 2026-10-09 (632 garments, 3,194 days with wears, 31,527 wear events; `public/data` 435 kB).
 
 ## Source Google Sheet layout
 
@@ -127,6 +128,11 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   - Days used = share of days from the category's first ownership day to `to` with ≥ 1 wear in the category.
   - Yearly cost = cost per wear × 365 × days used.
   - Inventory turnover = yearly cost / inventory value. Total row: sums, turnover = Σ yearly / Σ value.
+- Charts over time (`activeOverTime`): active items / inventory value per category as step series.
+- Item listing (`itemListing`, category pages): times worn and wears per month in the range; `lifetimeWears`
+  and cost per wear over the whole ownership (D-2). `divestedAverages` = R's avg_*_divested (divested items
+  owned ≥ 30 days: Σ wears / Σ days × 30.5, and use-weighted cost per wear). Times worn bands use
+  `quantile` (R type 7) at 5/95 % and 32/68 % of divested items.
 - Validation: `metrics.reference.test.ts` compares with the live site's tables in the git-ignored
   `reference/` folder (snapshot date 2026-09-03; refresh `reference/sheet.json` with
   `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors and deliberate differences
@@ -134,9 +140,24 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 
 - Daily cost (`dailyCost`) = Σ lifetime cost per wear of the garments worn (and owned) that day; "final"
   when all of them are divested; `average` = 30-day rolling mean centred on the day (values i−14 … i+15).
-  With `asOf`, values are computed as known on that date (used by the animation).
+- **Animations** ("… animated by date") use `asOf` (`dailyCost`, `itemListing`): everything as known on that
+  date, i.e. only wears up to then. This is the one deliberate exception to D-2.
 
-Still to port: monthly cost and the benchmark comparison (questions in ROADMAP.md).
+Still to port: monthly cost and the benchmark comparison (waiting for the comparison data, Q-4).
+
+## Code map (`web/src`)
+
+| Path | What |
+|---|---|
+| `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`) |
+| `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
+| `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
+| `pages/LogDay.tsx` | Signed-in daily logging (not for real use before cut-over) |
+| `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` |
+| `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
+| `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
+| `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
+| `components/DateRangeControl.tsx`, `AsOfControl.tsx`, `PlotFigure.tsx` | Date range (slider + boxes), "as of" player, Plot wrapper |
 
 ## Commands
 
@@ -161,8 +182,15 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
 - Pages: `/` Dashboard, `/category/<slug>` category pages, `/log`; routing in `web/src/lib/route.ts` (no library).
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
-- The Dashboard has one page-wide date range. `DateRangeControl` (slider + date boxes) is rendered in
+- One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
+- Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
+- Item photos and category images come from Storage (`photoUrl`, `categoryImageUrl`); divested items get a
+  green ring (`#3CB371`, as on the live site).
+- Numbers are formatted Finnish style (`1 000 €`, `0,25 €`); reuse the `Intl.NumberFormat` instances.
+- Check charts in a real browser before calling them done: the site is public, so headless Chrome via
+  `puppeteer-core` (`executablePath` = the installed Google Chrome) can load, hover and screenshot it.
+  Full-page screenshots sometimes leave large SVGs unpainted; screenshot the element instead.
 - Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),
   never alphabetically: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants,
   Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear.
