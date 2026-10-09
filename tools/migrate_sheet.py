@@ -64,6 +64,17 @@ def read_stored_garments(db, uid: str):
     return {doc.id: Garment.from_firestore(doc.id, doc.to_dict()) for doc in garments.stream()}
 
 
+def sheet_retired(db, uid: str):
+    """Date the Sheet was retired as the wear log (R-15), or None. Set once; after it the app is the
+    source of truth for wears too, and writing from the Sheet would overwrite logs made in the app."""
+    doc = db.collection("users").document(uid).collection("settings").document("app").get()
+    return (doc.to_dict() or {}).get("sheetRetired") if doc.exists else None
+
+
+def retire_sheet(db, uid: str, date: str) -> None:
+    db.collection("users").document(uid).collection("settings").document("app").set({"sheetRetired": date}, merge=True)
+
+
 def read_deleted_garments(db, uid: str) -> frozenset:
     deleted = db.collection("users").document(uid).collection("deletedGarments")
     return frozenset(ref.id for ref in deleted.list_documents())
@@ -108,6 +119,7 @@ def main() -> int:
     p.add_argument("--uid", required=True, help="Firebase Auth uid that owns the data")
     p.add_argument("--write", action="store_true", help="write to Firestore (default: dry run)")
     p.add_argument("--dump", type=Path, help="also save the parsed data as JSON to this path")
+    p.add_argument("--retire-sheet", metavar="DATE", help="mark the Sheet as retired on DATE (YYYY-MM-DD); no writes after that")
     args = p.parse_args()
 
     rows = read_sheet(args.sheet_id, args.tab)
@@ -157,8 +169,20 @@ def main() -> int:
         )
         print(f"Wrote {args.dump}")
 
+    retired = sheet_retired(db, args.uid)
+    if args.retire_sheet:
+        retire_sheet(db, args.uid, args.retire_sheet)
+        print(f"\nSheet marked as retired on {args.retire_sheet}: wears are logged in the app from now on.")
+        return 0
+    if retired and args.write:
+        print(
+            f"\nThe Sheet was retired on {retired}: wears are logged in the app, and writing from the Sheet "
+            "would overwrite them. Nothing written.",
+            file=sys.stderr,
+        )
+        return 1
     if not args.write:
-        print("\nDry run, nothing written. Re-run with --write to write to Firestore.")
+        print("\nDry run, nothing written." + (f" (The Sheet was retired on {retired}.)" if retired else " Re-run with --write to write to Firestore."))
         return 0
     if problems or day_problems:
         print("Refusing to write while validation fails.", file=sys.stderr)

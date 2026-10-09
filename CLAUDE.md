@@ -12,11 +12,11 @@ session; update it when work is finished, started, or newly identified (see its 
 Replace "Google Sheet → R scripts → static PNG/GIF on Firebase Hosting" with:
 data entry, storage, tables and charts all live in one Firebase-backed web app.
 
-**Current phase:** garment details (Sheet columns A–K) are edited in the app at `/manage` and stored in
-Firestore (decision D-4); the Google Sheet remains the source of truth only for the daily wear ticks, which
-`tools/sync.sh --write` copies into Firestore. The new public app at https://wardrobediary.web.app rebuilds everything on the
-live site (portfolio page + 13 category pages) except the monthly cost comparison (waiting for data, Q-4)
-and the static text pages. The live site must not be touched until cut-over (ROADMAP R-16).
+**Current phase:** the app is the single source of truth. Garment details have been edited in the app since
+2026-10-09 (D-4), and **wears have been logged in the app (`/log`) since the cut-over on 2026-10-09** (the
+Google Sheet is retired; logged through 2026-10-09). The public app at https://wardrobediary.web.app rebuilds
+everything on the live site except the monthly cost comparison (waiting for data, Q-4) and the static text
+pages. The live site must not be touched until the domain switch (ROADMAP R-16).
 
 ## Environment
 
@@ -59,6 +59,8 @@ users/{uid}/deletedGarments/{garmentId}
   deletedAt, garment                      // deleted in the app (never-worn only); the sync won't re-create it
 users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
+users/{uid}/settings/app
+  sheetRetired: "2026-10-09"   // cut-over date; the Sheet sync refuses to write while this is set
 users/{uid}/public/data     // world-readable copy for public pages (decision D-1), written by the sync:
   version: 1, garments: Garment[] (all fields), days: { "YYYY-MM-DD": number[] }  // indexes into garments
 ```
@@ -74,27 +76,24 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
 - The app reads `VITE_OWNER_UID` (in `web/.env.local`) to know whose public data to show.
 - Security rules: owner-only read/write under `users/{uid}`, world-readable `public/*`.
 
-## Sheet → Firestore sync (wear log only)
+## Logging and backups (since the cut-over, 2026-10-09)
 
-`tools/sync.sh` (dry run) / `tools/sync.sh --write`. It wraps `migrate_sheet.py` + `sheet_transform.py`.
-Since D-4 (2026-10-09) it **never updates or deletes garments**: it reads the stored garments from
-Firestore, takes only the wear ticks from the Sheet (rows matched by Photo id), and rebuilds `public/data`.
-New garments are added in the app (`/manage/new`, photo uploaded); to log their wears in the Sheet, add a row
-with Category, Item and the Photo id (only the Photo id is matched). A Sheet row whose Photo id has no garment
-yet is still created once, unless it was deleted in the app (`deletedGarments`); garments without a Sheet row
-are reported, since their wears can't be logged there. Ticks for garments that don't exist are dropped.
-- Validates that day columns run consecutively (catches header typos like `0204-02-19`) and that
-  `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
-  if either check fails.
-- Days are a full sync: day docs whose checkboxes were all unticked are deleted.
-- The "Times used" check is Sheet-internal (column L vs the Sheet's own column I + ticks), so it stays valid
-  even when details are edited in the app. Wears outside ownership are checked against the stored dates.
-- Skips "ADD NEXT" placeholder rows and rows with an empty Category (both as in R), rounds prices to whole
-  cents.
-  ⚠️ While the Sheet is the source of truth, anything logged via the app's LogDay page is
-  overwritten or removed by the next sync.
+- Wears are logged at `/log` (owner only, `pages/LogDay.tsx`). Each tap is one batch (`setDayWorn`): it
+  writes `days/{date}` and updates only that day in `public/data` (`days.<date>` as garment indexes, via a
+  field path, no full read), so public pages update at once. Batches work offline and sync later.
+- **Backups:** Firestore is now the only copy of the wear log. `tools/backup.sh` writes everything
+  (garments + history, days, deleted garments, settings, public data) to `backups/wardrobe-YYYY-MM-DD.json`
+  (git-ignored; the project folder is in Dropbox, so backups get an off-machine copy). Run it regularly
+  until an automatic backup exists (ROADMAP R-28).
 
-Last full sync: 2026-10-09 (632 garments, 3,194 days with wears, 31,527 wear events; `public/data` 435 kB).
+## Sheet → Firestore sync (retired 2026-10-09)
+
+`tools/sync.sh` still runs as a dry run (useful to compare with the old Sheet), but **refuses to write** since
+`settings/app.sheetRetired` is set: writing would overwrite wears logged in the app. History: it wrapped
+`migrate_sheet.py` + `sheet_transform.py`; after D-4 it copied only wear ticks (rows matched by Photo id),
+never updated or deleted garments, created a garment once for a new Sheet row unless deleted in the app,
+dropped ticks for unknown garments, rebuilt `public/data`, and validated day columns and "Times used".
+The final sync (2026-10-09): 632 garments, 3,194 days with wears, 31,539 wear events.
 
 ## Source Google Sheet layout
 
@@ -165,7 +164,7 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`) |
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
-| `pages/LogDay.tsx` | Signed-in daily logging (not for real use before cut-over) |
+| `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, search, recent-first order, offline status |
 | `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters and bulk changes; `/manage/<id>` edit, divest, replace photo, delete (never worn), history; `/manage/new` add with photo upload |
 | `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
 | `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |
@@ -182,8 +181,8 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 cd web && npm install && npm run dev       # local dev server
 cd web && npm test                         # vitest
 cd tools && .venv/bin/pytest               # Python tests
-tools/sync.sh                              # Sheet → Firestore dry run (validates)
-tools/sync.sh --write                      # Sheet → Firestore sync
+tools/backup.sh                            # back up all Firestore data to backups/ (run regularly)
+tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
@@ -214,3 +213,4 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - Never commit `.env.local` or service-account JSON.
 - Git: run `git add`, `git commit` and `git push` as separate commands (not chained with `&&`); the local
   permission rules in `.claude/settings.local.json` allow commit, push and `tools/sync.sh` only individually.
+- Never write to Firestore in bulk from scripts without a fresh `tools/backup.sh` first.

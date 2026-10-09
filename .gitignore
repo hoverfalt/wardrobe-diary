@@ -14,3 +14,4 @@ tools/*.json
 .DS_Store
 .claude/settings.local.json
 *.tsbuildinfo
+backups/

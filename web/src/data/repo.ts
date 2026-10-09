@@ -1,56 +1,45 @@
 import {
-  arrayRemove,
-  arrayUnion,
   collection,
+  deleteField,
   doc,
+  FieldPath,
   onSnapshot,
   orderBy,
   query,
   runTransaction,
   serverTimestamp,
-  setDoc,
   Timestamp,
+  writeBatch,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import type { GarmentFields } from "../lib/garmentForm";
 import { decodePublicData, withGarments, withoutGarment, type PublicData, type Wardrobe } from "../lib/publicData";
-import type { Day, Garment, IsoDate } from "../types";
+import type { IsoDate } from "../types";
 
-export function useGarments(uid: string): Garment[] | null {
-  const [garments, setGarments] = useState<Garment[] | null>(null);
+/** Logs a day's worn garments (the app is the source of truth for wears since 2026-10-09). One batch
+ *  writes days/{date} and the same day in the public data (as garment indexes), so public pages update
+ *  at once. Batches work offline: the SDK queues them and syncs when back online. */
+export function setDayWorn(uid: string, date: IsoDate, ids: string[], indexes: number[]): Promise<void> {
+  const batch = writeBatch(db);
+  const dayRef = doc(db, "users", uid, "days", date);
+  if (ids.length > 0) batch.set(dayRef, { worn: ids });
+  else batch.delete(dayRef);
+  batch.update(doc(db, "users", uid, "public", "data"), new FieldPath("days", date), indexes.length > 0 ? indexes : deleteField());
+  return batch.commit();
+}
+
+/** Whether local changes to the public data are still waiting to reach the server (e.g. offline). */
+export function usePendingWrites(uid: string): boolean {
+  const [pending, setPending] = useState(false);
   useEffect(
     () =>
-      onSnapshot(collection(db, "users", uid, "garments"), (snap) =>
-        setGarments(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Garment, "id">) }))),
+      onSnapshot(doc(db, "users", uid, "public", "data"), { includeMetadataChanges: true }, (snap) =>
+        setPending(snap.metadata.hasPendingWrites),
       ),
     [uid],
   );
-  return garments;
-}
-
-export function useDays(uid: string): Day[] | null {
-  const [days, setDays] = useState<Day[] | null>(null);
-  useEffect(
-    () =>
-      onSnapshot(collection(db, "users", uid, "days"), (snap) =>
-        setDays(
-          snap.docs
-            .map((d) => ({ date: d.id, worn: (d.data().worn as string[]) ?? [] }))
-            .sort((a, b) => a.date.localeCompare(b.date)),
-        ),
-      ),
-    [uid],
-  );
-  return days;
-}
-
-export function setWorn(uid: string, date: IsoDate, garmentId: string, worn: boolean) {
-  return setDoc(
-    doc(db, "users", uid, "days", date),
-    { worn: worn ? arrayUnion(garmentId) : arrayRemove(garmentId) },
-    { merge: true },
-  );
+  return pending;
 }
 
 /** The owner's public wardrobe; null while loading. Readable without signing in. */

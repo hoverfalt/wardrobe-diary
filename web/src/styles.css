@@ -132,3 +132,19 @@ button.danger { border-color: var(--accent); color: var(--accent); }
 .bulk-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; margin-bottom: 8px; border: 1px solid var(--accent); border-radius: 8px; background: var(--bg); }
 .bulk-bar small { flex-basis: 100%; }
 th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
+
+/* Logging (mobile-first) */
+.log-day { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.log-day h2 { margin: 0; font-size: 20px; min-width: 14em; }
+.log-day > button[aria-label] { font-size: 20px; line-height: 1; padding: 6px 14px; }
+.log-outfit { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.chips { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border-radius: 999px; font-size: 13px; }
+.chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.log-search { width: 100%; margin: 12px 0 0; }
+.tile { border-radius: 10px; }
+@media (max-width: 520px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
+  .tile img { width: 56px; height: 56px; }
+  .tile { font-size: 12px; padding: 6px 4px; }
+}

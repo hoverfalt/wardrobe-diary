@@ -12,7 +12,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { LogDay } from "./pages/LogDay";
 
 // Public pages (Dashboard, category pages) read only users/{OWNER_UID}/public/data, loaded once here
-// and shared, as is the date range. Logging needs sign-in; managing garments needs the owner (R-27).
+// and shared, as is the date range. Logging wears and managing garments need the owner's sign-in.
 export function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   useEffect(() => onAuthStateChanged(auth, setUser), []);
@@ -54,11 +54,13 @@ export function App() {
           signInPrompt
         ))}
       {route.page === "log" &&
-        (user ? (
-          <LogDay uid={user.uid} />
-        ) : user === null ? (
-          <button onClick={signIn}>Sign in with Google to log</button>
-        ) : null)}
+        (isOwner ? (
+          <LogDay uid={user!.uid} wardrobe={wardrobe} />
+        ) : user ? (
+          <p>Only the owner can log wears.</p>
+        ) : (
+          signInPrompt
+        ))}
     </main>
   );
 }
