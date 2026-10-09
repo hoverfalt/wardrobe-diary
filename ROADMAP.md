@@ -15,9 +15,9 @@ How this file works:
 - D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
   the single `public/data` document.
 - Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
-- R-22 (speed), daily cost and its animation done.
-- **Next for Claude:** R-09 "Average yearly cost and category frequency of use" (same `CategoryScatter`,
-  y = yearly cost), then "Monthly cost and comparison" (needs Q-4: import the Sheet's "Comparison" tab).
+- Portfolio page rebuilt except "Monthly cost and comparison", postponed until the comparison data is in
+  the Sheet (Q-4, waiting for Olof).
+- **Next for Claude:** the category pages (R-09, second half): item listing table first.
 
 ## Inbox
 
@@ -39,11 +39,12 @@ _(empty)_
         the per-category split is shown by the small multiples above instead
   - [x] Average cost per wear and category frequency of use: scatter, one category image per point in
         its colour ring (as on the live site), Sportswear included; values from the category listing (D-2)
-  - [ ] Average yearly cost and category frequency of use
+  - [x] Average yearly cost and category frequency of use: same scatter, y = yearly cost (D-2)
   - [x] Daily cost (cost of all items worn on a day; "all divested" = final): dots + 30-day centred average,
         summers shaded, fixed 0–40 € scale with a note on days above it; hollow/filled dots as well as colour
   - [x] Daily cost animated by date: interactive "as of" slider with play/pause instead of a GIF
-  - [ ] Monthly cost and comparison to other consumption (needs Q-4)
+  - [ ] Monthly cost and comparison to other consumption. **Postponed until Olof has entered the
+        comparison data in the Google Sheet (Q-4)**; then import that tab in the sync and build the chart
 
   One page per category (13: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks,
   Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear):
@@ -89,8 +90,8 @@ _(none open)_
 ## Open questions
 
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
-- **Q-4** Data source of the external consumption benchmarks in the monthly comparison
-  (R reads a "Comparison" tab from the Sheet).
+- **Q-4** Comparison data for the monthly cost chart (external consumption benchmarks). **Waiting for
+  Olof** to enter it in the Google Sheet (R read it from a "Comparison" tab).
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.

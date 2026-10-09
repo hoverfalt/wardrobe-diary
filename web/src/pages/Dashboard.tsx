@@ -48,6 +48,7 @@ const COLUMNS: {
 ];
 
 const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];
+const YEARLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Yearly cost"];
 
 export function Dashboard({ ownerUid }: { ownerUid: string }) {
   const wardrobe = usePublicWardrobe(ownerUid);
@@ -92,6 +93,15 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
       rows.flatMap((r): ScatterPoint[] =>
         r.category !== "Total" && r.costPerWear != null && r.daysUsed != null
           ? [{ category: r.category, x: r.daysUsed, y: r.costPerWear }]
+          : [],
+      ),
+    [rows],
+  );
+  const yearlyVsUse = useMemo(
+    () =>
+      rows.flatMap((r): ScatterPoint[] =>
+        r.category !== "Total" && r.yearlyCost != null && r.daysUsed != null
+          ? [{ category: r.category, x: r.daysUsed, y: r.yearlyCost }]
           : [],
       ),
     [rows],
@@ -172,6 +182,20 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
             yFormat={formatEur2}
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}
+          />
+          {rangeControl}
+
+          <h2>Average yearly cost and category frequency of use</h2>
+          <p className="muted">
+            Yearly cost of using the items in a particular category. Frequency of use is the share of all days in
+            which any item in the category was used.
+          </p>
+          <CategoryScatter
+            points={yearlyVsUse}
+            xLabel="Category frequency of use (share of all days)"
+            yLabel="Average yearly cost"
+            yFormat={formatEur}
+            tipLabels={YEARLY_VS_USE_TIP}
           />
           {rangeControl}
 
