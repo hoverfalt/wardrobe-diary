@@ -39,6 +39,28 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Later
 
+- **R-27 Garment management in the app** (add, edit, divest), starting with the existing portfolio incl.
+  divested items. Fields = Sheet columns A–K: Category, Item, Details, Photo, Price, Purchased, Divested,
+  Times used init, Materials, Weight. Design proposal (2026-10-09), pending D-4:
+  - **Data ownership (D-4):** garment fields move to Firestore as the source of truth; the Sheet keeps only
+    the daily wear log until cut-over (R-15). The sync stops writing garment fields and matches Sheet rows
+    to garments by Photo id (warns about rows without a garment and vice versa).
+  - **Where:** owner-only `/manage` (shown when signed in as the owner): searchable list with filters
+    (category, active/divested), and an edit page per garment. Category pages get an "Edit" link per item
+    when signed in.
+  - **Edit form:** category (standard list), name, details, price (€, cents), purchased / divested dates
+    (divested ≥ purchased), times used init, materials, weight (g); quick "Divest today" / "Undo divest".
+    Every save keeps the previous version in `garments/{id}/history` (undo, audit).
+  - **Add garment:** same form plus PNG upload with a preview in the circle used on the site; Photo id
+    generated as `<Category_with_underscores>-NNN` (next free number); stored as `<id>.png` in the Storage
+    bucket like the existing photos. Then add a Sheet row with that Photo id to log wears until R-15.
+  - **Public data:** after each save the app rebuilds `public/data` from the owner's garments and days, so
+    public pages update immediately (no Cloud Function needed).
+  - **Prerequisites:** Storage rules allowing the owner to upload photos (needs the live rules reviewed
+    first, see R-18); Firestore rules already allow owner writes.
+  - **Phases:** (a) edit and divest existing garments + sync switch; (b) add garments with photo upload;
+    (c) later: delete (only garments without wears), bulk edits.
+
 - **R-13 Daily logging UI** (mobile-first, offline). A basic version exists in `web/src/pages/LogDay.tsx`;
   don't use it for real logging until cut-over, since the sync overwrites it.
 - **R-14 Automatic sync** while the Sheet is the source of truth (e.g. scheduled GitHub Action or
@@ -54,7 +76,13 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Decisions needed
 
-_(none open)_
+- **D-4 Where do garment details live once they can be edited in the app (R-27)?**
+  (a) Firestore becomes the source of truth for garment details now; the Sheet keeps only the wear log
+  until cut-over. Simple, but columns A–K in the Sheet go stale, and a new garment still needs a Sheet row
+  (Photo id only) for logging. (b) The app writes changes back to the Sheet through a Cloud Function using
+  the service account (Sheet stays the single source; needs Editor access, the Blaze plan, and careful
+  row matching around formulas and manual edits). (c) Wait and launch garment management together with
+  in-app logging at cut-over (R-13/R-15). **Recommendation: (a).**
 
 ## Open questions
 
