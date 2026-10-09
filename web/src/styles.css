@@ -76,3 +76,15 @@ td.img { width: 28px; padding: 2px 4px; }
 .date-range-years { position: relative; height: 16px; margin: 0 9px; font-size: 11px; color: var(--muted); }
 .date-range-years span { position: absolute; transform: translateX(-50%); }
 .date-range .muted { margin: 6px 0 0; }
+
+/* Chart legends and the "as of" control */
+.chart-legend { list-style: none; padding: 0; margin: 0 0 6px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
+.chart-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.chart-legend .dot.hollow { border: 1.5px solid; background: none; width: 6px; height: 6px; }
+.chart-legend .line { width: 16px; height: 2px; display: inline-block; }
+.chart-legend .box { width: 12px; height: 10px; display: inline-block; background: rgba(245, 215, 110, 0.35); }
+.as-of { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+.as-of label { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 240px; }
+.as-of input[type="range"] { flex: 1; accent-color: var(--accent); }
+.as-of strong { font-variant-numeric: tabular-nums; min-width: 6.5em; }

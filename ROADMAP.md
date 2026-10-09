@@ -15,8 +15,9 @@ How this file works:
 - D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
   the single `public/data` document.
 - Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
-- Average cost per wear vs frequency of use scatter done.
-- **Next for Claude:** R-09 "Average yearly cost and category frequency of use" (same `CategoryScatter`, y = yearly cost).
+- R-22 (speed), daily cost and its animation done.
+- **Next for Claude:** R-09 "Average yearly cost and category frequency of use" (same `CategoryScatter`,
+  y = yearly cost), then "Monthly cost and comparison" (needs Q-4: import the Sheet's "Comparison" tab).
 
 ## Inbox
 
@@ -39,8 +40,9 @@ _(empty)_
   - [x] Average cost per wear and category frequency of use: scatter, one category image per point in
         its colour ring (as on the live site), Sportswear included; values from the category listing (D-2)
   - [ ] Average yearly cost and category frequency of use
-  - [ ] Daily cost (cost of all items worn on a day; "all divested" = final)
-  - [ ] Daily cost animated by date (GIF on the live site; could become an interactive date slider)
+  - [x] Daily cost (cost of all items worn on a day; "all divested" = final): dots + 30-day centred average,
+        summers shaded, fixed 0–40 € scale with a note on days above it; hollow/filled dots as well as colour
+  - [x] Daily cost animated by date: interactive "as of" slider with play/pause instead of a GIF
   - [ ] Monthly cost and comparison to other consumption (needs Q-4)
 
   One page per category (13: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks,
@@ -64,7 +66,7 @@ _(empty)_
 
 1. **R-10 Reference data from R.** Export golden CSVs from the Threddit R pipeline into `reference/`
    and add tests comparing the TypeScript metrics to them.
-2. **R-12 Resolve the remaining metric questions** (Q-1, Q-2, Q-4) against the Threddit R scripts.
+2. **R-12 Resolve the remaining metric questions** (Q-2, Q-4) against the Threddit R scripts.
 
 ## Later
 
@@ -86,7 +88,6 @@ _(none open)_
 
 ## Open questions
 
-- **Q-1** Exact daily-cost formula in R (the "Daily cost" chart, `calculate_daily_cost`).
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Data source of the external consumption benchmarks in the monthly comparison
   (R reads a "Comparison" tab from the Sheet).
@@ -102,6 +103,11 @@ _(none open)_
   item table.
 
 ## Decisions made
+
+- **2026-10-09 Q-1** Daily cost (from R `calculate_daily_cost`) = Σ over garments worn that day (and owned
+  then) of their lifetime cost per wear; "all divested" = every one of them is divested, so the value is
+  final. Plus a 30-day rolling mean centred on the day. Matches D-2. The animation instead uses values
+  "as of" each date (only wears up to then), which is what the live site's GIF shows.
 
 - **2026-10-09 D-3** Charts that show several categories use small multiples: one small chart per
   category on a shared scale, with its category image and the value at the end date, instead of many

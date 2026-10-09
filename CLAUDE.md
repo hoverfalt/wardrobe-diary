@@ -132,7 +132,11 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors and deliberate differences
   are listed in ROADMAP.md and in the test.
 
-Still to port: daily cost, monthly cost and the benchmark comparison (questions in ROADMAP.md).
+- Daily cost (`dailyCost`) = Σ lifetime cost per wear of the garments worn (and owned) that day; "final"
+  when all of them are divested; `average` = 30-day rolling mean centred on the day (values i−14 … i+15).
+  With `asOf`, values are computed as known on that date (used by the animation).
+
+Still to port: monthly cost and the benchmark comparison (questions in ROADMAP.md).
 
 ## Commands
 

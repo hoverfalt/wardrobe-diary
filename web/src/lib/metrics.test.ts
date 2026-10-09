@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Day, Garment } from "../types";
 import {
   activeItemsOverTime,
+  dailyCost,
+  rollingMean,
   inventoryValueOverTime,
   totalInventoryValueOverTime,
   valueOn,
@@ -149,5 +151,46 @@ describe("inventory value over time", () => {
     const total = totalInventoryValueOverTime([a, b, shirt], range);
     expect(valueOn(total, "2018-01-02")).toBe(30.3);
     expect(valueOn(total, "2018-01-05")).toBe(20.9);
+  });
+});
+
+describe("dailyCost", () => {
+  // shirt: 30 €, worn 3 times; jacket: 100 €, worn twice, divested on 2018-01-03
+  const shirt = garment({ id: "shirt", category: "Shirts", price: 30 });
+  const jacket = garment({ id: "jacket", price: 100, divested: "2018-01-03" });
+  const days: Day[] = [
+    { date: "2018-01-01", worn: ["shirt", "jacket"] },
+    { date: "2018-01-02", worn: ["jacket"] },
+    { date: "2018-01-03", worn: ["shirt"] },
+    { date: "2018-01-04", worn: ["shirt", "jacket"] }, // jacket after divesting: ignored
+  ];
+  const range = { from: "2018-01-01", to: "2018-01-04" };
+
+  it("sums lifetime cost per wear of the garments worn each day (D-2)", () => {
+    expect(dailyCost([shirt, jacket], days, range).map((p) => [p.date, p.cost, p.final])).toEqual([
+      ["2018-01-01", 10 + 50, false],
+      ["2018-01-02", 50, true],
+      ["2018-01-03", 10, false],
+      ["2018-01-04", 10, false],
+    ]);
+  });
+
+  it("computes values as known on a date with asOf", () => {
+    const asOf = dailyCost([shirt, jacket], days, range, "2018-01-02");
+    expect(asOf.map((p) => [p.date, p.cost, p.final])).toEqual([
+      ["2018-01-01", 30 + 50, false], // shirt worn once so far; jacket not yet divested
+      ["2018-01-02", 50, false],
+    ]);
+  });
+});
+
+describe("rollingMean", () => {
+  it("centres a 30-value window on values i-14 … i+15", () => {
+    const values = Array.from({ length: 40 }, (_, i) => i);
+    const out = rollingMean(values, 30);
+    expect(out[13]).toBeNull();
+    expect(out[14]).toBe((0 + 29) / 2); // mean of 0…29
+    expect(out[24]).toBe((10 + 39) / 2); // mean of 10…39
+    expect(out[25]).toBeNull();
   });
 });

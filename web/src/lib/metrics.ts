@@ -287,3 +287,67 @@ export function valueOn(points: SeriesPoint[], date: IsoDate): number {
 function round2(v: number): number {
   return Math.round(v * 100) / 100;
 }
+
+export interface DailyCostPoint {
+  date: IsoDate;
+  /** Sum of the cost per wear of the garments worn that day (R: `calculate_daily_cost`). */
+  cost: number;
+  /** All garments worn that day are divested, so their cost per wear, and the day's cost, are final. */
+  final: boolean;
+  /** 30-day rolling average centred on the day; null near the ends of the range. */
+  average: number | null;
+}
+
+/** Daily cost for each day in the range on which something was worn.
+ *
+ *  By default (D-2) each garment's cost per wear is its lifetime value. With `asOf`, everything is
+ *  computed as it was known on that date: only wears up to `asOf` count, and a garment is "divested"
+ *  only if it was divested by then. That is what the live site's daily cost animation shows. */
+export function dailyCost(garments: Garment[], days: Day[], range: DateRange, asOf: IsoDate = FOREVER): DailyCostPoint[] {
+  const wears = wearIndex(days);
+  const known: DateRange = { from: TRACKING_START, to: asOf };
+  const byId = new Map(garments.map((g) => [g.id, g]));
+  const cpw = new Map<string, number>();
+  const costOf = (g: Garment) => {
+    let c = cpw.get(g.id);
+    if (c === undefined) {
+      const n = timesWorn(g, wears, known);
+      c = g.price == null ? 0 : n === 0 ? g.price : g.price / n;
+      cpw.set(g.id, c);
+    }
+    return c;
+  };
+  const to = min(range.to, asOf);
+  const points: DailyCostPoint[] = [];
+  for (const day of days) {
+    if (day.date < range.from || day.date > to) continue;
+    let cost = 0;
+    let final = true;
+    let worn = 0;
+    for (const id of day.worn) {
+      const g = byId.get(id);
+      if (!g || !isActive(g, day.date)) continue; // wears outside ownership don't count (as in R)
+      cost += costOf(g);
+      final &&= g.divested != null && g.divested <= asOf;
+      worn++;
+    }
+    if (worn > 0) points.push({ date: day.date, cost, final, average: null });
+  }
+  const averages = rollingMean(points.map((p) => p.cost), 30);
+  points.forEach((p, i) => (p.average = averages[i]));
+  return points;
+}
+
+/** Mean of `window` consecutive values centred on each index (R: roll_mean shifted to the midpoint:
+ *  values i−14 … i+15 for a 30-value window); null where the window doesn't fit. */
+export function rollingMean(values: number[], window: number): (number | null)[] {
+  const ahead = Math.round(window / 2); // the window ending at i is centred on i − ahead
+  const out: (number | null)[] = values.map(() => null);
+  let sum = 0;
+  for (let i = 0; i < values.length; i++) {
+    sum += values[i];
+    if (i >= window) sum -= values[i - window];
+    if (i >= window - 1) out[i - ahead] = sum / window;
+  }
+  return out;
+}

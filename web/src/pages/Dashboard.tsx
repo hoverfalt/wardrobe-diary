@@ -2,6 +2,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
+import { DailyCostAnimation, DailyCostChart } from "../components/DailyCostCharts";
 import { DateRangeControl } from "../components/DateRangeControl";
 import { isValidRange, todayIso } from "../lib/dates";
 import {
@@ -79,6 +80,7 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
     if (!garments) return null;
     const notSportswear = garments.filter((g) => g.category !== "Sportswear");
     return {
+      notSportswear,
       activeItems: activeItemsOverTime(notSportswear, range),
       inventoryValue: inventoryValueOverTime(notSportswear, range),
       totalValue: totalInventoryValueOverTime(notSportswear, range),
@@ -171,6 +173,22 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}
           />
+          {rangeControl}
+
+          <h2>Daily cost</h2>
+          <p className="muted">
+            Daily cost of all items used on a particular day: the sum of their cost per wear. “All divested”
+            means the daily cost is final and no longer decreases with future use. Sportswear not included.
+          </p>
+          <DailyCostChart garments={charts.notSportswear} days={days!} range={range} />
+          {rangeControl}
+
+          <h2>Daily cost – animated by date</h2>
+          <p className="muted">
+            Daily costs as they looked on the “as of” date, counting only the wears logged by then. Press play
+            to watch the cost of past days fall as the garments worn on them get more use.
+          </p>
+          <DailyCostAnimation garments={charts.notSportswear} days={days!} range={range} />
           {rangeControl}
         </>
       )}
