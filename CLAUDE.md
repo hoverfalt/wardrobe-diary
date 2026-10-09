@@ -54,7 +54,9 @@ users/{uid}/garments/{garmentId}          // source of truth for garment details
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
   timesUsedInit, materials, weightG
 users/{uid}/garments/{garmentId}/history/{autoId}
-  savedAt, before, after                  // every save in the app keeps the previous version
+  savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
+users/{uid}/deletedGarments/{garmentId}
+  deletedAt, garment                      // deleted in the app (never-worn only); the sync won't re-create it
 users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
 users/{uid}/public/data     // world-readable copy for public pages (decision D-1), written by the sync:
@@ -79,7 +81,8 @@ Since D-4 (2026-10-09) it **never updates or deletes garments**: it reads the st
 Firestore, takes only the wear ticks from the Sheet (rows matched by Photo id), and rebuilds `public/data`.
 New garments are added in the app (`/manage/new`, photo uploaded); to log their wears in the Sheet, add a row
 with Category, Item and the Photo id (only the Photo id is matched). A Sheet row whose Photo id has no garment
-yet is still created once; garments without a Sheet row are reported, since their wears can't be logged there.
+yet is still created once, unless it was deleted in the app (`deletedGarments`); garments without a Sheet row
+are reported, since their wears can't be logged there. Ticks for garments that don't exist are dropped.
 - Validates that day columns run consecutively (catches header typos like `0204-02-19`) and that
   `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
   if either check fails.
@@ -163,10 +166,10 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/LogDay.tsx` | Signed-in daily logging (not for real use before cut-over) |
-| `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters; `/manage/<id>` edit form, divest, history; `/manage/new` add with photo upload |
-| `components/GarmentFormFields.tsx` | The garment form fields (columns A–K), shared by edit and add |
+| `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters and bulk changes; `/manage/<id>` edit, divest, replace photo, delete (never worn), history; `/manage/new` add with photo upload |
+| `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
 | `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |
-| `data/repo.ts` | Firestore access; `saveGarment` / `createGarment` = one transaction each: history + garment + its entry in `public/data` |
+| `data/repo.ts` | Firestore access. Every garment write is one transaction that also updates `public/data`: `updateGarments` (single and bulk edits, computed from the stored version), `createGarment`, `deleteGarment` (re-indexes the days via `withoutGarment`) |
 | `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` |
 | `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |

@@ -12,12 +12,10 @@ How this file works:
 
 ## Where we left off (2026-10-09)
 
-- **R-27 garment management, phases (a) and (b) built.** (a) tested OK by Olof. (b) `/manage/new` adds a
-  garment with its PNG photo; **waiting for Olof to test it** (needs the owner's sign-in).
-- **Security fix:** the 2021 Storage rules let any signed-in user write to both buckets, which became
-  reachable when Google sign-in was enabled (2026-10-07). Replaced with owner-only, PNG-only uploads; no
-  files had been changed in the meantime.
-- Next: R-27 phase (c) when wanted, or another scope (see Next / Later). R-26 still waits for Q-4 data.
+- **R-27 garment management: phases (a), (b) and (c) built**; (a) and (b) tested OK by Olof. Phase (c) adds
+  replacing a photo, deleting never-worn garments, and bulk changes on the Manage list. **Waiting for Olof
+  to test (c)** (needs the owner's sign-in).
+- Next: another scope (see Next / Later). R-26 still waits for the Q-4 comparison data.
 
 ## Inbox
 
@@ -25,7 +23,7 @@ _(empty)_
 
 ## Now
 
-- **R-27 Garment management**: phases (a) and (b) built; (b) awaiting Olof's test. Phase (c) later (see Later).
+- **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
 
 ## Next
 
@@ -58,8 +56,9 @@ _(empty)_
   - **Prerequisites:** Storage rules allowing the owner to upload photos ✅ (live rules reviewed and
     replaced, 2026-10-09); Firestore rules already allow owner writes.
   - **Phases:** (a) edit and divest existing garments + sync switch ✅ 2026-10-09 (tested); (b) add garments
-    with photo upload ✅ built 2026-10-09; (c) later: replace a garment's photo, delete (only garments
-    without wears), bulk edits.
+    with photo upload ✅ 2026-10-09 (tested); (c) replace a garment's photo, delete (only never-worn garments,
+    recorded in `deletedGarments` so the sync won't re-create them), bulk changes (divest on a date, mark
+    active, set category) ✅ built 2026-10-09.
 
 - **R-13 Daily logging UI** (mobile-first, offline). A basic version exists in `web/src/pages/LogDay.tsx`;
   don't use it for real logging until cut-over, since the sync overwrites it.
