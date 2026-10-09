@@ -53,13 +53,19 @@ users/{uid}/garments/{garmentId}
   timesUsedInit, materials, weightG
 users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
-users/{uid}/public/summary  // precomputed data for public pages, world-readable
+users/{uid}/public/data     // world-readable copy for public pages (decision D-1), written by the sync:
+  version: 1, garments: Garment[] (all fields), days: { "YYYY-MM-DD": number[] }  // indexes into garments
 ```
 
 - `garmentId` = the Sheet's Photo id (e.g. `Jackets_and_hoodies-006`); fallback slug if blank.
 - One doc per day: logging a day = one write; full history ≈ 3,200 docs, cached offline by the SDK.
-- **Public pages must read only `public/summary`**, never the raw days collection (Firestore bills per doc read).
-  What goes into it (full compact log vs aggregates only) is an open decision in ROADMAP.md.
+- **Public pages read only `public/data`** (one document read), never the raw garments/days collections
+  (Firestore bills per doc read). It holds the full day-by-day log so any metric can be computed for any
+  time span in the browser. ~435 kB in 2026 of the 1 MiB document limit (grows ~30 kB/year); the sync
+  prints its size and warns above 800 kB.
+- `firestore.indexes.json` exempts `public.garments` and `public.days` from indexing: otherwise the log
+  exceeds Firestore's 40,000 index entries per document.
+- The app reads `VITE_OWNER_UID` (in `web/.env.local`) to know whose public data to show.
 - Security rules: owner-only read/write under `users/{uid}`, world-readable `public/*`.
 
 ## Sheet → Firestore sync
@@ -109,17 +115,22 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 - Ownership: from `max(purchased, 2018-01-01)` to `divested` **inclusive** (the divest day counts).
   Wears outside ownership are ignored.
 - Times worn = wears in range (+ `timesUsedInit` if the range starts 2018-01-01).
-- Garment cost per wear = price / times worn; **an unworn garment costs its full price**.
+- Garment cost per wear (decision D-2) = price / **all** wears over the garment's whole ownership
+  (incl. `timesUsedInit`), **independent of the chosen range**, even counting wears after the range ends.
+  An unworn garment costs its full price.
 - Wears per month = times worn / (days owned / 30.5); days owned count from purchase, frozen at divest.
 - Category listing (the live site's portfolio table):
   - Active items, Inventory value: garments active on `to`, and the sum of their prices.
-  - Cost per wear = Σ price of all garments owned during the range (incl. divested) / Σ their times worn.
+  - Cost per wear (D-2) = use-weighted average of garment cost per wear over the category's garments
+    with ≥ 1 wear in the range, weighted by their wears in the range. (R instead used Σ price of all
+    owned garments / Σ wears, so this column, Yearly cost and Turnover differ from the live site.)
   - Days used = share of days from the category's first ownership day to `to` with ≥ 1 wear in the category.
   - Yearly cost = cost per wear × 365 × days used.
   - Inventory turnover = yearly cost / inventory value. Total row: sums, turnover = Σ yearly / Σ value.
 - Validation: `metrics.reference.test.ts` compares with the live site's tables in the git-ignored
   `reference/` folder (snapshot date 2026-09-03; refresh `reference/sheet.json` with
-  `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors are listed in ROADMAP.md.
+  `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors and deliberate differences
+  are listed in ROADMAP.md and in the test.
 
 Still to port: daily cost, monthly cost and the benchmark comparison (questions in ROADMAP.md).
 

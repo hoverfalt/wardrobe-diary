@@ -1,10 +1,12 @@
 // Port of the Threddit R metrics (github.com/hoverfalt/Threddit: 01-, 02-, 03-Calculate_plot_data.R).
 // Keep these pure and tested.
 //
-// Every metric takes a DateRange. With range.from = TRACKING_START the results match the R pipeline,
-// which always measured "from the start of tracking up to a date". Later starts are provisional
-// (see ROADMAP D-2): wears are counted inside the range only, and "Times used init" (wears before
-// tracking began) counts only when the range starts at TRACKING_START.
+// Metrics take a DateRange (users choose time spans). Wears are counted inside the range only, and
+// "Times used init" (wears before tracking began) counts only when the range starts at TRACKING_START.
+//
+// Exception, by decision D-2 (2026-10-09): a garment's cost per wear never depends on the range. It is
+// always price / all wears over the garment's whole ownership (purchase to divest day inclusive, plus
+// pre-tracking wears), even wears after the range's end, so the concept is treated consistently.
 import type { Day, Garment, IsoDate } from "../types";
 import { compareCategories } from "./categories";
 
@@ -72,10 +74,15 @@ export function timesWorn(g: Garment, wears: WearIndex, range: DateRange): numbe
   return init + wearDatesIn(g, wears, range).length;
 }
 
-/** Price / times worn. An unworn garment's cost per wear is its full price (as in R). */
-export function costPerWear(g: Garment, wears: WearIndex, range: DateRange): number | null {
+/** All wears over the garment's whole ownership, including pre-tracking wears. */
+export function lifetimeWears(g: Garment, wears: WearIndex): number {
+  return timesWorn(g, wears, { from: TRACKING_START, to: FOREVER });
+}
+
+/** Price / lifetime wears, independent of any chosen range (D-2). An unworn garment costs its full price (as in R). */
+export function costPerWear(g: Garment, wears: WearIndex): number | null {
   if (g.price == null) return null;
-  const n = timesWorn(g, wears, range);
+  const n = lifetimeWears(g, wears);
   return n === 0 ? g.price : g.price / n;
 }
 
@@ -110,7 +117,7 @@ export function itemListing(garments: Garment[], days: Day[], range: DateRange):
         garment: g,
         category: g.category,
         timesWorn: n,
-        costPerWear: costPerWear(g, wears, range),
+        costPerWear: costPerWear(g, wears),
         wearsPerMonth: owned > 0 ? n / (owned / 30.5) : 0,
         monthsOwned: owned / 30.5,
         active: isActive(g, range.to),
@@ -124,7 +131,8 @@ export interface CategoryRow {
   activeItems: number;
   /** Sum of purchase prices of garments active on range.to. */
   inventoryValue: number;
-  /** Value of all garments owned during the range / their total wears (the live site's "Cost per wear"). */
+  /** Use-weighted average of the garments' (lifetime) cost per wear, over garments worn in the range,
+   *  weighted by their wears in the range (D-2). */
   costPerWear: number | null;
   /** Share of days in the range on which any garment of the category was worn ("Days used"). */
   daysUsed: number | null;
@@ -149,9 +157,16 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
     .map(([category, items]): CategoryRow => {
       const active = items.filter((g) => isActive(g, range.to));
       const inventoryValue = sum(active.map((g) => g.price ?? 0));
-      const value = sum(items.map((g) => g.price ?? 0));
-      const uses = sum(items.map((g) => timesWorn(g, wears, range)));
-      const costPerWear = uses > 0 ? value / uses : null;
+      let weighted = 0;
+      let uses = 0;
+      for (const g of items) {
+        const n = timesWorn(g, wears, range);
+        const cpw = costPerWear(g, wears);
+        if (n === 0 || cpw == null) continue;
+        weighted += cpw * n;
+        uses += n;
+      }
+      const avgCostPerWear = uses > 0 ? weighted / uses : null;
 
       // Category days counted from when the category's first garment was owned (as in R).
       const start = max(range.from, items.map(ownedFrom).reduce(min));
@@ -159,12 +174,12 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
       const span = daysInclusive(start, range.to);
       const daysUsed = span > 0 ? used.size / span : null;
 
-      const yearlyCost = costPerWear != null && daysUsed != null ? costPerWear * 365 * daysUsed : null;
+      const yearlyCost = avgCostPerWear != null && daysUsed != null ? avgCostPerWear * 365 * daysUsed : null;
       return {
         category,
         activeItems: active.length,
         inventoryValue,
-        costPerWear,
+        costPerWear: avgCostPerWear,
         daysUsed,
         yearlyCost,
         turnover: yearlyCost != null && inventoryValue > 0 ? yearlyCost / inventoryValue : null,

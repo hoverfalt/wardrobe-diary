@@ -19,7 +19,10 @@ import sys
 from pathlib import Path
 
 from sheet_transform import (
+    PUBLIC_DOC_WARN_BYTES,
+    firestore_size,
     parse_sheet,
+    public_document,
     validate_day_columns,
     validate_times_used,
     wears_outside_ownership,
@@ -63,6 +66,14 @@ def write_firestore(uid: str, data) -> None:
     ]
     ops = [(ref, doc) for ref, doc in writes] + [(ref, None) for ref in stale]
     print(f"  {len(writes)} docs to write, {len(stale)} stale docs to delete")
+
+    # Public copy for the public pages (D-1), written last so it reflects a complete sync.
+    public = public_document(data)
+    ops.append((user.collection("public").document("data"), public))
+    size = firestore_size(public)
+    print(f"  public/data: {size / 1000:.0f} kB of Firestore's 1 MiB limit")
+    if size > PUBLIC_DOC_WARN_BYTES:
+        print("  WARNING public/data is getting close to the 1 MiB limit; switch to a more compact encoding")
 
     for i in range(0, len(ops), BATCH_SIZE):
         batch = db.batch()

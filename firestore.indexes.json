@@ -1,1 +1,15 @@
-{ "indexes": [], "fieldOverrides": [] }
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "public",
+      "fieldPath": "garments",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "public",
+      "fieldPath": "days",
+      "indexes": []
+    }
+  ]
+}

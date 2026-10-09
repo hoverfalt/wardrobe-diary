@@ -173,6 +173,40 @@ def parse_sheet(rows: List[List[Any]]) -> SheetData:
     return out
 
 
+# Firestore's document limit is 1 MiB; warn well before it.
+PUBLIC_DOC_WARN_BYTES = 800_000
+
+
+def public_document(data: SheetData) -> Dict[str, Any]:
+    """The world-readable users/{uid}/public/data document (decision D-1): every garment plus the full
+    day-by-day log, so public pages can compute any metric for any time span with one document read.
+
+    Days map to indexes into `garments` (Firestore allows no nested arrays, and indexes keep it small).
+    Days with nothing worn are left out.
+    """
+    index = {g.id: i for i, g in enumerate(data.garments)}
+    return {
+        "version": 1,
+        "garments": [asdict(g) for g in data.garments],
+        "days": {day: [index[gid] for gid in worn] for day, worn in sorted(data.days.items()) if worn},
+    }
+
+
+def firestore_size(value: Any) -> int:
+    """Approximate stored size in bytes, per Firestore's documented size rules."""
+    if value is None or isinstance(value, bool):
+        return 1
+    if isinstance(value, (int, float)):
+        return 8
+    if isinstance(value, str):
+        return len(value.encode()) + 1
+    if isinstance(value, list):
+        return sum(firestore_size(v) for v in value)
+    if isinstance(value, dict):
+        return sum(len(k.encode()) + 1 + firestore_size(v) for k, v in value.items())
+    raise TypeError(type(value))
+
+
 def validate_day_columns(data: SheetData) -> List[str]:
     """Check that the day columns run one day apart, in Sheet order, with no gaps or duplicates.
 

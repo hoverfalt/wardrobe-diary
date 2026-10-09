@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useDays, useGarments } from "../data/repo";
+import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
 import { todayIso } from "../lib/dates";
@@ -28,9 +28,10 @@ const COLUMNS: {
   { key: "turnover", title: "Inventory turnover", format: pct, bar: "var(--bar-grey)" },
 ];
 
-export function Dashboard({ uid }: { uid: string }) {
-  const garments = useGarments(uid);
-  const days = useDays(uid);
+export function Dashboard({ ownerUid }: { ownerUid: string }) {
+  const wardrobe = usePublicWardrobe(ownerUid);
+  const garments = wardrobe?.garments;
+  const days = wardrobe?.days;
   const [range, setRange] = useState<DateRange>({ from: TRACKING_START, to: todayIso() });
   const rows = useMemo(
     () => (garments && days && range.from <= range.to ? categoryListing(garments, days, range) : []),

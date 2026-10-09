@@ -12,6 +12,9 @@ const app = initializeApp({
 
 export const auth = getAuth(app);
 
+/** Whose wardrobe the public pages show. */
+export const OWNER_UID: string = import.meta.env.VITE_OWNER_UID;
+
 // Offline cache: the full history is small, so it stays on device and logging works offline.
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),

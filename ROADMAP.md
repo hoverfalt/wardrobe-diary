@@ -10,13 +10,12 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-08)
+## Where we left off (2026-10-09)
 
-- Category listing is done and live on the signed-in Dashboard (wardrobediary.web.app); the live site is untouched.
-- **Waiting for Olof:** D-1 (what public pages expose), D-2 (span semantics), Q-8 (Boss Modern black 15/16 divest date), plus new remarks.
-- **Next for Claude:** triage the new remarks into this file; after any Sheet fixes run
-  `tools/sync.sh --write --dump ../reference/sheet.json`; continue R-09 with "Active items by category
-  (over time)", the first chart (load the dataviz skill first; Observable Plot is the suggested library).
+- D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
+  the single `public/data` document.
+- **Next for Claude:** R-09 "Active items by category (over time)", the first chart (load the dataviz
+  skill first; Observable Plot is the suggested library).
 
 ## Inbox
 
@@ -29,8 +28,9 @@ _(empty)_
 
   Portfolio page (`portfolio.html`):
   - [x] Category listing table: Category, Active items, Inventory value, Cost per wear, Days used
-        (share of days), Yearly cost, Inventory turnover; plus a Total row. On the signed-in Dashboard
-        with a from/to date range, category images and data bars (same colours and max logic); matches the live site except where the live site is wrong (see R pipeline bugs)
+        (share of days), Yearly cost, Inventory turnover; plus a Total row. On the public Dashboard with
+        a from/to date range, category images and data bars (same colours and max logic). Cost per wear,
+        Yearly cost and Turnover follow D-2; the rest matches the live site except where it is wrong
   - [ ] Active items by category (over time)
   - [ ] Inventory value by category (over time)
   - [ ] Total inventory value (over time, stacked)
@@ -61,9 +61,7 @@ _(empty)_
 
 1. **R-10 Reference data from R.** Export golden CSVs from the Threddit R pipeline into `reference/`
    and add tests comparing the TypeScript metrics to them.
-2. **R-11 Public data document.** Have the sync also write `users/{uid}/public/summary`, so public
-   pages need one document read. Blocked by D-1.
-3. **R-12 Resolve the remaining metric questions** (Q-1, Q-2, Q-4) against the Threddit R scripts.
+2. **R-12 Resolve the remaining metric questions** (Q-1, Q-2, Q-4) against the Threddit R scripts.
 
 ## Later
 
@@ -74,24 +72,14 @@ _(empty)_
 - **R-15 Cut-over:** stop entering in the Sheet, make Firestore the source of truth, scheduled Firestore
   export as backup.
 - **R-16 Domain switch:** point wardrobediary.io at the new app once it covers the live site.
-- **R-17 Multi-user:** sign-up, public profiles, `public/summary` via Cloud Function.
+- **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 - **R-18 Housekeeping:** code-split the web bundle (> 500 kB warning); move `tools/.venv` to
   Python ≥ 3.10 (3.9 is end of life); review `storage.rules` against the live rules before it is ever
   deployed.
 
 ## Decisions needed
 
-- **D-1 What do public pages expose?** Either (a) one public document with the full compact daily
-  log, so all metrics are computed in the browser with the existing TypeScript code, or (b) aggregates
-  only, which shows less detail but means duplicating some metric logic in Python. Recommendation: (a).
-  User-chosen time spans (see Decisions made, 2026-10-08) practically require it: with (b), every span
-  a visitor could pick would have to be precomputed.
-- **D-2 What do metrics mean for a span that starts after 2018-01-01?** The R metrics are all
-  "from the start of tracking up to a date". Current provisional rule: only wears inside the span count,
-  "Times used init" counts only for spans starting 2018-01-01, and a garment's full price counts in
-  every span it was owned in (so short spans show high cost per wear). Alternatives: spread the price
-  over the ownership period, or show "cost so far" as of the end date. To decide when building the
-  first view where it matters.
+_(none open)_
 
 ## Open questions
 
@@ -99,10 +87,9 @@ _(empty)_
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Data source of the external consumption benchmarks in the monthly comparison
   (R reads a "Comparison" tab from the Sheet).
-- **Q-8** 15 garments have wears outside their purchase-to-divest period; the metrics ignore those wears
-  (as R did), and `tools/sync.sh` lists them. Mostly single wears just after the divest date, but
-  *Boss Modern black 15* and *16* have about 60 wears each after a divest date of 2023-05-05,
-  one day after purchase. Is that divest date a typo?
+- **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
+  `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
+  Fix the dates in the Sheet if they are wrong; otherwise nothing to do.
 
 ### R pipeline bugs found while porting (the new code does not reproduce them)
 
@@ -112,6 +99,15 @@ _(empty)_
   item table.
 
 ## Decisions made
+
+- **2026-10-09 D-1** Public pages get the full day-by-day log and compute the metrics from it. The sync
+  writes it to the world-readable `users/{uid}/public/data` document; the Dashboard is public.
+- **2026-10-09 D-2** A garment's cost per wear is always price / all its wears over its whole ownership
+  (purchase to divest day inclusive), regardless of the chosen time span, even when wears after the
+  span lower it: the concept must be treated consistently. A category's cost per wear for a span is the
+  use-weighted average of the cost per wear of its garments worn at least once in the span.
+- **2026-10-09 Q-8** The divest dates of *Boss Modern black 15* and *16* (2023-05-05) were typos; now
+  blank in the Sheet.
 
 - **2026-10-08** Sheet rows with an empty Category are skipped by the sync, like "ADD NEXT" rows and as
   in R (was Q-7: 13 Socks rows, `Socks-100`…`107` and `Socks-142`…`146`).
@@ -142,5 +138,9 @@ _(empty)_
   Metrics); tests compare every category and item with the live site.
 - **R-20** 2026-10-08 Sync skips "ADD NEXT" placeholder rows, rounds prices to cents, warns about empty
   categories and wears outside ownership.
+- **R-11** 2026-10-09 Public data document `public/data` (full log, one read) written by the sync;
+  Dashboard reads it and no longer needs sign-in.
+- **R-21** 2026-10-09 D-2 cost per wear implemented (lifetime garment cost per wear, use-weighted
+  category average).
 - **R-08** 2026-10-07 Inventory of the live site's views (checklist under R-09); live tables saved
   to `reference/live/`.

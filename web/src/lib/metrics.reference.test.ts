@@ -18,7 +18,10 @@ const KNOWN_LIVE_ERRORS: Record<string, string> = {
   "Underwear boxers": "R dropped Urban Classics dark camo 07–10 (duplicate item names)",
   // The live category row is 210 € above the sum of the live Sportswear item table.
   Sportswear: "live category row disagrees with the live item table",
+  // Q-8: divest dates of Boss Modern black 15/16 were typos, fixed in the Sheet after the snapshot.
+  "Underwear shirts": "Boss Modern black 15/16 divest dates fixed after the snapshot",
 };
+const ITEMS_FIXED_SINCE_SNAPSHOT = new Set(["Boss Modern black 15", "Boss Modern black 16"]);
 
 const LIVE_ITEM_TABLES = [
   "jackets", "blazers", "knits", "shirts", "t-shirts", "pants", "shorts",
@@ -71,10 +74,11 @@ describe.skipIf(!haveData)("category listing vs live site", () => {
     expect(o, `category ${category} missing`).toBeDefined();
     const report = { category, live: l, ours: o };
     // Tolerances: the Sheet has changed a little since the snapshot (dates, late-logged days).
+    // Cost per wear, and so Yearly cost and Turnover, are not compared: decision D-2 defines them
+    // differently from R (lifetime cost per wear, use-weighted, unworn garments left out).
     expect(Math.abs(o!.activeItems - l.activeItems!), JSON.stringify(report)).toBeLessThanOrEqual(1);
+    expect(Math.abs(o!.inventoryValue - l.inventoryValue!), JSON.stringify(report)).toBeLessThan(0.05);
     expect(o!.daysUsed!).toBeCloseTo(l.daysUsed!, 2);
-    expect(relErr(o!.costPerWear!, l.costPerWear!), JSON.stringify(report)).toBeLessThan(0.02);
-    expect(relErr(o!.yearlyCost!, l.yearlyCost!), JSON.stringify(report)).toBeLessThan(0.02);
   });
 });
 
@@ -91,6 +95,7 @@ describe.skipIf(!haveData)("item listings vs live site", () => {
     const mismatches: string[] = [];
     for (const l of readCsv(`../reference/live/${table}.csv`)) {
       if ((nameCount.get(l.Item) ?? 0) > 1) continue; // ambiguous in R too
+      if (ITEMS_FIXED_SINCE_SNAPSHOT.has(l.Item)) continue;
       const o = byName.get(l.Item);
       if (!o) {
         mismatches.push(`${l.Item}: missing`);
@@ -104,7 +109,3 @@ describe.skipIf(!haveData)("item listings vs live site", () => {
     expect(mismatches).toEqual([]);
   });
 });
-
-function relErr(a: number, b: number) {
-  return Math.abs(a - b) / Math.abs(b);
-}

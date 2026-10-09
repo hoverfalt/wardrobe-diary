@@ -1,6 +1,7 @@
 import { arrayRemove, arrayUnion, collection, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
+import { decodePublicData, type PublicData, type Wardrobe } from "../lib/publicData";
 import type { Day, Garment, IsoDate } from "../types";
 
 export function useGarments(uid: string): Garment[] | null {
@@ -37,4 +38,17 @@ export function setWorn(uid: string, date: IsoDate, garmentId: string, worn: boo
     { worn: worn ? arrayUnion(garmentId) : arrayRemove(garmentId) },
     { merge: true },
   );
+}
+
+/** The owner's public wardrobe; null while loading. Readable without signing in. */
+export function usePublicWardrobe(ownerUid: string): Wardrobe | null {
+  const [wardrobe, setWardrobe] = useState<Wardrobe | null>(null);
+  useEffect(
+    () =>
+      onSnapshot(doc(db, "users", ownerUid, "public", "data"), (snap) =>
+        setWardrobe(snap.exists() ? decodePublicData(snap.data() as PublicData) : { garments: [], days: [] }),
+      ),
+    [ownerUid],
+  );
+  return wardrobe;
 }

@@ -6,6 +6,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sheet_transform import (  # noqa: E402
+    firestore_size,
+    public_document,
     parse_sheet,
     serial_to_iso,
     validate_day_columns,
@@ -93,6 +95,16 @@ def test_wears_outside_ownership():
     # Body warmer (purchased 2018-04-06) is worn on 2018-01-02, before its purchase date.
     [problem] = wears_outside_ownership(data)
     assert problem.startswith("Jackets_and_hoodies-008 (Suit Supply gray body warmer): 1 wears outside 2018-04-06")
+
+
+def test_public_document():
+    data = parse_sheet(make_rows())
+    doc = public_document(data)
+    assert [g["id"] for g in doc["garments"]] == [
+        "Jackets_and_hoodies-006", "Jackets_and_hoodies-008", "Jackets_and_hoodies-No_photo_jacket",
+    ]
+    assert doc["days"] == {"2018-01-01": [0], "2018-01-02": [1], "2018-01-03": [0]}
+    assert firestore_size({"ab": [1, 2], "c": "xy"}) == (3 + 16) + (2 + 3)
 
 
 def test_missing_header():
