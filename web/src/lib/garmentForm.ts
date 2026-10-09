@@ -93,3 +93,36 @@ export function parseGarmentForm(
 export function changedFields(before: GarmentFields, after: GarmentFields): (keyof GarmentFields)[] {
   return (Object.keys(after) as (keyof GarmentFields)[]).filter((k) => before[k] !== after[k]);
 }
+
+/** Photo id prefix of a category, as in the Sheet: "T-shirts and tanks" → "T-shirts_and_tanks". */
+export function photoPrefix(category: string): string {
+  return category.replaceAll(" ", "_");
+}
+
+/** The next free Photo id in a category: one above the highest number in use, three digits
+ *  ("Jackets_and_hoodies-035"). Garment ids are their Photo ids. */
+export function nextPhotoId(category: string, existingIds: string[]): string {
+  const prefix = `${photoPrefix(category)}-`;
+  const used = existingIds
+    .filter((id) => id.startsWith(prefix))
+    .map((id) => Number(id.slice(prefix.length)))
+    .filter((n) => Number.isInteger(n));
+  return `${prefix}${String(Math.max(0, ...used) + 1).padStart(3, "0")}`;
+}
+
+/** The standard garment photo: a 228 × 228 PNG (as all existing photos are). */
+export const PHOTO_SIZE = 228;
+export const PHOTO_MAX_BYTES = 5 * 1024 * 1024; // also enforced by storage.rules
+
+/** Problems that block an upload, and warnings that don't. */
+export function checkPhoto(file: { type: string; size: number }, dims: { width: number; height: number } | null) {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  if (file.type !== "image/png") errors.push("The photo must be a PNG file.");
+  if (file.size >= PHOTO_MAX_BYTES) errors.push("The photo must be smaller than 5 MB.");
+  if (dims && (dims.width !== PHOTO_SIZE || dims.height !== PHOTO_SIZE))
+    warnings.push(
+      `The photo is ${dims.width} × ${dims.height} px; the standard is ${PHOTO_SIZE} × ${PHOTO_SIZE}. It will be scaled${dims.width !== dims.height ? " and cropped to a circle" : ""}.`,
+    );
+  return { errors, warnings };
+}

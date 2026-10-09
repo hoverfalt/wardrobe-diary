@@ -93,7 +93,8 @@ export async function saveGarment(uid: string, id: string, fields: GarmentFields
 export interface HistoryEntry {
   id: string;
   savedAt: Date | null;
-  before: GarmentFields;
+  /** null when the garment was created in the app. */
+  before: GarmentFields | null;
   after: GarmentFields;
 }
 
@@ -125,4 +126,22 @@ export function useGarment(uid: string, id: string): GarmentFields | null | unde
     [uid, id],
   );
   return garment;
+}
+
+/** Creates a garment (R-27 phase b) in one transaction: the garment doc (refused if the id is taken),
+ *  a history entry with no previous version, and its entry appended to the public data document. */
+export async function createGarment(uid: string, id: string, fields: GarmentFields): Promise<void> {
+  const garmentRef = doc(db, "users", uid, "garments", id);
+  const publicRef = doc(db, "users", uid, "public", "data");
+  const historyRef = doc(collection(db, "users", uid, "garments", id, "history"));
+  await runTransaction(db, async (tx) => {
+    const [existing, pub] = [await tx.get(garmentRef), await tx.get(publicRef)];
+    if (existing.exists()) throw new Error(`Photo id ${id} is already in use`);
+    tx.set(garmentRef, fields);
+    tx.set(historyRef, { savedAt: serverTimestamp(), before: null, after: fields });
+    if (pub.exists()) {
+      const data = pub.data() as PublicData;
+      tx.update(publicRef, { garments: [...data.garments, { id, ...fields }] });
+    }
+  });
 }

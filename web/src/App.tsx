@@ -4,6 +4,7 @@ import { useDateRange } from "./components/DateRangeControl";
 import { usePublicWardrobe } from "./data/repo";
 import { auth, OWNER_UID, signIn, signOutUser } from "./firebase";
 import { navigate, useRoute } from "./lib/route";
+import { AddGarmentPage } from "./pages/AddGarmentPage";
 import { CategoryPage } from "./pages/CategoryPage";
 import { GarmentEditPage } from "./pages/GarmentEditPage";
 import { ManagePage } from "./pages/ManagePage";
@@ -40,7 +41,9 @@ export function App() {
       )}
       {route.page === "manage" &&
         (isOwner ? (
-          route.id ? (
+          route.id === "new" ? (
+            <AddGarmentPage uid={user!.uid} wardrobe={wardrobe} />
+          ) : route.id ? (
             <GarmentEditPage uid={user!.uid} id={route.id} wardrobe={wardrobe} />
           ) : (
             <ManagePage wardrobe={wardrobe} />

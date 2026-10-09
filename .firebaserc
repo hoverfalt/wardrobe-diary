@@ -8,7 +8,16 @@
         "app": [
           "wardrobediary"
         ]
+      },
+      "storage": {
+        "photos": [
+          "threddit-297417.appspot.com"
+        ],
+        "plots": [
+          "threddit-plots"
+        ]
       }
     }
-  }
+  },
+  "etags": {}
 }

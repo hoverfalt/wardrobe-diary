@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changedFields, parseGarmentForm, toForm, type GarmentFields } from "./garmentForm";
+import { changedFields, checkPhoto, nextPhotoId, parseGarmentForm, toForm, type GarmentFields } from "./garmentForm";
 
 const vest: GarmentFields = {
   category: "Jackets and hoodies",
@@ -39,5 +39,25 @@ describe("garment form", () => {
 
   it("lists changed fields", () => {
     expect(changedFields(vest, { ...vest, price: 55, divested: "2026-10-09" })).toEqual(["price", "divested"]);
+  });
+});
+
+describe("new garment photos", () => {
+  it("picks the next free Photo id in the category", () => {
+    const ids = ["Jackets_and_hoodies-006", "Jackets_and_hoodies-034", "Socks-146", "T-shirts_and_tanks-017"];
+    expect(nextPhotoId("Jackets and hoodies", ids)).toBe("Jackets_and_hoodies-035");
+    expect(nextPhotoId("T-shirts and tanks", ids)).toBe("T-shirts_and_tanks-018");
+    expect(nextPhotoId("Knits", ids)).toBe("Knits-001");
+  });
+
+  it("matches the Photo id pattern the Storage rules accept", () => {
+    expect(`${nextPhotoId("T-shirts and tanks", [])}.png`).toMatch(/^[A-Za-z_-]+-[0-9]{3}[.]png$/);
+  });
+
+  it("checks type and size, and warns about non-standard dimensions", () => {
+    expect(checkPhoto({ type: "image/png", size: 70_000 }, { width: 228, height: 228 })).toEqual({ errors: [], warnings: [] });
+    const r = checkPhoto({ type: "image/jpeg", size: 6 * 1024 * 1024 }, { width: 400, height: 300 });
+    expect(r.errors).toHaveLength(2);
+    expect(r.warnings[0]).toContain("cropped");
   });
 });

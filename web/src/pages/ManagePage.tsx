@@ -43,7 +43,10 @@ export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
   if (!wardrobe) return <p>Loading…</p>;
   return (
     <section>
-      <h2>Manage garments</h2>
+      <div className="manage-head">
+        <h2>Manage garments</h2>
+        <Link className="button primary" to={{ page: "manage", id: "new" }}>+ Add garment</Link>
+      </div>
       <div className="filters">
         <input type="search" placeholder="Search name, details, materials, photo id" value={search}
           onChange={(e) => setSearch(e.target.value)} aria-label="Search" />

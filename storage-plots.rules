@@ -1,0 +1,10 @@
+rules_version = '2';
+// Bucket threddit-plots: the live site's chart images (uploaded by the old R pipeline with Google Cloud
+// credentials, which bypass these rules). Publicly readable, read-only through the apps.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read;
+    }
+  }
+}

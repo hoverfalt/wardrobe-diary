@@ -12,13 +12,12 @@ How this file works:
 
 ## Where we left off (2026-10-09)
 
-- **R-27 garment management, phase (a) built** (D-4 decided: garment details live in Firestore): `/manage`
-  lists all garments; `/manage/<id>` edits Sheet columns A–K, divests, keeps a restorable history; saves
-  update the public pages immediately. The sync now copies only wear ticks from the Sheet.
-- **Waiting for Olof:** test phase (a) signed in (e.g. edit a field, save, check the public page, restore
-  it from the history). Saving could not be tested by Claude, since it needs the owner's Google sign-in.
-- **Next for Claude:** R-27 phase (b), adding garments with photo upload (needs the Storage rules, R-18).
-- Still open from the live site: R-26 monthly comparison (waiting for Q-4 data).
+- **R-27 garment management, phases (a) and (b) built.** (a) tested OK by Olof. (b) `/manage/new` adds a
+  garment with its PNG photo; **waiting for Olof to test it** (needs the owner's sign-in).
+- **Security fix:** the 2021 Storage rules let any signed-in user write to both buckets, which became
+  reachable when Google sign-in was enabled (2026-10-07). Replaced with owner-only, PNG-only uploads; no
+  files had been changed in the meantime.
+- Next: R-27 phase (c) when wanted, or another scope (see Next / Later). R-26 still waits for Q-4 data.
 
 ## Inbox
 
@@ -26,7 +25,7 @@ _(empty)_
 
 ## Now
 
-- **R-27 Garment management**: phase (a) done, awaiting Olof's test; phase (b) next (see Later for the design).
+- **R-27 Garment management**: phases (a) and (b) built; (b) awaiting Olof's test. Phase (c) later (see Later).
 
 ## Next
 
@@ -53,13 +52,14 @@ _(empty)_
     Every save keeps the previous version in `garments/{id}/history` (undo, audit). ✅ done
   - **Add garment:** same form plus PNG upload with a preview in the circle used on the site; Photo id
     generated as `<Category_with_underscores>-NNN` (next free number); stored as `<id>.png` in the Storage
-    bucket like the existing photos. Then add a Sheet row with that Photo id to log wears until R-15.
+    bucket like the existing photos. Then add a Sheet row with that Photo id to log wears until R-15. ✅ done
   - **Public data:** each save also updates the garment's entry in `public/data` (same transaction), so
     public pages update immediately (no Cloud Function needed). ✅ done
-  - **Prerequisites:** Storage rules allowing the owner to upload photos (needs the live rules reviewed
-    first, see R-18); Firestore rules already allow owner writes.
-  - **Phases:** (a) edit and divest existing garments + sync switch ✅ built 2026-10-09; (b) add garments
-    with photo upload; (c) later: delete (only garments without wears), bulk edits.
+  - **Prerequisites:** Storage rules allowing the owner to upload photos ✅ (live rules reviewed and
+    replaced, 2026-10-09); Firestore rules already allow owner writes.
+  - **Phases:** (a) edit and divest existing garments + sync switch ✅ 2026-10-09 (tested); (b) add garments
+    with photo upload ✅ built 2026-10-09; (c) later: replace a garment's photo, delete (only garments
+    without wears), bulk edits.
 
 - **R-13 Daily logging UI** (mobile-first, offline). A basic version exists in `web/src/pages/LogDay.tsx`;
   don't use it for real logging until cut-over, since the sync overwrites it.
@@ -71,8 +71,7 @@ _(empty)_
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 - **R-18 Housekeeping:** code-split the web bundle (> 500 kB warning); move `tools/.venv` to
-  Python ≥ 3.10 (3.9 is end of life); review `storage.rules` against the live rules before it is ever
-  deployed.
+  Python ≥ 3.10 (3.9 is end of life). (Storage rules: done 2026-10-09.)
 
 ## Decisions needed
 
@@ -100,6 +99,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-09 Storage rules** (security fix): both buckets stay publicly readable; uploads only by the owner,
+  only `<Photo id>.png` (PNG, < 5 MB) in the photo bucket; `threddit-plots` read-only through the apps; no
+  deletes. The 2021 rules allowed any signed-in user to write anything, which became exploitable when
+  Google sign-in was enabled for the new app. Checked: no files changed between 2026-10-07 and the fix.
 
 - **2026-10-09 D-4** Garment details (Sheet columns A–K) are edited in the app and stored in Firestore,
   which is their source of truth; the Sheet keeps only the daily wear ticks until cut-over (R-15). Chosen

@@ -26,7 +26,7 @@ and the static text pages. The live site must not be touched until cut-over (ROA
 | Live site (do not deploy to) | Hosting site `threddit-297417` → wardrobediary.io |
 | New app | Hosting site `wardrobediary` → https://wardrobediary.web.app (deploy target `app`) |
 | Firestore | `(default)` database, Native mode (switched from empty Datastore mode), location `eur3` |
-| Storage bucket | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (always use these originals, not the `thumbs/` copies), publicly readable. Shared with the live site; **never deploy `storage.rules`** without first matching the current live rules |
+| Storage buckets | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (228 × 228 PNG; always use these originals, not the `thumbs/` copies) and category images, shared with the live site. `threddit-plots`: the live site's chart images. Rules are versioned here (`storage.rules`, `storage-plots.rules`, deploy targets `photos` / `plots`): everything publicly readable; only the owner may upload, and only `<Photo id>.png`; no deletes. Deploy deliberately with `cd web && npx firebase deploy --only storage` and re-check that the live site's images still load |
 | Owner uid | `0q0I90W7W3RAcgFN1c1JX6pZupG3` |
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
@@ -77,8 +77,9 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
 `tools/sync.sh` (dry run) / `tools/sync.sh --write`. It wraps `migrate_sheet.py` + `sheet_transform.py`.
 Since D-4 (2026-10-09) it **never updates or deletes garments**: it reads the stored garments from
 Firestore, takes only the wear ticks from the Sheet (rows matched by Photo id), and rebuilds `public/data`.
-A Sheet row whose Photo id has no garment yet is created once (the way to add garments until R-27 phase b);
-garments without a Sheet row are reported, since their wears can't be logged there.
+New garments are added in the app (`/manage/new`, photo uploaded); to log their wears in the Sheet, add a row
+with Category, Item and the Photo id (only the Photo id is matched). A Sheet row whose Photo id has no garment
+yet is still created once; garments without a Sheet row are reported, since their wears can't be logged there.
 - Validates that day columns run consecutively (catches header typos like `0204-02-19`) and that
   `timesUsedInit + checked days` reproduces the Sheet's "Times used" for every garment. Refuses to write
   if either check fails.
@@ -162,9 +163,10 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/LogDay.tsx` | Signed-in daily logging (not for real use before cut-over) |
-| `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx` | `/manage` (owner only): garment list with filters; `/manage/<id>` edit form, divest, history |
-| `lib/garmentForm.ts` | Garment form ↔ stored fields: validation and normalisation (tested) |
-| `data/repo.ts` | Firestore access; `saveGarment` = one transaction: history + garment + its entry in `public/data` |
+| `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters; `/manage/<id>` edit form, divest, history; `/manage/new` add with photo upload |
+| `components/GarmentFormFields.tsx` | The garment form fields (columns A–K), shared by edit and add |
+| `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |
+| `data/repo.ts` | Firestore access; `saveGarment` / `createGarment` = one transaction each: history + garment + its entry in `public/data` |
 | `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` |
 | `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |

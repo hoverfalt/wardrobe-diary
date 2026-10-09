@@ -2,11 +2,30 @@
   "hosting": {
     "target": "app",
     "public": "web/dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
-  }
+  },
+  "storage": [
+    {
+      "target": "photos",
+      "rules": "storage.rules"
+    },
+    {
+      "target": "plots",
+      "rules": "storage-plots.rules"
+    }
+  ]
 }

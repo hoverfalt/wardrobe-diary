@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { GoogleAuthProvider, getAuth, signInWithPopup, signOut } from "firebase/auth";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,4 +38,10 @@ export function categoryImageUrl(category: string): string | null {
 function storageUrl(path: string): string | null {
   const bucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET;
   return bucket ? `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media` : null;
+}
+
+/** Uploads a garment photo as <photo>.png at the bucket root, next to the existing ones. storage.rules
+ *  allow this only for the owner, PNG, under 5 MB, and Photo ids like Jackets_and_hoodies-035. */
+export async function uploadGarmentPhoto(photo: string, file: Blob): Promise<void> {
+  await uploadBytes(ref(getStorage(app), `${photo}.png`), file, { contentType: "image/png" });
 }
