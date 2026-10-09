@@ -12,13 +12,13 @@ How this file works:
 
 ## Where we left off (2026-10-09)
 
-- **Scope "rebuild the live site's views" (R-09) is complete:** the public app at
-  https://wardrobediary.web.app has the portfolio page (category listing + 7 charts) and all 13 category
-  pages (item listing + 6 charts each), with an app-wide date range, all checked against the live site.
-- Two pieces of the live site remain: the monthly cost comparison (R-26, waiting for Olof's data, Q-4) and
-  the static front / "Track your own wardrobe" pages (part of R-16).
-- **Next:** Olof picks the next scope. Natural candidates, in rough order: R-14 automatic sync, R-16 domain
-  switch (incl. the static pages), R-13 logging UI and R-15 cut-over, or R-18 housekeeping.
+- **R-27 garment management, phase (a) built** (D-4 decided: garment details live in Firestore): `/manage`
+  lists all garments; `/manage/<id>` edits Sheet columns A–K, divests, keeps a restorable history; saves
+  update the public pages immediately. The sync now copies only wear ticks from the Sheet.
+- **Waiting for Olof:** test phase (a) signed in (e.g. edit a field, save, check the public page, restore
+  it from the history). Saving could not be tested by Claude, since it needs the owner's Google sign-in.
+- **Next for Claude:** R-27 phase (b), adding garments with photo upload (needs the Storage rules, R-18).
+- Still open from the live site: R-26 monthly comparison (waiting for Q-4 data).
 
 ## Inbox
 
@@ -26,7 +26,7 @@ _(empty)_
 
 ## Now
 
-_(nothing in progress; waiting for the next scope)_
+- **R-27 Garment management**: phase (a) done, awaiting Olof's test; phase (b) next (see Later for the design).
 
 ## Next
 
@@ -41,25 +41,25 @@ _(nothing in progress; waiting for the next scope)_
 
 - **R-27 Garment management in the app** (add, edit, divest), starting with the existing portfolio incl.
   divested items. Fields = Sheet columns A–K: Category, Item, Details, Photo, Price, Purchased, Divested,
-  Times used init, Materials, Weight. Design proposal (2026-10-09), pending D-4:
-  - **Data ownership (D-4):** garment fields move to Firestore as the source of truth; the Sheet keeps only
-    the daily wear log until cut-over (R-15). The sync stops writing garment fields and matches Sheet rows
-    to garments by Photo id (warns about rows without a garment and vice versa).
+  Times used init, Materials, Weight. Design agreed 2026-10-09 (D-4 = option a):
+  - **Data ownership (D-4):** garment fields live in Firestore as the source of truth; the Sheet keeps only
+    the daily wear log until cut-over (R-15). The sync no longer writes garment fields and matches Sheet
+    rows to garments by Photo id (new Sheet rows still create a garment once). ✅ done
   - **Where:** owner-only `/manage` (shown when signed in as the owner): searchable list with filters
     (category, active/divested), and an edit page per garment. Category pages get an "Edit" link per item
-    when signed in.
+    when signed in. ✅ done
   - **Edit form:** category (standard list), name, details, price (€, cents), purchased / divested dates
     (divested ≥ purchased), times used init, materials, weight (g); quick "Divest today" / "Undo divest".
-    Every save keeps the previous version in `garments/{id}/history` (undo, audit).
+    Every save keeps the previous version in `garments/{id}/history` (undo, audit). ✅ done
   - **Add garment:** same form plus PNG upload with a preview in the circle used on the site; Photo id
     generated as `<Category_with_underscores>-NNN` (next free number); stored as `<id>.png` in the Storage
     bucket like the existing photos. Then add a Sheet row with that Photo id to log wears until R-15.
-  - **Public data:** after each save the app rebuilds `public/data` from the owner's garments and days, so
-    public pages update immediately (no Cloud Function needed).
+  - **Public data:** each save also updates the garment's entry in `public/data` (same transaction), so
+    public pages update immediately (no Cloud Function needed). ✅ done
   - **Prerequisites:** Storage rules allowing the owner to upload photos (needs the live rules reviewed
     first, see R-18); Firestore rules already allow owner writes.
-  - **Phases:** (a) edit and divest existing garments + sync switch; (b) add garments with photo upload;
-    (c) later: delete (only garments without wears), bulk edits.
+  - **Phases:** (a) edit and divest existing garments + sync switch ✅ built 2026-10-09; (b) add garments
+    with photo upload; (c) later: delete (only garments without wears), bulk edits.
 
 - **R-13 Daily logging UI** (mobile-first, offline). A basic version exists in `web/src/pages/LogDay.tsx`;
   don't use it for real logging until cut-over, since the sync overwrites it.
@@ -76,13 +76,7 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Decisions needed
 
-- **D-4 Where do garment details live once they can be edited in the app (R-27)?**
-  (a) Firestore becomes the source of truth for garment details now; the Sheet keeps only the wear log
-  until cut-over. Simple, but columns A–K in the Sheet go stale, and a new garment still needs a Sheet row
-  (Photo id only) for logging. (b) The app writes changes back to the Sheet through a Cloud Function using
-  the service account (Sheet stays the single source; needs Editor access, the Blaze plan, and careful
-  row matching around formulas and manual edits). (c) Wait and launch garment management together with
-  in-app logging at cut-over (R-13/R-15). **Recommendation: (a).**
+_(none open)_
 
 ## Open questions
 
@@ -106,6 +100,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-09 D-4** Garment details (Sheet columns A–K) are edited in the app and stored in Firestore,
+  which is their source of truth; the Sheet keeps only the daily wear ticks until cut-over (R-15). Chosen
+  over writing changes back to the Sheet (needs a Cloud Function, Sheet edit access, fragile row matching)
+  and over waiting for cut-over. Consequence: Sheet columns A–K go stale and should no longer be edited.
 
 - **2026-10-09 Q-1** Daily cost (from R `calculate_daily_cost`) = Σ over garments worn that day (and owned
   then) of their lifetime cost per wear; "all divested" = every one of them is divested, so the value is
