@@ -143,6 +143,12 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 .chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
 .log-search { width: 100%; margin: 12px 0 0; }
 .tile { border-radius: 10px; }
+/* Phones: the outfit chips would cover the garments, so only the slim count + save-status bar stays;
+   worn garments are highlighted in the grid anyway. */
+@media (max-width: 640px) {
+  .log-outfit .chips { display: none; }
+  .log-outfit { padding: 6px 0; font-size: 14px; }
+}
 @media (max-width: 520px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
   .tile img { width: 56px; height: 56px; }
