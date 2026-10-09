@@ -1,10 +1,8 @@
-import { startTransition, useEffect, useMemo, useState } from "react";
-import { usePublicWardrobe } from "../data/repo";
+import { useMemo, type ReactNode } from "react";
+import type { Wardrobe } from "../lib/publicData";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
 import { DailyCostAnimation, DailyCostChart } from "../components/DailyCostCharts";
-import { DateRangeControl } from "../components/DateRangeControl";
-import { isValidRange, todayIso } from "../lib/dates";
 import {
   CategoryScatter,
   CategorySmallMultiples,
@@ -14,12 +12,12 @@ import {
   TotalChart,
   type ScatterPoint,
 } from "../components/CategoryCharts";
+import { CategoryLink } from "../components/CategoryLink";
 import {
   activeItemsOverTime,
   categoryListing,
   inventoryValueOverTime,
   totalInventoryValueOverTime,
-  TRACKING_START,
   type CategoryRow,
   type DateRange,
 } from "../lib/metrics";
@@ -50,27 +48,18 @@ const COLUMNS: {
 const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];
 const YEARLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Yearly cost"];
 
-export function Dashboard({ ownerUid }: { ownerUid: string }) {
-  const wardrobe = usePublicWardrobe(ownerUid);
+export function Dashboard({
+  wardrobe,
+  range,
+  rangeControl,
+}: {
+  wardrobe: Wardrobe | null;
+  range: DateRange;
+  /** The shared date range control; rendered at the top and under each chart section. */
+  rangeControl: ReactNode;
+}) {
   const garments = wardrobe?.garments;
   const days = wardrobe?.days;
-  const today = todayIso();
-  // The inputs edit `draft`; the charts follow `range`, which takes a draft only once it is a valid range
-  // and the user has paused for a moment. Recomputing everything takes ~0.5 s, and half-typed years
-  // (0002, 0202 …) would otherwise make ranges thousands of years long and hang the tab.
-  const [draft, setDraft] = useState<DateRange>({ from: TRACKING_START, to: today });
-  const [range, setRange] = useState<DateRange>(draft);
-  const draftValid = isValidRange(draft, TRACKING_START, today);
-  useEffect(() => {
-    if (!draftValid || (draft.from === range.from && draft.to === range.to)) return;
-    const timer = setTimeout(() => startTransition(() => setRange(draft)), 300);
-    return () => clearTimeout(timer);
-  }, [draft, draftValid, range]);
-
-  // One date range for the whole page: every copy of the control edits the same draft.
-  const rangeControl = (
-    <DateRangeControl value={draft} onChange={setDraft} min={TRACKING_START} max={today} valid={draftValid} />
-  );
 
   const rows = useMemo(
     () => (garments && days ? categoryListing(garments, days, range) : []),
@@ -134,7 +123,7 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
               return (
                 <tr key={r.category} className={r.category === "Total" ? "total" : undefined}>
                   <td className="img">{img && <img className="category-image" src={img} alt="" />}</td>
-                  <td>{r.category}</td>
+                  <td>{r.category === "Total" ? r.category : <CategoryLink category={r.category} />}</td>
                   {COLUMNS.map((c) => (
                     <td key={c.key} className="num" style={barStyle(r[c.key], maxima[c.key], c.bar)}>
                       {c.format(r[c.key])}

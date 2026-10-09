@@ -17,7 +17,8 @@ How this file works:
 - Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
 - Portfolio page rebuilt except "Monthly cost and comparison", postponed until the comparison data is in
   the Sheet (Q-4, waiting for Olof).
-- **Next for Claude:** the category pages (R-09, second half): item listing table first.
+- Category pages started: Jackets and hoodies has the item table and the Times worn chart, for review.
+- **Next for Claude:** refine the category page from Olof's feedback, then the remaining category charts.
 
 ## Inbox
 
@@ -47,9 +48,13 @@ _(empty)_
         comparison data in the Google Sheet (Q-4)**; then import that tab in the sync and build the chart
 
   One page per category (13: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks,
-  Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear):
-  - [ ] Item listing table: Item, Price, Times worn, Cost per wear, Wears per month, Status
-  - [ ] Times worn per item
+  Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear), at
+  `/category/<slug>`, linked from the Dashboard table. **Built generically, first reviewed on Jackets and
+  hoodies;** every category page works the same way:
+  - [x] Item listing table: Item, Price, Times worn, Cost per wear, Wears per month, Status (data bars,
+        active first, then by times worn), item photos
+  - [x] Times worn per item: one row per item (no overlapping photos), divested items' 5–95 % and
+        32–68 % bands
   - [ ] Cost per wear and times worn
   - [ ] Cost per wear and frequency of use
   - [ ] Times worn, animated by date
@@ -92,6 +97,8 @@ _(none open)_
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Comparison data for the monthly cost chart (external consumption benchmarks). **Waiting for
   Olof** to enter it in the Google Sheet (R read it from a "Comparison" tab).
+- **Q-10** *G Star Raw black short jacket* (Jackets and hoodies) has no photo in Storage, so its image is
+  blank (also on the live site).
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.

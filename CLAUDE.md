@@ -159,6 +159,8 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
+- Pages: `/` Dashboard, `/category/<slug>` category pages, `/log`; routing in `web/src/lib/route.ts` (no library).
+  The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
 - The Dashboard has one page-wide date range. `DateRangeControl` (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
 - Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),

@@ -351,3 +351,12 @@ export function rollingMean(values: number[], window: number): (number | null)[]
   }
   return out;
 }
+
+/** The p-quantile of values with linear interpolation (R's default, type 7); null for no values. */
+export function quantile(values: number[], p: number): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const h = (sorted.length - 1) * p;
+  const lo = Math.floor(h);
+  return sorted[lo] + (h - lo) * ((sorted[lo + 1] ?? sorted[lo]) - sorted[lo]);
+}

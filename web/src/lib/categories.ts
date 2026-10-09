@@ -41,3 +41,12 @@ export function categoryColor(category: string, dark = false): string {
   const light = CATEGORY_COLORS_LIGHT[CATEGORY_ORDER.indexOf(category)] ?? "#888888";
   return dark ? (DARK_OVERRIDES[light] ?? light) : light;
 }
+
+/** URL-friendly name: "Jackets and hoodies" → "jackets-and-hoodies". */
+export function categorySlug(category: string): string {
+  return category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+export function categoryFromSlug(slug: string, categories: string[] = CATEGORY_ORDER): string | null {
+  return categories.find((c) => categorySlug(c) === slug) ?? null;
+}

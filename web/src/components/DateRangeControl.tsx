@@ -1,7 +1,25 @@
 // Date range control: a two-handle slider across the content width plus exact date boxes. The Dashboard
 // renders several copies bound to the same state, so they always stay in sync.
-import { addDays, dayIndex, formatFi } from "../lib/dates";
-import type { DateRange } from "../lib/metrics";
+import { startTransition, useEffect, useState, type ReactNode } from "react";
+import { addDays, dayIndex, formatFi, isValidRange, todayIso } from "../lib/dates";
+import { TRACKING_START, type DateRange } from "../lib/metrics";
+
+/** The app's one date range, shared by every page. The controls edit `draft`; `range` (what the charts
+ *  use) takes a draft only once it is valid and the user has paused: recomputing takes a moment, and
+ *  half-typed years (0002, 0202 …) would otherwise make ranges thousands of years long. */
+export function useDateRange(): { range: DateRange; control: ReactNode } {
+  const today = todayIso();
+  const [draft, setDraft] = useState<DateRange>({ from: TRACKING_START, to: today });
+  const [range, setRange] = useState<DateRange>(draft);
+  const valid = isValidRange(draft, TRACKING_START, today);
+  useEffect(() => {
+    if (!valid || (draft.from === range.from && draft.to === range.to)) return;
+    const timer = setTimeout(() => startTransition(() => setRange(draft)), 300);
+    return () => clearTimeout(timer);
+  }, [draft, valid, range]);
+  const control = <DateRangeControl value={draft} onChange={setDraft} min={TRACKING_START} max={today} valid={valid} />;
+  return { range, control };
+}
 
 export function DateRangeControl({
   value,

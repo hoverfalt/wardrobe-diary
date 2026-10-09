@@ -4,6 +4,7 @@ import {
   activeItemsOverTime,
   dailyCost,
   rollingMean,
+  quantile,
   inventoryValueOverTime,
   totalInventoryValueOverTime,
   valueOn,
@@ -192,5 +193,15 @@ describe("rollingMean", () => {
     expect(out[14]).toBe((0 + 29) / 2); // mean of 0…29
     expect(out[24]).toBe((10 + 39) / 2); // mean of 10…39
     expect(out[25]).toBeNull();
+  });
+});
+
+describe("quantile", () => {
+  it("interpolates like R's quantile() (type 7)", () => {
+    const v = [1, 2, 3, 4, 10];
+    expect(quantile(v, 0.05)).toBeCloseTo(1.2); // R: quantile(c(1,2,3,4,10), 0.05) = 1.2
+    expect(quantile(v, 0.32)).toBeCloseTo(2.28);
+    expect(quantile(v, 0.95)).toBeCloseTo(8.8);
+    expect(quantile([], 0.5)).toBeNull();
   });
 });
