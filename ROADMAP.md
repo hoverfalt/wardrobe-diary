@@ -16,7 +16,8 @@ How this file works:
   2026-10-09 (31,539 wears); the Sheet is retired and the sync refuses to write. Logging happens at `/log`
   (mobile-first, offline-capable). **Waiting for Olof to test logging** (needs the owner's sign-in).
 - **R-27 phase (c)** (replace photo, delete, bulk changes) is also waiting for Olof's test.
-- **Backups:** Firestore is now the only copy; `tools/backup.sh` (first backup taken). Automating it is R-28.
+- **Backups:** Firestore is now the only copy; manual `tools/backup.sh` works. Nightly backups (R-28) are
+  prepared and wait for Olof's setup steps (service account, GitHub repo + secret).
 - Next candidates: R-28 automatic backup, R-16 domain switch, R-26 once the Q-4 data exists.
 
 ## Inbox
@@ -27,6 +28,10 @@ _(empty)_
 
 - **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
 - **R-13/R-15 Logging in the app**: done; awaiting Olof's test.
+- **R-28 Automatic backups** (option B, chosen 2026-10-09): nightly GitHub Actions job in the private repo
+  `hoverfalt/wardrobe-diary-backups` with a read-only service account; restore script `tools/restore.sh`.
+  Scripts done and tested; **waiting for Olof** to create the read-only service account + key, the GitHub
+  repo and its secret (see the chat 2026-10-09), then Claude pushes the job and checks the first run.
 
 ## Next
 
@@ -63,9 +68,6 @@ _(empty)_
     recorded in `deletedGarments` so the sync won't re-create them), bulk changes (divest on a date, mark
     active, set category) ✅ built 2026-10-09.
 
-- **R-28 Automatic backups** of Firestore (now the only copy of the wear log): e.g. a scheduled Firestore
-  export to a Cloud Storage bucket (needs the Blaze plan) or a scheduled job running `tools/backup.py`.
-  Until then: run `tools/backup.sh` regularly.
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.

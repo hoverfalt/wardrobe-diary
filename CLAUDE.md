@@ -81,10 +81,15 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
 - Wears are logged at `/log` (owner only, `pages/LogDay.tsx`). Each tap is one batch (`setDayWorn`): it
   writes `days/{date}` and updates only that day in `public/data` (`days.<date>` as garment indexes, via a
   field path, no full read), so public pages update at once. Batches work offline and sync later.
-- **Backups:** Firestore is now the only copy of the wear log. `tools/backup.sh` writes everything
-  (garments + history, days, deleted garments, settings, public data) to `backups/wardrobe-YYYY-MM-DD.json`
-  (git-ignored; the project folder is in Dropbox, so backups get an off-machine copy). Run it regularly
-  until an automatic backup exists (ROADMAP R-28).
+- **Backups (R-28):** Firestore is now the only copy of the wear log. A nightly GitHub Actions job in the
+  private repo `hoverfalt/wardrobe-diary-backups` (local clone next to this project) runs `backup.py` with a
+  **read-only** service account (role Cloud Datastore Viewer, secret `FIREBASE_BACKUP_KEY`) and commits
+  `wardrobe.json` + `last-backup.txt`; git history keeps every day. GitHub emails on failure. Keep its
+  `backup.py` identical to `tools/backup.py`. Manual backups: `tools/backup.sh` → `backups/` (git-ignored,
+  in Dropbox). The backup has garments + history, days, deleted garments and settings (pretty, sorted JSON;
+  public data left out as it is derived).
+- **Restore:** `tools/restore.sh <backup.json>` shows what would change; `--write` takes a safety backup to
+  `backups/` and then makes Firestore match the backup exactly and rebuilds `public/data` (history untouched).
 
 ## Sheet → Firestore sync (retired 2026-10-09)
 
@@ -181,7 +186,8 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 cd web && npm install && npm run dev       # local dev server
 cd web && npm test                         # vitest
 cd tools && .venv/bin/pytest               # Python tests
-tools/backup.sh                            # back up all Firestore data to backups/ (run regularly)
+tools/backup.sh                            # manual backup to backups/ (nightly backups run on GitHub)
+tools/restore.sh <backup.json> [--write]   # restore from a backup (dry run by default)
 tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
