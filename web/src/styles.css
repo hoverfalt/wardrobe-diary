@@ -35,8 +35,6 @@ td.img { width: 28px; padding: 2px 4px; }
 .category-image:hover { transform: scale(4); position: relative; z-index: 1; }
 /* Scroll wide tables only on narrow screens: a scroll container would clip the hover zoom. */
 @media (max-width: 760px) { .table-wrap { overflow-x: auto; } }
-.range { display: flex; flex-wrap: wrap; gap: 12px; }
-.range input { margin-left: 6px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; font-size: 13px; }
 .tile img { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }
@@ -49,3 +47,32 @@ td.img { width: 28px; padding: 2px 4px; }
 .multiple { margin: 0; }
 .multiple figcaption { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 4px; }
 .multiple figcaption .muted { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Date range control (several synced copies per page) */
+.date-range { margin: 12px 0 28px; padding: 10px 12px 6px; border: 1px solid var(--line); border-radius: 8px; }
+.date-range-boxes { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+.date-range-boxes input { margin-left: 6px; }
+.date-range-slider { position: relative; height: 24px; margin: 0 9px; }
+.date-range-slider .track, .date-range-slider .selection {
+  position: absolute; top: 10px; height: 4px; border-radius: 2px;
+}
+.date-range-slider .track { left: 0; right: 0; background: var(--line); }
+.date-range-slider .selection { background: var(--accent); }
+/* Two native range inputs on top of each other; only their thumbs take the pointer. */
+.date-range-slider input[type="range"] {
+  position: absolute; left: -9px; width: calc(100% + 18px); top: 0; height: 24px; margin: 0;
+  background: none; pointer-events: none; -webkit-appearance: none; appearance: none;
+}
+.date-range-slider input[type="range"]::-webkit-slider-runnable-track { background: none; }
+.date-range-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent); cursor: grab;
+}
+.date-range-slider input[type="range"]::-moz-range-thumb {
+  pointer-events: auto; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent); cursor: grab;
+}
+.date-range-slider input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.date-range-years { position: relative; height: 16px; margin: 0 9px; font-size: 11px; color: var(--muted); }
+.date-range-years span { position: absolute; transform: translateX(-50%); }
+.date-range .muted { margin: 6px 0 0; }

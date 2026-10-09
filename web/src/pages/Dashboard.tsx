@@ -2,7 +2,8 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
-import { formatFi, isValidRange, todayIso } from "../lib/dates";
+import { DateRangeControl } from "../components/DateRangeControl";
+import { isValidRange, todayIso } from "../lib/dates";
 import {
   CategoryScatter,
   CategorySmallMultiples,
@@ -64,6 +65,11 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
     return () => clearTimeout(timer);
   }, [draft, draftValid, range]);
 
+  // One date range for the whole page: every copy of the control edits the same draft.
+  const rangeControl = (
+    <DateRangeControl value={draft} onChange={setDraft} min={TRACKING_START} max={today} valid={draftValid} />
+  );
+
   const rows = useMemo(
     () => (garments && days ? categoryListing(garments, days, range) : []),
     [garments, days, range],
@@ -98,21 +104,7 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
   return (
     <section>
       <h2>Category listing</h2>
-      <p className="range">
-        <label>
-          From <input type="date" value={draft.from} min={TRACKING_START} max={today}
-            onChange={(e) => setDraft({ ...draft, from: e.target.value })} />
-        </label>
-        <label>
-          To <input type="date" value={draft.to} min={TRACKING_START} max={today}
-            onChange={(e) => setDraft({ ...draft, to: e.target.value })} />
-        </label>
-      </p>
-      {!draftValid && (
-        <p className="muted">
-          Choose dates between {formatFi(TRACKING_START)} and {formatFi(today)}, with From before To.
-        </p>
-      )}
+      {rangeControl}
       <div className="table-wrap">
         <table>
           <thead>
@@ -148,16 +140,19 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
           <h2>Active items by category</h2>
           <p className="muted">Number of active items in each category; the number is the count at the end date.</p>
           <CategorySmallMultiples series={charts.activeItems} range={range} format={formatCount} />
+          {rangeControl}
 
           <h2>Inventory value by category</h2>
           <p className="muted">
             Sum of the value of active items in each category. The value of an item is its purchase price.
           </p>
           <CategorySmallMultiples series={charts.inventoryValue} range={range} format={formatEur} />
+          {rangeControl}
 
           <h2>Total inventory value</h2>
           <p className="muted">Total value of active items. The value of an item is its purchase price.</p>
           <TotalChart points={charts.totalValue} range={range} format={formatEur} />
+          {rangeControl}
 
           <p className="muted">
             Sportswear is not included in the charts above, as on wardrobediary.io.
@@ -176,6 +171,7 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}
           />
+          {rangeControl}
         </>
       )}
     </section>

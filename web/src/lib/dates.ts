@@ -27,3 +27,13 @@ export function isValidRange(range: { from: IsoDate; to: IsoDate }, earliest: Is
     range.from >= earliest && range.to <= latest && range.from <= range.to
   );
 }
+
+/** Days from a to b (b − a). */
+export function dayIndex(a: IsoDate, b: IsoDate): number {
+  return Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
+}
+
+/** The date n days after iso. */
+export function addDays(iso: IsoDate, n: number): IsoDate {
+  return new Date(Date.parse(iso) + n * 86_400_000).toISOString().slice(0, 10);
+}

@@ -149,6 +149,8 @@ _(none open)_
   Metrics); tests compare every category and item with the live site.
 - **R-20** 2026-10-08 Sync skips "ADD NEXT" placeholder rows, rounds prices to cents, warns about empty
   categories and wears outside ownership.
+- **R-24** 2026-10-09 Date range control: content-wide two-handle slider + exact date boxes, repeated
+  above the table and under each chart section; all copies share one state and drive the whole page.
 - **R-23** 2026-10-09 Date range: half-typed years (0002, 0202 …) no longer hang the tab; the charts
   update only for valid dates, 0.3 s after typing stops, as a low-priority update.
 - **R-11** 2026-10-09 Public data document `public/data` (full log, one read) written by the sync;
