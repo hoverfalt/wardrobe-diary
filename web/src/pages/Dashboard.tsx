@@ -3,8 +3,16 @@ import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
 import { todayIso } from "../lib/dates";
-import { ActiveItemsLines, ActiveItemsSmallMultiples } from "../components/ActiveItemsCharts";
-import { activeItemsOverTime, categoryListing, TRACKING_START, type CategoryRow, type DateRange } from "../lib/metrics";
+import { CategorySmallMultiples, formatCount, formatEur, TotalChart } from "../components/CategoryCharts";
+import {
+  activeItemsOverTime,
+  categoryListing,
+  inventoryValueOverTime,
+  totalInventoryValueOverTime,
+  TRACKING_START,
+  type CategoryRow,
+  type DateRange,
+} from "../lib/metrics";
 
 const eur0 = (v: number | null) =>
   v == null ? "–" : v.toLocaleString("fi-FI", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
@@ -38,14 +46,16 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
     () => (garments && days && range.from <= range.to ? categoryListing(garments, days, range) : []),
     [garments, days, range],
   );
-  // As on the live site, the chart leaves out Sportswear.
-  const activeSeries = useMemo(
-    () =>
-      garments && range.from <= range.to
-        ? activeItemsOverTime(garments, range).filter((s) => s.category !== "Sportswear")
-        : [],
-    [garments, range],
-  );
+  // As on the live site, the charts over time leave out Sportswear.
+  const charts = useMemo(() => {
+    if (!garments || range.from > range.to) return null;
+    const notSportswear = garments.filter((g) => g.category !== "Sportswear");
+    return {
+      activeItems: activeItemsOverTime(notSportswear, range),
+      inventoryValue: inventoryValueOverTime(notSportswear, range),
+      totalValue: totalInventoryValueOverTime(notSportswear, range),
+    };
+  }, [garments, range]);
   const maxima = useMemo(() => {
     const categories = rows.filter((r) => r.category !== "Total");
     return Object.fromEntries(COLUMNS.map((c) => [c.key, c.fixedMax ?? barMax(categories.map((r) => r[c.key]))]));
@@ -101,14 +111,25 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
         </table>
       </div>
 
-      <h2>Active items by category</h2>
-      <p className="muted">Number of active items in each category (Sportswear not included).</p>
-      <h3>A: one chart</h3>
-      <p className="muted">Hover a category in the legend to highlight it; click to keep it highlighted.</p>
-      <ActiveItemsLines series={activeSeries} range={range} />
-      <h3>B: small multiples</h3>
-      <p className="muted">One chart per category on the same scale; the number is the count at the end date.</p>
-      <ActiveItemsSmallMultiples series={activeSeries} range={range} />
+      {charts && (
+        <>
+          <h2>Active items by category</h2>
+          <p className="muted">Number of active items in each category; the number is the count at the end date.</p>
+          <CategorySmallMultiples series={charts.activeItems} range={range} format={formatCount} />
+
+          <h2>Inventory value by category</h2>
+          <p className="muted">
+            Sum of the value of active items in each category. The value of an item is its purchase price.
+          </p>
+          <CategorySmallMultiples series={charts.inventoryValue} range={range} format={formatEur} />
+
+          <h2>Total inventory value</h2>
+          <p className="muted">Total value of active items. The value of an item is its purchase price.</p>
+          <TotalChart points={charts.totalValue} range={range} format={formatEur} />
+
+          <p className="muted">Sportswear is not included in the charts, as on wardrobediary.io.</p>
+        </>
+      )}
     </section>
   );
 }

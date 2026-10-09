@@ -151,7 +151,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 
 - Dates are ISO strings `YYYY-MM-DD` everywhere (no timezones).
 - Metric logic lives in pure functions in `web/src/lib/metrics.ts`, with tests.
-- Charts use Observable Plot via `web/src/components/PlotFigure.tsx`; category colours come from
+- Charts use Observable Plot via `web/src/components/PlotFigure.tsx`. **Per-category data is always shown as
+  small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
+  never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
 - Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),
   never alphabetically: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants,

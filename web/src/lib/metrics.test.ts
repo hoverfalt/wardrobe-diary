@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { Day, Garment } from "../types";
 import {
   activeItemsOverTime,
-  countOn,
+  inventoryValueOverTime,
+  totalInventoryValueOverTime,
+  valueOn,
   categoryListing,
   costPerWear,
   daysOwned,
@@ -113,21 +115,39 @@ describe("activeItemsOverTime", () => {
     const [jackets, shirts] = activeItemsOverTime([a, b, shirt], range);
     expect(jackets.category).toBe("Jackets and hoodies");
     expect(jackets.points).toEqual([
-      { date: "2018-01-01", count: 1 },
-      { date: "2018-01-02", count: 2 },
-      { date: "2018-01-04", count: 1 },
-      { date: "2018-01-06", count: 1 },
+      { date: "2018-01-01", value: 1 },
+      { date: "2018-01-02", value: 2 },
+      { date: "2018-01-04", value: 1 },
+      { date: "2018-01-06", value: 1 },
     ]);
     expect(shirts.points).toEqual([
-      { date: "2018-01-01", count: 0 },
-      { date: "2018-01-04", count: 1 },
-      { date: "2018-01-06", count: 1 },
+      { date: "2018-01-01", value: 0 },
+      { date: "2018-01-04", value: 1 },
+      { date: "2018-01-06", value: 1 },
     ]);
   });
 
   it("agrees with isActive on every day", () => {
     const [jackets] = activeItemsOverTime([a, b], range);
     for (const date of ["2018-01-01", "2018-01-02", "2018-01-03", "2018-01-04", "2018-01-05", "2018-01-06"])
-      expect(countOn(jackets.points, date)).toBe([a, b].filter((g) => isActive(g, date)).length);
+      expect(valueOn(jackets.points, date)).toBe([a, b].filter((g) => isActive(g, date)).length);
+  });
+});
+
+describe("inventory value over time", () => {
+  const a = garment({ id: "a", price: 10.1, purchased: "2018-01-02", divested: "2018-01-03" });
+  const b = garment({ id: "b", price: 20.2, purchased: "2017-05-01" });
+  const shirt = garment({ id: "s", category: "Shirts", price: 0.7, purchased: "2018-01-04" });
+  const range = { from: "2018-01-01", to: "2018-01-06" };
+
+  it("sums prices of active garments per category, in whole cents", () => {
+    const [jackets] = inventoryValueOverTime([a, b, shirt], range);
+    expect(jackets.points.map((p) => p.value)).toEqual([20.2, 30.3, 20.2, 20.2]);
+  });
+
+  it("sums all categories for the total", () => {
+    const total = totalInventoryValueOverTime([a, b, shirt], range);
+    expect(valueOn(total, "2018-01-02")).toBe(30.3);
+    expect(valueOn(total, "2018-01-05")).toBe(20.9);
   });
 });

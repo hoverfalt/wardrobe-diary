@@ -204,16 +204,16 @@ function sum(values: number[]): number {
   return values.reduce((a, b) => a + b, 0);
 }
 
-export interface CountPoint {
+export interface SeriesPoint {
   date: IsoDate;
-  count: number;
+  value: number;
 }
 
 export interface CategorySeries {
   category: string;
-  /** Change points: the count holds from each date until the next point (step-after); the first point
+  /** Change points: the value holds from each date until the next point (step-after); the first point
    *  is range.from and the last is range.to. */
-  points: CountPoint[];
+  points: SeriesPoint[];
 }
 
 /** Next calendar day. */
@@ -221,43 +221,69 @@ export function nextDay(date: IsoDate): IsoDate {
   return new Date(Date.parse(date) + 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Number of active garments per category over the range ("Active items by category"), in the standard
- *  category order. Categories with no garment owned during the range are left out. */
-export function activeItemsOverTime(garments: Garment[], range: DateRange): CategorySeries[] {
+/** Sum of `measure` over the garments active on each day of the range, grouped by `group`, as step
+ *  series in the standard category order. Groups with no garment owned during the range are left out. */
+export function activeOverTime(
+  garments: Garment[],
+  range: DateRange,
+  measure: (g: Garment) => number,
+  group: (g: Garment) => string = (g) => g.category,
+): CategorySeries[] {
   const deltas = new Map<string, Map<IsoDate, number>>();
   for (const g of garments) {
     if (!ownedDuring(g, range)) continue;
-    const byDate = deltas.get(g.category) ?? new Map<IsoDate, number>();
-    deltas.set(g.category, byDate);
+    const key = group(g);
+    const byDate = deltas.get(key) ?? new Map<IsoDate, number>();
+    deltas.set(key, byDate);
+    const m = measure(g);
     const start = max(ownedFrom(g), range.from);
-    byDate.set(start, (byDate.get(start) ?? 0) + 1);
+    byDate.set(start, (byDate.get(start) ?? 0) + m);
     if (ownedUntil(g) < range.to) {
       const end = nextDay(ownedUntil(g));
-      byDate.set(end, (byDate.get(end) ?? 0) - 1);
+      byDate.set(end, (byDate.get(end) ?? 0) - m);
     }
   }
   return [...deltas.entries()]
     .sort(([a], [b]) => compareCategories(a, b))
     .map(([category, byDate]) => {
-      const points: CountPoint[] = [{ date: range.from, count: 0 }];
-      let count = 0;
+      const points: SeriesPoint[] = [{ date: range.from, value: 0 }];
+      let value = 0;
       for (const date of [...byDate.keys()].sort()) {
-        count += byDate.get(date)!;
+        value = round2(value + byDate.get(date)!); // whole cents: no floating-point drift in sums of prices
         const last = points[points.length - 1];
-        if (last.date === date) last.count = count;
-        else points.push({ date, count });
+        if (last.date === date) last.value = value;
+        else points.push({ date, value });
       }
-      if (points[points.length - 1].date !== range.to) points.push({ date: range.to, count });
+      if (points[points.length - 1].date !== range.to) points.push({ date: range.to, value });
       return { category, points };
     });
 }
 
-/** The count of a step series on a date. */
-export function countOn(points: CountPoint[], date: IsoDate): number {
-  let count = 0;
+/** "Active items by category": number of active garments per category. */
+export function activeItemsOverTime(garments: Garment[], range: DateRange): CategorySeries[] {
+  return activeOverTime(garments, range, () => 1);
+}
+
+/** "Inventory value by category": sum of purchase prices of active garments per category. */
+export function inventoryValueOverTime(garments: Garment[], range: DateRange): CategorySeries[] {
+  return activeOverTime(garments, range, (g) => g.price ?? 0);
+}
+
+/** "Total inventory value": sum of purchase prices of all active garments. */
+export function totalInventoryValueOverTime(garments: Garment[], range: DateRange): SeriesPoint[] {
+  return activeOverTime(garments, range, (g) => g.price ?? 0, () => "Total")[0]?.points ?? [];
+}
+
+/** The value of a step series on a date. */
+export function valueOn(points: SeriesPoint[], date: IsoDate): number {
+  let value = 0;
   for (const p of points) {
     if (p.date > date) break;
-    count = p.count;
+    value = p.value;
   }
-  return count;
+  return value;
+}
+
+function round2(v: number): number {
+  return Math.round(v * 100) / 100;
 }
