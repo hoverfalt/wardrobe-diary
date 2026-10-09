@@ -12,10 +12,12 @@ How this file works:
 
 ## Where we left off (2026-10-09)
 
-- **R-27 garment management: phases (a), (b) and (c) built**; (a) and (b) tested OK by Olof. Phase (c) adds
-  replacing a photo, deleting never-worn garments, and bulk changes on the Manage list. **Waiting for Olof
-  to test (c)** (needs the owner's sign-in).
-- Next: another scope (see Next / Later). R-26 still waits for the Q-4 comparison data.
+- **Cut-over done (R-13, R-15):** the app is the source of truth for wears too. Final Sheet sync through
+  2026-10-09 (31,539 wears); the Sheet is retired and the sync refuses to write. Logging happens at `/log`
+  (mobile-first, offline-capable). **Waiting for Olof to test logging** (needs the owner's sign-in).
+- **R-27 phase (c)** (replace photo, delete, bulk changes) is also waiting for Olof's test.
+- **Backups:** Firestore is now the only copy; `tools/backup.sh` (first backup taken). Automating it is R-28.
+- Next candidates: R-28 automatic backup, R-16 domain switch, R-26 once the Q-4 data exists.
 
 ## Inbox
 
@@ -24,6 +26,7 @@ _(empty)_
 ## Now
 
 - **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
+- **R-13/R-15 Logging in the app**: done; awaiting Olof's test.
 
 ## Next
 
@@ -60,12 +63,9 @@ _(empty)_
     recorded in `deletedGarments` so the sync won't re-create them), bulk changes (divest on a date, mark
     active, set category) ✅ built 2026-10-09.
 
-- **R-13 Daily logging UI** (mobile-first, offline). A basic version exists in `web/src/pages/LogDay.tsx`;
-  don't use it for real logging until cut-over, since the sync overwrites it.
-- **R-14 Automatic sync** while the Sheet is the source of truth (e.g. scheduled GitHub Action or
-  Cloud Function), instead of running `tools/sync.sh --write` by hand.
-- **R-15 Cut-over:** stop entering in the Sheet, make Firestore the source of truth, scheduled Firestore
-  export as backup.
+- **R-28 Automatic backups** of Firestore (now the only copy of the wear log): e.g. a scheduled Firestore
+  export to a Cloud Storage bucket (needs the Blaze plan) or a scheduled job running `tools/backup.py`.
+  Until then: run `tools/backup.sh` regularly.
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
@@ -98,6 +98,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-09 Cut-over (R-15):** the app is the source of truth for wears from 2026-10-10 on; the Sheet holds
+  the log through 2026-10-09 and is retired (`settings/app.sheetRetired`, the sync refuses to write).
+  R-14 (automatic Sheet sync) is dropped as obsolete.
 
 - **2026-10-09 Storage rules** (security fix): both buckets stay publicly readable; uploads only by the owner,
   only `<Photo id>.png` (PNG, < 5 MB) in the photo bucket; `threddit-plots` read-only through the apps; no
@@ -144,6 +148,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-13 / R-15** 2026-10-09 Logging in the app as the source of truth: final Sheet sync (632 garments,
+  3,194 days, 31,539 wears), Sheet retired with a write guard, mobile-first `/log` (day navigation, outfit
+  chips, search, recent-first, offline status; each tap updates the day and the public data in one batch),
+  `tools/backup.sh` with a first backup.
 
 - **R-25** 2026-10-09 Category pages, all 13, generic (`/category/<slug>`, linked from the Dashboard): item
   listing with photos and data bars; Times worn (one row per item, divested percentile bands); cost per
