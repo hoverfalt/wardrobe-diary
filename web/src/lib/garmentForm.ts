@@ -126,3 +126,23 @@ export function checkPhoto(file: { type: string; size: number }, dims: { width: 
     );
   return { errors, warnings };
 }
+
+export type BulkAction =
+  | { type: "divest"; date: string }
+  | { type: "activate" }
+  | { type: "category"; category: string };
+
+/** One bulk change applied to one garment: the new fields, or why it can't be applied to this one. */
+export function applyBulk(g: GarmentFields, action: BulkAction): GarmentFields | string {
+  switch (action.type) {
+    case "divest":
+      if (!isIsoDate(action.date)) return "Enter a valid date.";
+      if (g.purchased && action.date < g.purchased) return `purchased ${g.purchased}, after the divest date`;
+      return { ...g, divested: action.date };
+    case "activate":
+      return { ...g, divested: null };
+    case "category":
+      if (!CATEGORY_ORDER.includes(action.category)) return "Choose a category.";
+      return { ...g, category: action.category };
+  }
+}

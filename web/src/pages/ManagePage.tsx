@@ -5,12 +5,16 @@ import { Link } from "../components/Link";
 import { photoUrl } from "../firebase";
 import { CATEGORY_ORDER, compareCategories } from "../lib/categories";
 import { formatFi, todayIso } from "../lib/dates";
+import { updateGarments } from "../data/repo";
+import { applyBulk, type BulkAction } from "../lib/garmentForm";
 import { itemListing, TRACKING_START } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
+import type { Garment } from "../types";
 
 type Status = "all" | "active" | "divested";
 
-export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
+export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | null }) {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState<Status>("all");
@@ -40,6 +44,22 @@ export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
       (!q || `${r.garment.item} ${r.garment.details} ${r.garment.materials} ${r.garment.id}`.toLowerCase().includes(q)),
   );
 
+  const toggle = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelected(next);
+  };
+  const allShownSelected = shown.length > 0 && shown.every((r) => selected.has(r.garment.id));
+  const selectShown = () => {
+    const next = new Set(selected);
+    for (const r of shown) {
+      if (allShownSelected) next.delete(r.garment.id);
+      else next.add(r.garment.id);
+    }
+    setSelected(next);
+  };
+
   if (!wardrobe) return <p>Loading…</p>;
   return (
     <section>
@@ -61,10 +81,20 @@ export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
         </select>
         <span className="muted">{shown.length} of {rows.length}</span>
       </div>
+      {selected.size > 0 && (
+        <BulkBar
+          uid={uid}
+          garments={wardrobe.garments.filter((g) => selected.has(g.id))}
+          onDone={() => setSelected(new Set())}
+        />
+      )}
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
+              <th className="check">
+                <input type="checkbox" checked={allShownSelected} onChange={selectShown} aria-label="Select all shown" />
+              </th>
               <th aria-label="Image" />
               <th>Item</th>
               <th>Category</th>
@@ -79,6 +109,9 @@ export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
               const src = photoUrl(g.photo);
               return (
                 <tr key={g.id} className={active ? undefined : "divested"}>
+                  <td className="check">
+                    <input type="checkbox" checked={selected.has(g.id)} onChange={() => toggle(g.id)} aria-label={`Select ${g.item}`} />
+                  </td>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>
                   <td><Link to={{ page: "manage", id: g.id }}>{g.item}</Link></td>
                   <td>{g.category}</td>
@@ -93,5 +126,68 @@ export function ManagePage({ wardrobe }: { wardrobe: Wardrobe | null }) {
         </table>
       </div>
     </section>
+  );
+}
+
+type ActionType = BulkAction["type"];
+
+/** Bulk changes for the selected garments: divest on a date, mark active again, or set the category.
+ *  Garments a change can't apply to are listed and left out. */
+function BulkBar({ uid, garments, onDone }: { uid: string; garments: Garment[]; onDone: () => void }) {
+  const [type, setType] = useState<ActionType>("divest");
+  const [date, setDate] = useState(todayIso());
+  const [category, setCategory] = useState(CATEGORY_ORDER[0]);
+  const [status, setStatus] = useState("");
+  const action: BulkAction = type === "divest" ? { type, date } : type === "category" ? { type, category } : { type };
+  const results = garments.map((g) => ({ g, r: applyBulk(g, action) }));
+  const ok = results.filter((x) => typeof x.r !== "string").map((x) => x.g);
+  const skipped = results.filter((x) => typeof x.r === "string");
+
+  async function apply() {
+    setStatus("Saving…");
+    try {
+      await updateGarments(
+        uid,
+        ok.map((g) => ({
+          id: g.id,
+          update: (current) => {
+            const r = applyBulk(current, action);
+            if (typeof r === "string") throw new Error(`${g.item}: ${r}`);
+            return r;
+          },
+        })),
+      );
+      setStatus("");
+      onDone();
+    } catch (e) {
+      setStatus(`Saving failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  return (
+    <div className="bulk-bar">
+      <strong>{garments.length} selected</strong>
+      <select value={type} onChange={(e) => setType(e.target.value as ActionType)} aria-label="Bulk change">
+        <option value="divest">Divest on</option>
+        <option value="activate">Mark active again</option>
+        <option value="category">Set category to</option>
+      </select>
+      {type === "divest" && <input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Divest date" />}
+      {type === "category" && (
+        <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Category">
+          {CATEGORY_ORDER.map((c) => <option key={c}>{c}</option>)}
+        </select>
+      )}
+      <button type="button" className="primary" disabled={ok.length === 0 || status === "Saving…"} onClick={() => void apply()}>
+        Apply to {ok.length}
+      </button>
+      <button type="button" onClick={onDone}>Clear selection</button>
+      {status && <span className={status.startsWith("Saving failed") ? "error" : "muted"}>{status}</span>}
+      {skipped.length > 0 && (
+        <small className="muted">
+          Left out: {skipped.map((x) => `${x.g.item} (${x.r})`).join("; ")}
+        </small>
+      )}
+    </div>
   );
 }

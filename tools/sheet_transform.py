@@ -178,12 +178,16 @@ def parse_sheet(rows: List[List[Any]]) -> SheetData:
     return out
 
 
-def merge_with_stored(sheet: SheetData, stored: Dict[str, Garment]) -> Tuple[SheetData, List[Garment]]:
+def merge_with_stored(
+    sheet: SheetData, stored: Dict[str, Garment], deleted: frozenset = frozenset()
+) -> Tuple[SheetData, List[Garment]]:
     """Decision D-4: garment details live in Firestore (edited in the app); the Sheet supplies only the
     daily wear ticks. Returns the data to sync (stored garments + the Sheet's days) and the garments that
     are new in the Sheet: rows whose Photo id has no garment yet are created once, never updated later.
+    Garments deleted in the app (`deleted` ids) are never re-created; ticks for garments that don't exist
+    are dropped (the public data can only reference existing garments).
     """
-    new = [g for g in sheet.garments if g.id not in stored]
+    new = [g for g in sheet.garments if g.id not in stored and g.id not in deleted]
     in_sheet = {g.id for g in sheet.garments}
     ordered = [stored[g.id] for g in sheet.garments if g.id in stored]
     ordered += [g for gid, g in sorted(stored.items()) if gid not in in_sheet]
@@ -192,7 +196,15 @@ def merge_with_stored(sheet: SheetData, stored: Dict[str, Garment]) -> Tuple[She
         for gid, g in sorted(stored.items())
         if gid not in in_sheet
     ]
-    merged = replace(sheet, garments=ordered + new, warnings=sheet.warnings + warnings)
+    warnings += [
+        f"{g.id} ({g.item}) was deleted in the app; remove its row from the Sheet (its ticks are ignored)"
+        for g in sheet.garments
+        if g.id in deleted and g.id not in stored
+    ]
+    garments = ordered + new
+    known = {g.id for g in garments}
+    days = {day: [gid for gid in worn if gid in known] for day, worn in sheet.days.items()}
+    merged = replace(sheet, garments=garments, days=days, warnings=sheet.warnings + warnings)
     return merged, new
 
 

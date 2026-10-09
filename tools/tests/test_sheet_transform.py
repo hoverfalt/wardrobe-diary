@@ -124,6 +124,16 @@ def test_merge_with_stored_keeps_app_edits():
     assert merged.days == sheet.days  # wears still come from the Sheet
 
 
+def test_merge_skips_garments_deleted_in_the_app():
+    sheet = parse_sheet(make_rows())
+    stored = {g.id: g for g in sheet.garments if g.id != "Jackets_and_hoodies-008"}
+    merged, new = merge_with_stored(sheet, stored, deleted=frozenset({"Jackets_and_hoodies-008"}))
+    assert new == []
+    assert "Jackets_and_hoodies-008" not in {g.id for g in merged.garments}
+    assert all("Jackets_and_hoodies-008" not in worn for worn in merged.days.values())  # its ticks dropped
+    assert any("deleted in the app" in w for w in merged.warnings)
+
+
 def test_missing_header():
     with pytest.raises(ValueError):
         parse_sheet([["foo"]])

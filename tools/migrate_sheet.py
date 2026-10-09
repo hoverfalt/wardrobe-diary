@@ -64,6 +64,11 @@ def read_stored_garments(db, uid: str):
     return {doc.id: Garment.from_firestore(doc.id, doc.to_dict()) for doc in garments.stream()}
 
 
+def read_deleted_garments(db, uid: str) -> frozenset:
+    deleted = db.collection("users").document(uid).collection("deletedGarments")
+    return frozenset(ref.id for ref in deleted.list_documents())
+
+
 def write_firestore(db, uid: str, data, new_garments) -> None:
     user = db.collection("users").document(uid)
     garments, days = user.collection("garments"), user.collection("days")
@@ -108,7 +113,9 @@ def main() -> int:
     rows = read_sheet(args.sheet_id, args.tab)
     sheet = parse_sheet(rows)
     db = firestore_client()
-    data, new_garments = merge_with_stored(sheet, read_stored_garments(db, args.uid))
+    data, new_garments = merge_with_stored(
+        sheet, read_stored_garments(db, args.uid), read_deleted_garments(db, args.uid)
+    )
 
     logged_days = sum(1 for w in data.days.values() if w)
     wears = sum(len(w) for w in data.days.values())

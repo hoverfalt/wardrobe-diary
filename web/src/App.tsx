@@ -46,7 +46,7 @@ export function App() {
           ) : route.id ? (
             <GarmentEditPage uid={user!.uid} id={route.id} wardrobe={wardrobe} />
           ) : (
-            <ManagePage wardrobe={wardrobe} />
+            <ManagePage uid={user!.uid} wardrobe={wardrobe} />
           )
         ) : user ? (
           <p>Only the owner can manage garments.</p>

@@ -1,12 +1,13 @@
 // Add a garment (R-27 phase b, owner only): details + a standard PNG photo. The Photo id (= garment id)
 // is the next free number in the category; the photo is stored as <id>.png like the existing ones.
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { GarmentFormFields } from "../components/GarmentFormFields";
+import { PhotoPicker, type PickedPhoto } from "../components/PhotoPicker";
 import { Link } from "../components/Link";
 import { createGarment } from "../data/repo";
-import { uploadGarmentPhoto } from "../firebase";
+import { photoUrl, uploadGarmentPhoto } from "../firebase";
 import { todayIso } from "../lib/dates";
-import { checkPhoto, nextPhotoId, parseGarmentForm, PHOTO_SIZE, type FormErrors, type GarmentForm } from "../lib/garmentForm";
+import { nextPhotoId, parseGarmentForm, type FormErrors, type GarmentForm } from "../lib/garmentForm";
 import type { Wardrobe } from "../lib/publicData";
 
 const EMPTY: GarmentForm = {
@@ -24,9 +25,8 @@ const EMPTY: GarmentForm = {
 export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | null }) {
   const [form, setForm] = useState<GarmentForm>(EMPTY);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [file, setFile] = useState<File | null>(null);
-  const [dims, setDims] = useState<{ width: number; height: number } | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<PickedPhoto | null>(null);
+  const [pickerKey, setPickerKey] = useState(0);
   const [status, setStatus] = useState<"editing" | "saving" | "error">("editing");
   const [message, setMessage] = useState("");
   const [created, setCreated] = useState<{ id: string; item: string } | null>(null);
@@ -37,24 +37,10 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
     [form.category, wardrobe],
   );
 
-  // Preview and pixel size of the chosen file.
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    setDims(null);
-    const img = new Image();
-    img.onload = () => setDims({ width: img.naturalWidth, height: img.naturalHeight });
-    img.src = url;
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  const photoCheck = file ? checkPhoto(file, dims) : null;
-
   async function save() {
     const r = parseGarmentForm(form, photoId);
-    const missingPhoto = !file;
-    if (!r.ok || missingPhoto || (photoCheck && photoCheck.errors.length > 0)) {
+    const missingPhoto = !photo;
+    if (!r.ok || missingPhoto || photo.errors.length > 0) {
       setErrors(r.ok ? {} : r.errors);
       if (missingPhoto) setMessage("Choose the garment's PNG photo.");
       return;
@@ -63,7 +49,7 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
     setMessage("");
     setStatus("saving");
     try {
-      await uploadGarmentPhoto(photoId, file!);
+      await uploadGarmentPhoto(photoId, photo!.file);
       await createGarment(uid, photoId, r.fields);
       setCreated({ id: photoId, item: r.fields.item });
     } catch (e) {
@@ -80,7 +66,7 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
       <section className="edit">
         {back}
         <div className="edit-head">
-          {preview && <img src={preview} alt="" />}
+          <img src={photoUrl(created.id) ?? ""} alt="" />
           <div>
             <h2>Added: {created.item}</h2>
             <p className="ok">Saved with its photo. Public pages are updated.</p>
@@ -104,7 +90,7 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
         </div>
         <p className="row">
           <Link to={{ page: "manage", id: created.id }}>Open the garment</Link>
-          <a href="/manage/new" onClick={(e) => { e.preventDefault(); setForm(EMPTY); setFile(null); setPreview(null); setCreated(null); setCopied(false); setStatus("editing"); }}>
+          <a href="/manage/new" onClick={(e) => { e.preventDefault(); setForm(EMPTY); setPhoto(null); setPickerKey((k) => k + 1); setCreated(null); setCopied(false); setStatus("editing"); }}>
             Add another
           </a>
         </p>
@@ -123,16 +109,10 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
           void save();
         }}
       >
-        <label className={message && !file ? "field invalid" : "field"}>
+        <div className="field">
           <span>Photo</span>
-          <div className="photo-pick">
-            <span className="photo-preview">{preview ? <img src={preview} alt="" /> : "PNG"}</span>
-            <input type="file" accept="image/png" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-          </div>
-          {photoCheck?.errors.map((m) => <small key={m} className="error">{m}</small>)}
-          {photoCheck?.warnings.map((m) => <small key={m} className="muted">{m}</small>)}
-          {!file && <small className="muted">The standard garment photo: {PHOTO_SIZE} × {PHOTO_SIZE} px PNG.</small>}
-        </label>
+          <PhotoPicker key={pickerKey} onChange={setPhoto} invalid={!!message && !photo} />
+        </div>
         <label className="field">
           <span>Photo id</span>
           <code className="photo-id">{photoId || "Choose a category first"}</code>

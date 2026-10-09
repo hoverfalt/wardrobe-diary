@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changedFields, checkPhoto, nextPhotoId, parseGarmentForm, toForm, type GarmentFields } from "./garmentForm";
+import { applyBulk, changedFields, checkPhoto, nextPhotoId, parseGarmentForm, toForm, type GarmentFields } from "./garmentForm";
 
 const vest: GarmentFields = {
   category: "Jackets and hoodies",
@@ -59,5 +59,18 @@ describe("new garment photos", () => {
     const r = checkPhoto({ type: "image/jpeg", size: 6 * 1024 * 1024 }, { width: 400, height: 300 });
     expect(r.errors).toHaveLength(2);
     expect(r.warnings[0]).toContain("cropped");
+  });
+});
+
+describe("bulk changes", () => {
+  it("divests, reactivates and recategorises", () => {
+    expect(applyBulk(vest, { type: "divest", date: "2026-10-09" })).toMatchObject({ divested: "2026-10-09" });
+    expect(applyBulk({ ...vest, divested: "2020-01-01" }, { type: "activate" })).toMatchObject({ divested: null });
+    expect(applyBulk(vest, { type: "category", category: "Knits" })).toMatchObject({ category: "Knits" });
+  });
+
+  it("explains what can't be applied", () => {
+    expect(applyBulk(vest, { type: "divest", date: "2017-01-01" })).toContain("after the divest date");
+    expect(typeof applyBulk(vest, { type: "category", category: "Hats" })).toBe("string");
   });
 });

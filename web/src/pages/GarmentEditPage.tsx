@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatEur2 } from "../components/CategoryCharts";
 import { Link } from "../components/Link";
-import { saveGarment, useGarment, useGarmentHistory } from "../data/repo";
-import { photoUrl } from "../firebase";
+import { PhotoPicker, type PickedPhoto } from "../components/PhotoPicker";
+import { deleteGarment, saveGarment, useGarment, useGarmentHistory } from "../data/repo";
+import { photoUrl, uploadGarmentPhoto } from "../firebase";
+import { navigate } from "../lib/route";
 import { formatFi, todayIso } from "../lib/dates";
 import { GarmentFormFields, LABELS } from "../components/GarmentFormFields";
 import { changedFields, parseGarmentForm, toForm, type FormErrors, type GarmentForm } from "../lib/garmentForm";
@@ -19,6 +21,11 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [newPhoto, setNewPhoto] = useState<PickedPhoto | null>(null);
+  const [pickerKey, setPickerKey] = useState(0);
+  const [photoVersion, setPhotoVersion] = useState(0); // forces this page to reload a replaced photo
+  const [photoStatus, setPhotoStatus] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   // Fill the form once the stored garment has loaded (and again after navigating to another garment).
   useEffect(() => setForm(null), [id]);
@@ -59,7 +66,34 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
     }
   }
 
-  const src = photoUrl(stored.photo);
+  const base = photoUrl(stored.photo);
+  const src = base && photoVersion ? `${base}&v=${photoVersion}` : base;
+
+  async function replacePhoto() {
+    if (!newPhoto || newPhoto.errors.length > 0) return;
+    setPhotoStatus("Uploading…");
+    try {
+      await uploadGarmentPhoto(stored!.photo, newPhoto.file);
+      await saveGarment(uid, id, stored!, "Photo replaced");
+      setPhotoVersion(Date.now());
+      setNewPhoto(null);
+      setPickerKey((k) => k + 1);
+      setPhotoStatus("Photo replaced. Other pages show it after a reload.");
+    } catch (e) {
+      setPhotoStatus(`Replacing failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  async function remove() {
+    if (!window.confirm(`Delete “${stored!.item}” (${id})? This can't be undone in the app.`)) return;
+    try {
+      await deleteGarment(uid, id);
+      navigate({ page: "manage" });
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : String(e));
+    }
+  }
+  const neverWorn = stats ? stats.lifetimeWears === 0 : stored.timesUsedInit === 0;
 
   return (
     <section className="edit">
@@ -96,6 +130,17 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
         </div>
       </form>
 
+      <h3>Photo</h3>
+      <div className="field photo-replace">
+        <PhotoPicker key={pickerKey} onChange={setNewPhoto} />
+        <div className="row">
+          <button type="button" disabled={!newPhoto || newPhoto.errors.length > 0} onClick={() => void replacePhoto()}>
+            Replace photo
+          </button>
+          {photoStatus && <span className={photoStatus.startsWith("Replacing failed") ? "error" : "muted"}>{photoStatus}</span>}
+        </div>
+      </div>
+
       <h3>History</h3>
       {history === null ? (
         <p className="muted">Loading…</p>
@@ -106,7 +151,9 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
           {history.map((h) => (
             <li key={h.id}>
               <span>{h.savedAt ? h.savedAt.toLocaleString("fi-FI") : "just now"}</span>
-              {h.before ? (
+              {h.note ? (
+                <span className="muted">{h.note}</span>
+              ) : h.before ? (
                 <>
                   <span className="muted">
                     {changedFields(h.before, h.after)
@@ -123,6 +170,20 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
             </li>
           ))}
         </ul>
+      )}
+
+      <h3>Delete</h3>
+      {neverWorn ? (
+        <div className="row">
+          <button type="button" className="danger" onClick={() => void remove()}>Delete this garment</button>
+          <span className="muted">
+            Only for garments added by mistake: it has never been worn. If it has a row in the Sheet, remove that
+            too (the sync won't re-create it, but reports the row).
+          </span>
+          {deleteError && <span className="error">{deleteError}</span>}
+        </div>
+      ) : (
+        <p className="muted">Garments that have been worn can't be deleted, since their wears are part of the history. Divest it instead.</p>
       )}
     </section>
   );
