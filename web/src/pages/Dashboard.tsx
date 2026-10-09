@@ -3,7 +3,15 @@ import { usePublicWardrobe } from "../data/repo";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
 import { todayIso } from "../lib/dates";
-import { CategorySmallMultiples, formatCount, formatEur, TotalChart } from "../components/CategoryCharts";
+import {
+  CategoryScatter,
+  CategorySmallMultiples,
+  formatCount,
+  formatEur,
+  formatEur2,
+  TotalChart,
+  type ScatterPoint,
+} from "../components/CategoryCharts";
 import {
   activeItemsOverTime,
   categoryListing,
@@ -37,6 +45,8 @@ const COLUMNS: {
   { key: "turnover", title: "Inventory turnover", format: pct, bar: "var(--bar-grey)" },
 ];
 
+const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];
+
 export function Dashboard({ ownerUid }: { ownerUid: string }) {
   const wardrobe = usePublicWardrobe(ownerUid);
   const garments = wardrobe?.garments;
@@ -56,6 +66,16 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
       totalValue: totalInventoryValueOverTime(notSportswear, range),
     };
   }, [garments, range]);
+  // Cost per wear vs frequency of use: one point per category (Sportswear included, as on the live site).
+  const costVsUse = useMemo(
+    () =>
+      rows.flatMap((r): ScatterPoint[] =>
+        r.category !== "Total" && r.costPerWear != null && r.daysUsed != null
+          ? [{ category: r.category, x: r.daysUsed, y: r.costPerWear }]
+          : [],
+      ),
+    [rows],
+  );
   const maxima = useMemo(() => {
     const categories = rows.filter((r) => r.category !== "Total");
     return Object.fromEntries(COLUMNS.map((c) => [c.key, c.fixedMax ?? barMax(categories.map((r) => r[c.key]))]));
@@ -127,7 +147,23 @@ export function Dashboard({ ownerUid }: { ownerUid: string }) {
           <p className="muted">Total value of active items. The value of an item is its purchase price.</p>
           <TotalChart points={charts.totalValue} range={range} format={formatEur} />
 
-          <p className="muted">Sportswear is not included in the charts, as on wardrobediary.io.</p>
+          <p className="muted">
+            Sportswear is not included in the charts above, as on wardrobediary.io.
+          </p>
+
+          <h2>Average cost per wear and category frequency of use</h2>
+          <p className="muted">
+            Average cost per wear by category. Category frequency of use is the share of all days in which any
+            item in the category was used.
+          </p>
+          <CategoryScatter
+            points={costVsUse}
+            xLabel="Category frequency of use (share of all days)"
+            yLabel="Average cost per wear"
+            yFormat={formatEur2}
+            yTickFormat={formatEur}
+            tipLabels={COST_VS_USE_TIP}
+          />
         </>
       )}
     </section>

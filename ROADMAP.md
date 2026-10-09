@@ -15,7 +15,8 @@ How this file works:
 - D-1, D-2 and Q-8 decided/fixed and implemented. The Dashboard is now public (no sign-in) and reads
   the single `public/data` document.
 - Active items, inventory value by category and total inventory value charts are done (small multiples, D-3).
-- **Next for Claude:** R-09 "Average cost per wear and category frequency of use".
+- Average cost per wear vs frequency of use scatter done.
+- **Next for Claude:** R-09 "Average yearly cost and category frequency of use" (same `CategoryScatter`, y = yearly cost).
 
 ## Inbox
 
@@ -35,7 +36,8 @@ _(empty)_
   - [x] Inventory value by category (over time): small multiples (D-3)
   - [x] Total inventory value (over time): one total line. The live site stacks the categories; with D-3
         the per-category split is shown by the small multiples above instead
-  - [ ] Average cost per wear and category frequency of use
+  - [x] Average cost per wear and category frequency of use: scatter, one category image per point in
+        its colour ring (as on the live site), Sportswear included; values from the category listing (D-2)
   - [ ] Average yearly cost and category frequency of use
   - [ ] Daily cost (cost of all items worn on a day; "all divested" = final)
   - [ ] Daily cost animated by date (GIF on the live site; could become an interactive date slider)

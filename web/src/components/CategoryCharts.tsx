@@ -12,6 +12,7 @@ export type Format = (v: number) => string;
 export const formatCount: Format = (v) => String(v);
 export const formatEur: Format = (v) =>
   v.toLocaleString("fi-FI", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+export const formatEur2: Format = (v) => v.toLocaleString("fi-FI", { style: "currency", currency: "EUR" });
 
 interface DayRow {
   date: Date;
@@ -125,6 +126,72 @@ export function TotalChart({ points, range, format }: { points: SeriesPoint[]; r
     (width: number) =>
       stepChart({ points, rows, index: 0, yMax: maxOf([points]), color, format, width, height: 300, ticks: 6 }),
     [points, rows, color, format],
+  );
+  if (points.length === 0) return null;
+  return (
+    <figure className="chart">
+      <PlotFigure options={options} />
+    </figure>
+  );
+}
+
+export interface ScatterPoint {
+  category: string;
+  /** 0…1 */
+  x: number;
+  y: number;
+}
+
+/** One point per category, drawn as its image in a ring of the category colour (as on the live site),
+ *  with a tooltip. Identity comes from the image, so colour is never the only cue. */
+export function CategoryScatter({
+  points,
+  xLabel,
+  yLabel,
+  yFormat,
+  yTickFormat = yFormat,
+  tipLabels,
+}: {
+  points: ScatterPoint[];
+  xLabel: string;
+  yLabel: string;
+  /** Values in the tooltip. */
+  yFormat: Format;
+  yTickFormat?: Format;
+  /** Short x and y names for the tooltip. */
+  tipLabels: [string, string];
+}) {
+  const dark = useDarkMode();
+  const options = useCallback(
+    (width: number): Plot.PlotOptions => {
+      const r = Math.round(Math.min(26, Math.max(14, width / 40)));
+      const data = points.map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
+      return {
+        width,
+        height: Math.min(560, Math.max(320, width * 0.6)),
+        marginLeft: 56,
+        marginTop: r + 8,
+        marginRight: r + 8,
+        marginBottom: 44,
+        x: { domain: [0, 1], label: xLabel, labelAnchor: "center", labelArrow: "none", tickFormat: ".0%", grid: true },
+        y: { domain: [0, Math.max(...points.map((p) => p.y), 0) * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
+        marks: [
+          Plot.ruleY([0]),
+          Plot.dot(data, { x: "x", y: "y", r: r + 3, fill: (d) => categoryColor(d.category, dark) }),
+          Plot.image(data, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
+          Plot.tip(
+            data,
+            Plot.pointer({
+              x: "x",
+              y: "y",
+              title: (d: ScatterPoint) =>
+                `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}`,
+            }),
+          ),
+        ],
+      };
+    },
+    [points, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
   );
   if (points.length === 0) return null;
   return (
