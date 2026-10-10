@@ -46,6 +46,8 @@ class Garment:
     timesUsedInit: int
     materials: str
     weightG: Optional[float]
+    # Set by the app when a photo is replaced (part of the photo URL, defeats browser caches).
+    photoVersion: Optional[str] = None
 
     def to_firestore(self) -> Dict[str, Any]:
         d = asdict(self)

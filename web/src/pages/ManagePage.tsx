@@ -106,7 +106,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
           </thead>
           <tbody>
             {shown.map(({ garment: g, worn, active }) => {
-              const src = photoUrl(g.photo);
+              const src = photoUrl(g);
               return (
                 <tr key={g.id} className={active ? undefined : "divested"}>
                   <td className="check">

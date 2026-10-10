@@ -15,7 +15,9 @@ How this file works:
 - **Cut-over done (R-13, R-15):** the app is the source of truth for wears too. Final Sheet sync through
   2026-10-09 (31,539 wears); the Sheet is retired and the sync refuses to write. Logging happens at `/log`
   (mobile-first, offline-capable). **Waiting for Olof to test logging** (needs the owner's sign-in).
-- **R-27 phase (c)** (replace photo, delete, bulk changes) is also waiting for Olof's test.
+- **R-27 phase (c)**: adding and replacing photos tested on iPhone (2026-10-10); a replaced photo kept
+  showing the old one in Safari's cache, fixed with a photo version in the URL. Delete and bulk changes
+  still to test (the test garments Knits-006/007 can be deleted).
 - **Backups (R-28) run nightly** on GitHub (first run 2026-10-10, verified: restores to exactly the live data).
 - Next candidates: R-28 automatic backup, R-16 domain switch, R-26 once the Q-4 data exists.
 
@@ -26,7 +28,7 @@ _(empty)_
 ## Now
 
 - **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
-- **R-13/R-15 Logging in the app**: done; awaiting Olof's test.
+- **R-13/R-15 Logging in the app**: done; tested OK on iPhone (2026-10-10).
 
 ## Next
 

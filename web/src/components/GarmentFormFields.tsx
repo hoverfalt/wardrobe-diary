@@ -4,11 +4,12 @@ import { CATEGORY_ORDER } from "../lib/categories";
 import { todayIso } from "../lib/dates";
 import type { FormErrors, GarmentForm } from "../lib/garmentForm";
 
-export const LABELS: Record<keyof GarmentForm | "photo", string> = {
+export const LABELS: Record<keyof GarmentForm | "photo" | "photoVersion", string> = {
   category: "Category",
   item: "Name",
   details: "Details",
   photo: "Photo",
+  photoVersion: "Photo version",
   price: "Price (€)",
   purchased: "Purchased",
   divested: "Divested",

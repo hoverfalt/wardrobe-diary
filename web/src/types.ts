@@ -7,6 +7,8 @@ export interface Garment {
   item: string;
   details: string;
   photo: string;
+  /** Changes whenever the photo is replaced; part of the photo URL so browsers don't show a cached old one. */
+  photoVersion?: string | null;
   price: number | null;
   purchased: IsoDate | null;
   divested: IsoDate | null;

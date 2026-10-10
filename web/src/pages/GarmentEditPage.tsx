@@ -23,7 +23,6 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
   const [message, setMessage] = useState("");
   const [newPhoto, setNewPhoto] = useState<PickedPhoto | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
-  const [photoVersion, setPhotoVersion] = useState(0); // forces this page to reload a replaced photo
   const [photoStatus, setPhotoStatus] = useState("");
   const [deleteError, setDeleteError] = useState("");
 
@@ -45,11 +44,11 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
   const back = <Link to={{ page: "manage" }}>← All garments</Link>;
   if (stored === null || !form) return <section>{back}<p>No garment with id {id}.</p></section>;
 
-  const parsed = parseGarmentForm(form, stored.photo);
+  const parsed = parseGarmentForm(form, stored);
   const dirty = parsed.ok ? changedFields(stored, parsed.fields).length > 0 : true;
 
   async function save() {
-    const r = parseGarmentForm(form!, stored!.photo);
+    const r = parseGarmentForm(form!, stored!);
     if (!r.ok) {
       setErrors(r.errors);
       return;
@@ -66,19 +65,17 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
     }
   }
 
-  const base = photoUrl(stored.photo);
-  const src = base && photoVersion ? `${base}&v=${photoVersion}` : base;
+  const src = photoUrl(stored);
 
   async function replacePhoto() {
     if (!newPhoto || newPhoto.errors.length > 0) return;
     setPhotoStatus("Uploading…");
     try {
       await uploadGarmentPhoto(stored!.photo, newPhoto.file);
-      await saveGarment(uid, id, stored!, "Photo replaced");
-      setPhotoVersion(Date.now());
+      await saveGarment(uid, id, { ...stored!, photoVersion: new Date().toISOString() }, "Photo replaced");
       setNewPhoto(null);
       setPickerKey((k) => k + 1);
-      setPhotoStatus("Photo replaced. Other pages show it after a reload.");
+      setPhotoStatus("Photo replaced.");
     } catch (e) {
       setPhotoStatus(`Replacing failed: ${e instanceof Error ? e.message : String(e)}`);
     }

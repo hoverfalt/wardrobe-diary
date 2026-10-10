@@ -47,7 +47,7 @@ function parseNumber(v: string): number | null {
 
 export function parseGarmentForm(
   form: GarmentForm,
-  photo: string,
+  base: { photo: string; photoVersion?: string | null },
 ): { ok: true; fields: GarmentFields } | { ok: false; errors: FormErrors } {
   const errors: FormErrors = {};
   const item = form.item.trim();
@@ -78,7 +78,8 @@ export function parseGarmentForm(
       category: form.category,
       item,
       details: form.details.trim(),
-      photo,
+      photo: base.photo,
+      ...(base.photoVersion ? { photoVersion: base.photoVersion } : {}),
       price: price == null ? null : Math.round(price * 100) / 100,
       purchased,
       divested,
@@ -89,9 +90,10 @@ export function parseGarmentForm(
   };
 }
 
-/** Field names that differ between two versions (for the history list). */
+/** Field names that differ between two versions (for the history list; the photo version is shown
+ *  as the "Photo replaced" note instead). */
 export function changedFields(before: GarmentFields, after: GarmentFields): (keyof GarmentFields)[] {
-  return (Object.keys(after) as (keyof GarmentFields)[]).filter((k) => before[k] !== after[k]);
+  return (Object.keys(after) as (keyof GarmentFields)[]).filter((k) => k !== "photoVersion" && before[k] !== after[k]);
 }
 
 /** Photo id prefix of a category, as in the Sheet: "T-shirts and tanks" → "T-shirts_and_tanks". */

@@ -16,14 +16,14 @@ const vest: GarmentFields = {
 
 describe("garment form", () => {
   it("round-trips a garment unchanged", () => {
-    const r = parseGarmentForm(toForm(vest), vest.photo);
+    const r = parseGarmentForm(toForm(vest), vest);
     expect(r).toEqual({ ok: true, fields: vest });
   });
 
   it("normalises Finnish decimals, whitespace and empty values", () => {
     const r = parseGarmentForm(
       { ...toForm(vest), item: "  Vest ", price: "49,905", weightG: "", timesUsedInit: "", divested: "2026-10-09" },
-      vest.photo,
+      vest,
     );
     expect(r.ok && r.fields).toMatchObject({ item: "Vest", price: 49.91, weightG: null, timesUsedInit: 0, divested: "2026-10-09" });
   });
@@ -31,10 +31,17 @@ describe("garment form", () => {
   it("reports invalid values", () => {
     const r = parseGarmentForm(
       { ...toForm(vest), item: " ", category: "Hats", price: "abc", divested: "2017-01-01", timesUsedInit: "1,5", weightG: "-3" },
-      vest.photo,
+      vest,
     );
     expect(r.ok).toBe(false);
     if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["category", "divested", "item", "price", "timesUsedInit", "weightG"]);
+  });
+
+  it("keeps the photo version through edits", () => {
+    const withVersion = { ...vest, photoVersion: "2026-10-10T05:00:00Z" };
+    const r = parseGarmentForm({ ...toForm(withVersion), item: "Renamed" }, withVersion);
+    expect(r.ok && r.fields.photoVersion).toBe("2026-10-10T05:00:00Z");
+    expect(changedFields(vest, withVersion)).toEqual([]); // shown as "Photo replaced", not as a field
   });
 
   it("lists changed fields", () => {

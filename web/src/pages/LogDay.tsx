@@ -65,7 +65,7 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
           {wornIds.map((id) => {
             const g = byId.get(id);
             if (!g) return null;
-            const src = photoUrl(g.photo);
+            const src = photoUrl(g);
             return (
               <button key={id} className="chip" onClick={() => toggle(id, false)} aria-label={`Remove ${g.item}`}>
                 {src && <img src={src} alt="" />}
@@ -85,7 +85,7 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
           <div className="grid">
             {items.map((g) => {
               const on = worn.has(g.id);
-              const src = photoUrl(g.photo);
+              const src = photoUrl(g);
               return (
                 <button key={g.id} className={on ? "tile on" : "tile"} aria-pressed={on} onClick={() => toggle(g.id, !on)}>
                   {src && <img src={src} alt="" loading="lazy" />}

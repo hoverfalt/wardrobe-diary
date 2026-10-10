@@ -26,8 +26,10 @@ export const signOutUser = () => signOut(auth);
 
 // Garment photos are public PNGs in the Storage bucket root (<id>.png), the same assets the live site
 // uses, e.g. https://firebasestorage.googleapis.com/v0/b/threddit-297417.appspot.com/o/Shirts-031.png?alt=media
-export function photoUrl(photo: string): string | null {
-  return photo ? storageUrl(`${photo}.png`) : null;
+export function photoUrl(g: { photo: string; photoVersion?: string | null }): string | null {
+  const url = g.photo ? storageUrl(`${g.photo}.png`) : null;
+  // The file name stays the same when a photo is replaced; the version makes it a new URL.
+  return url && g.photoVersion ? `${url}&v=${encodeURIComponent(g.photoVersion)}` : url;
 }
 
 /** Category images, as on the live site: Category_image-Jackets_and_hoodies.png */

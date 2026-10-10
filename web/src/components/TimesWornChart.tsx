@@ -45,7 +45,7 @@ export function TimesWornChart({ rows, minRows = 0, xMax }: {
         ...r,
         id: r.garment.id,
         name: r.garment.item,
-        src: photoUrl(r.garment.photo) ?? "",
+        src: photoUrl(r.garment) ?? "",
       }));
       const r = ROW / 2 - 2;
       // Outer band (90 %) labels on the upper line, inner band (36 %) labels below, so they can't collide.

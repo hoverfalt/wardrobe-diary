@@ -62,7 +62,7 @@ function toPoints(rows: ItemRow[], x: (r: ItemRow) => number): Point[] {
       row: r,
       x: x(r),
       y: r.costPerWear!,
-      src: photoUrl(r.garment.photo) ?? "",
+      src: photoUrl(r.garment) ?? "",
       name: r.garment.item,
       active: r.active,
     }));

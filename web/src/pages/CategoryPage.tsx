@@ -78,7 +78,7 @@ export function CategoryPage({
           </thead>
           <tbody>
             {rows.map((r) => {
-              const src = photoUrl(r.garment.photo);
+              const src = photoUrl(r.garment);
               return (
                 <tr key={r.garment.id} className={r.active ? undefined : "divested"}>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>

@@ -52,7 +52,7 @@ Python is not used for the core metrics.
 ```
 users/{uid}/garments/{garmentId}          // source of truth for garment details (D-4)
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
-  timesUsedInit, materials, weightG
+  timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced)
 users/{uid}/garments/{garmentId}/history/{autoId}
   savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
 users/{uid}/deletedGarments/{garmentId}
@@ -207,7 +207,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
-- Item photos and category images come from Storage (`photoUrl`, `categoryImageUrl`); divested items get a
+- Item photos and category images come from Storage (`photoUrl(garment)`, `categoryImageUrl`). Always pass
+  the garment to `photoUrl`: a replaced photo keeps its file name, and the `photoVersion` in the URL is what
+  makes browsers (notably Safari) load the new one; divested items get a
   green ring (`#3CB371`, as on the live site).
 - Numbers are formatted Finnish style (`1 000 €`, `0,25 €`); reuse the `Intl.NumberFormat` instances.
 - Check charts in a real browser before calling them done: the site is public, so headless Chrome via
