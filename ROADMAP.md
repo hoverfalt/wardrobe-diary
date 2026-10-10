@@ -10,16 +10,13 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-09)
+## Where we left off (2026-10-10)
 
-- **Cut-over done (R-13, R-15):** the app is the source of truth for wears too. Final Sheet sync through
-  2026-10-09 (31,539 wears); the Sheet is retired and the sync refuses to write. Logging happens at `/log`
-  (mobile-first, offline-capable). **Waiting for Olof to test logging** (needs the owner's sign-in).
-- **R-27 phase (c)**: adding and replacing photos tested on iPhone (2026-10-10); a replaced photo kept
-  showing the old one in Safari's cache, fixed with a photo version in the URL. Delete and bulk changes
-  still to test (the test garments Knits-006/007 can be deleted).
-- **Backups (R-28) run nightly** on GitHub (first run 2026-10-10, verified: restores to exactly the live data).
-- Next candidates: R-28 automatic backup, R-16 domain switch, R-26 once the Q-4 data exists.
+- **Everything built so far is done and tested on Olof's iPhone:** public Dashboard and category pages,
+  garment management (R-27: edit, add, replace photo, delete, bulk changes), logging in the app (R-13/R-15,
+  the Sheet is retired), nightly backups with restore (R-28).
+- **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
+  R-26 monthly comparison once the Q-4 data is in the Sheet, R-17 multi-user, R-18 housekeeping.
 
 ## Inbox
 
@@ -27,8 +24,7 @@ _(empty)_
 
 ## Now
 
-- **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
-- **R-13/R-15 Logging in the app**: done; tested OK on iPhone (2026-10-10).
+_(nothing in progress; waiting for the next scope)_
 
 ## Next
 
@@ -40,30 +36,6 @@ _(empty)_
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
-
-- **R-27 Garment management in the app** (add, edit, divest), starting with the existing portfolio incl.
-  divested items. Fields = Sheet columns A–K: Category, Item, Details, Photo, Price, Purchased, Divested,
-  Times used init, Materials, Weight. Design agreed 2026-10-09 (D-4 = option a):
-  - **Data ownership (D-4):** garment fields live in Firestore as the source of truth; the Sheet keeps only
-    the daily wear log until cut-over (R-15). The sync no longer writes garment fields and matches Sheet
-    rows to garments by Photo id (new Sheet rows still create a garment once). ✅ done
-  - **Where:** owner-only `/manage` (shown when signed in as the owner): searchable list with filters
-    (category, active/divested), and an edit page per garment. Category pages get an "Edit" link per item
-    when signed in. ✅ done
-  - **Edit form:** category (standard list), name, details, price (€, cents), purchased / divested dates
-    (divested ≥ purchased), times used init, materials, weight (g); quick "Divest today" / "Undo divest".
-    Every save keeps the previous version in `garments/{id}/history` (undo, audit). ✅ done
-  - **Add garment:** same form plus PNG upload with a preview in the circle used on the site; Photo id
-    generated as `<Category_with_underscores>-NNN` (next free number); stored as `<id>.png` in the Storage
-    bucket like the existing photos. Then add a Sheet row with that Photo id to log wears until R-15. ✅ done
-  - **Public data:** each save also updates the garment's entry in `public/data` (same transaction), so
-    public pages update immediately (no Cloud Function needed). ✅ done
-  - **Prerequisites:** Storage rules allowing the owner to upload photos ✅ (live rules reviewed and
-    replaced, 2026-10-09); Firestore rules already allow owner writes.
-  - **Phases:** (a) edit and divest existing garments + sync switch ✅ 2026-10-09 (tested); (b) add garments
-    with photo upload ✅ 2026-10-09 (tested); (c) replace a garment's photo, delete (only never-worn garments,
-    recorded in `deletedGarments` so the sync won't re-create them), bulk changes (divest on a date, mark
-    active, set category) ✅ built 2026-10-09.
 
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
@@ -147,6 +119,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-27** 2026-10-10 Garment management in the app (owner-only `/manage`), all tested on iPhone:
+  (a) edit and divest, history with restore; (b) add with PNG photo upload (next free Photo id);
+  (c) replace photo (photo version in the URL so caches show the new one), delete never-worn garments
+  (recorded in `deletedGarments`; their history is kept), bulk changes (divest on a date, mark active,
+  set category). Garment details live in Firestore (D-4). Storage rules locked down (owner-only uploads).
 
 - **R-28** 2026-10-10 Nightly backups: GitHub Actions in the private repo `hoverfalt/wardrobe-diary-backups`
   (02:17 UTC, read-only service account "wardrobe-backup", secret `FIREBASE_BACKUP_KEY`), committing
