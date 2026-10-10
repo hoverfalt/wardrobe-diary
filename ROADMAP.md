@@ -16,8 +16,7 @@ How this file works:
   2026-10-09 (31,539 wears); the Sheet is retired and the sync refuses to write. Logging happens at `/log`
   (mobile-first, offline-capable). **Waiting for Olof to test logging** (needs the owner's sign-in).
 - **R-27 phase (c)** (replace photo, delete, bulk changes) is also waiting for Olof's test.
-- **Backups:** Firestore is now the only copy; manual `tools/backup.sh` works. Nightly backups (R-28) are
-  prepared and wait for Olof's setup steps (service account, GitHub repo + secret).
+- **Backups (R-28) run nightly** on GitHub (first run 2026-10-10, verified: restores to exactly the live data).
 - Next candidates: R-28 automatic backup, R-16 domain switch, R-26 once the Q-4 data exists.
 
 ## Inbox
@@ -28,10 +27,6 @@ _(empty)_
 
 - **R-27 Garment management**: all three phases built; (c) awaiting Olof's test.
 - **R-13/R-15 Logging in the app**: done; awaiting Olof's test.
-- **R-28 Automatic backups** (option B, chosen 2026-10-09): nightly GitHub Actions job in the private repo
-  `hoverfalt/wardrobe-diary-backups` with a read-only service account; restore script `tools/restore.sh`.
-  Scripts done and tested; **waiting for Olof** to create the read-only service account + key, the GitHub
-  repo and its secret (see the chat 2026-10-09), then Claude pushes the job and checks the first run.
 
 ## Next
 
@@ -150,6 +145,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-28** 2026-10-10 Nightly backups: GitHub Actions in the private repo `hoverfalt/wardrobe-diary-backups`
+  (02:17 UTC, read-only service account "wardrobe-backup", secret `FIREBASE_BACKUP_KEY`), committing
+  `wardrobe.json` + `last-backup.txt`; GitHub emails on failure. `tools/restore.sh` restores from any backup
+  (dry run by default). First run verified against the live data: zero differences. Note: the stored GitHub
+  token lacks the `workflow` scope, so the workflow file is edited in GitHub's web editor.
 
 - **R-13 / R-15** 2026-10-09 Logging in the app as the source of truth: final Sheet sync (632 garments,
   3,194 days, 31,539 wears), Sheet retired with a write guard, mobile-first `/log` (day navigation, outfit
