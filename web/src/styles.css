@@ -62,6 +62,7 @@ td.img { width: 28px; padding: 2px 4px; }
 .date-range-slider input[type="range"] {
   position: absolute; left: -9px; width: calc(100% + 18px); top: 0; height: 24px; margin: 0;
   background: none; pointer-events: none; -webkit-appearance: none; appearance: none;
+  padding: 0; border: 0; box-sizing: border-box;
 }
 .date-range-slider input[type="range"]::-webkit-slider-runnable-track { background: none; }
 .date-range-slider input[type="range"]::-webkit-slider-thumb {
@@ -99,7 +100,9 @@ td a { color: inherit; }
 /* Garment management */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .filters input[type="search"] { flex: 1; min-width: 220px; }
-input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: inherit; }
+/* Text-like inputs only: range sliders and checkboxes keep their own sizing (padding and a border would
+   make the date slider wider than its box). */
+input:not([type="range"]):not([type="checkbox"]):not([type="file"]), select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: inherit; }
 .edit-head { display: flex; gap: 16px; align-items: center; margin: 12px 0; }
 .edit-head img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; }
 .edit-head h2 { margin: 0; }
