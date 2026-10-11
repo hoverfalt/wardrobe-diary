@@ -175,6 +175,8 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`) |
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
+| `pages/GarmentPage.tsx` | `/garment/<id>` (public): photo, all fields, composition bar, stats, wears per month; Edit for the owner |
+| `pages/MaterialsPage.tsx`, `components/MaterialsCharts.tsx` | `/materials` (public): fibre mass owned/worn, fibre mix per category (small multiples), monthly outfit weight and synthetic share |
 | `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, search, recent-first order, offline status |
 | `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters and bulk changes; `/manage/<id>` edit, divest, replace photo, delete (never worn), history; `/manage/new` add with photo upload |
 | `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
@@ -218,11 +220,14 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
-- Pages: `/` Dashboard, `/category/<slug>` category pages, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
+- Pages: `/` Dashboard, `/category/<slug>`, `/garment/<id>`, `/materials`, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
+- Fibre types (natural / regenerated / synthetic / other) have fixed colours (`--fibre-*` in `styles.css`, from the
+  validated reference palette: aqua, blue, orange, grey); always pair them with text labels.
+- On category pages, item names link to `/garment/<id>` for visitors and to `/manage/<id>` for the owner.
 - Item photos and category images come from Storage (`photoUrl(garment)`, `categoryImageUrl`). Always pass
   the garment to `photoUrl`: a replaced photo keeps its file name, and the `photoVersion` in the URL is what
   makes browsers (notably Safari) load the new one; divested items get a

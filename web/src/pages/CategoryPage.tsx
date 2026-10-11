@@ -29,7 +29,7 @@ export function CategoryPage({
   canEdit = false,
 }: {
   slug: string;
-  /** Signed in as the owner: item names link to their edit page. */
+  /** Signed in as the owner: item names link to their edit page (otherwise to the garment page). */
   canEdit?: boolean;
   wardrobe: Wardrobe | null;
   range: DateRange;
@@ -83,7 +83,7 @@ export function CategoryPage({
                 <tr key={r.garment.id} className={r.active ? undefined : "divested"}>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>
                   <td>
-                    {canEdit ? <Link to={{ page: "manage", id: r.garment.id }}>{r.garment.item}</Link> : r.garment.item}
+                    <Link to={canEdit ? { page: "manage", id: r.garment.id } : { page: "garment", id: r.garment.id }}>{r.garment.item}</Link>
                   </td>
                   {COLUMNS.map((c, i) => (
                     <td key={c.title} className="num" style={barStyle(c.value(r), maxima[i], c.bar)}>

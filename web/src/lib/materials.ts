@@ -35,6 +35,8 @@ export interface ParsedMaterials {
   parts: MaterialPart[];
   /** The main part's fibres with shares summing to 1 (empty when unknown). */
   main: Composition[];
+  /** Label of the main part (null when unlabelled). */
+  mainLabel: string | null;
   /** Shares guessed (no percentages given: equal split), or percentages not summing to 100. */
   estimated: boolean;
   /** Words that could not be read as a fibre (for cleaning up the source text). */
@@ -98,7 +100,7 @@ function parseFibre(item: string): Fibre | string | null {
 }
 
 export function parseMaterials(text: string | null | undefined): ParsedMaterials {
-  const empty: ParsedMaterials = { parts: [], main: [], estimated: false, unknown: [] };
+  const empty: ParsedMaterials = { parts: [], main: [], mainLabel: null, estimated: false, unknown: [] };
   if (!text || /^\s*na\b/i.test(text)) return empty;
 
   const normalised = text
@@ -159,7 +161,7 @@ export function parseMaterials(text: string | null | undefined): ParsedMaterials
     const prev = merged.get(key);
     merged.set(key, prev ? { ...prev, share: prev.share + c.share, recycled: prev.recycled || c.recycled, organic: prev.organic || c.organic } : c);
   }
-  return { parts, main: [...merged.values()].sort((a, b) => b.share - a.share), estimated, unknown };
+  return { parts, main: [...merged.values()].sort((a, b) => b.share - a.share), mainLabel: main.label, estimated, unknown };
 }
 
 export interface FibreMass {
@@ -236,4 +238,69 @@ export function materialBreakdown(
   const totalKg = [...mass.values()].reduce((s, m) => s + m.kg, 0);
   const fibres = [...mass.values()].map((m) => ({ ...m, share: totalKg ? m.kg / totalKg : 0 })).sort((a, b) => b.kg - a.kg);
   return { basis, totalKg, fibres, coverage, ...(basis === "worn" ? { averageOutfitKg } : {}) };
+}
+
+export type FibreClass = "natural" | "regenerated" | "synthetic" | "other";
+
+const CLASSES: Record<string, FibreClass> = {
+  cotton: "natural", wool: "natural", linen: "natural", leather: "natural", down: "natural", feather: "natural",
+  viscose: "regenerated", modal: "regenerated", lyocell: "regenerated",
+  polyester: "synthetic", polyamide: "synthetic", elastane: "synthetic", acrylic: "synthetic",
+  polypropylene: "synthetic", polyurethane: "synthetic", "synthetic textile": "synthetic",
+};
+
+/** Natural (cotton, wool, linen, leather, down…), regenerated cellulose (viscose, modal, lyocell), synthetic
+ *  (polyester, polyamide, elastane, acrylic…) or other (rubber, metal, unspecified textile). */
+export function fibreClass(fibre: string): FibreClass {
+  return CLASSES[fibre] ?? "other";
+}
+
+export interface MonthMaterials {
+  month: string; // YYYY-MM
+  /** Average weight of the garments worn per logged day (garments with a known weight). */
+  averageOutfitKg: number;
+  /** Worn mass by fibre class (garments with a weight and readable materials). */
+  kgByClass: Record<FibreClass, number>;
+  /** Share of the worn mass that is synthetic (null when nothing was measurable). */
+  syntheticShare: number | null;
+}
+
+/** Monthly figures for the worn wardrobe: outfit weight and fibre classes. */
+export function materialsByMonth(garments: Garment[], days: Day[], range: DateRange): MonthMaterials[] {
+  const byId = new Map(garments.map((g) => [g.id, g]));
+  const parsed = new Map(garments.map((g) => [g.id, parseMaterials(g.materials)]));
+  const months = new Map<string, { days: number; outfitKg: number; kg: Record<FibreClass, number> }>();
+  for (const d of days) {
+    if (d.date < range.from || d.date > range.to) continue;
+    const key = d.date.slice(0, 7);
+    const m = months.get(key) ?? { days: 0, outfitKg: 0, kg: { natural: 0, regenerated: 0, synthetic: 0, other: 0 } };
+    let any = false;
+    for (const id of d.worn) {
+      const g = byId.get(id);
+      if (!g || !isActive(g, d.date)) continue;
+      any = true;
+      if (!g.weightG) continue;
+      m.outfitKg += g.weightG / 1000;
+      for (const c of parsed.get(id)!.main) m.kg[fibreClass(c.fibre)] += (g.weightG * c.share) / 1000;
+    }
+    if (any) m.days++;
+    months.set(key, m);
+  }
+  return [...months]
+    .filter(([, m]) => m.days > 0)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, m]) => {
+      const total = m.kg.natural + m.kg.regenerated + m.kg.synthetic + m.kg.other;
+      return { month, averageOutfitKg: m.outfitKg / m.days, kgByClass: m.kg, syntheticShare: total > 0 ? m.kg.synthetic / total : null };
+    });
+}
+
+export type MaterialsIssue = "missing" | "unreadable" | "estimated";
+
+/** Why a garment's materials text needs a look (null when it reads cleanly). */
+export function materialsIssue(text: string | null | undefined): MaterialsIssue | null {
+  const p = parseMaterials(text);
+  if (p.unknown.length > 0) return "unreadable";
+  if (p.main.length === 0) return "missing";
+  return p.estimated ? "estimated" : null;
 }

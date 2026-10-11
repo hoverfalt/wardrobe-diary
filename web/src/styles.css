@@ -9,6 +9,11 @@
   --bar-blue: #cce5ff;
   --bar-red: #ffcccc;
   --bar-green: #ccffcc;
+  /* Fibre classes (materials), from the validated reference palette: aqua, blue, orange + neutral grey */
+  --fibre-natural: #1baf7a;
+  --fibre-regenerated: #2a78d6;
+  --fibre-synthetic: #eb6834;
+  --fibre-other: #9a9a9a;
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
 }
@@ -16,6 +21,7 @@
   :root {
     --bg: #141414; --fg: #eee; --muted: #9a9a9a; --line: #333; --accent: #e05a5a;
     --bar-grey: #3a3a3a; --bar-blue: #1f3a57; --bar-red: #5a2a2a; --bar-green: #24502a;
+    --fibre-natural: #199e70; --fibre-regenerated: #3987e5; --fibre-synthetic: #d95926; --fibre-other: #7a7a7a;
   }
 }
 body { margin: 0; background: var(--bg); color: var(--fg); }
@@ -161,3 +167,23 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
   .tile img { width: 56px; height: 56px; }
   .tile { font-size: 12px; padding: 6px 4px; }
 }
+.review-cell { white-space: pre-line; font-size: 13px; color: var(--muted); max-width: 320px; }
+
+/* Garment page */
+.garment-head { display: flex; gap: 20px; align-items: center; margin: 12px 0 16px; flex-wrap: wrap; }
+.garment-head img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; background: var(--line); }
+.garment-head h2 { margin: 0 0 4px; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0 0 16px; max-width: 700px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.pre { white-space: pre-line; }
+.composition { max-width: 700px; margin-bottom: 16px; }
+.composition-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; margin-bottom: 8px; }
+.composition-bar span { display: block; }
+.swatch-box { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+.stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 8px 0 16px; }
+.stat-tiles > div { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.stat-tiles strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat-tiles span { font-size: 13px; color: var(--muted); }
+/* Back links at the top of a page ("← Dashboard") */
+section > a:first-child { display: inline-block; margin-top: 8px; }

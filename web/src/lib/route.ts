@@ -5,12 +5,16 @@ export type Route =
   | { page: "dashboard" }
   | { page: "log" }
   | { page: "category"; slug: string }
-  | { page: "manage"; id?: string };
+  | { page: "manage"; id?: string }
+  | { page: "garment"; id: string }
+  | { page: "materials" };
 
 export function parseRoute(path: string): Route {
   const parts = path.split("/").filter(Boolean);
   if (parts[0] === "log") return { page: "log" };
   if (parts[0] === "category" && parts[1]) return { page: "category", slug: parts[1] };
+  if (parts[0] === "garment" && parts[1]) return { page: "garment", id: decodeURIComponent(parts[1]) };
+  if (parts[0] === "materials") return { page: "materials" };
   if (parts[0] === "manage") return parts[1] ? { page: "manage", id: decodeURIComponent(parts[1]) } : { page: "manage" };
   return { page: "dashboard" };
 }
@@ -25,6 +29,10 @@ export function routePath(route: Route): string {
       return `/category/${route.slug}`;
     case "manage":
       return route.id ? `/manage/${encodeURIComponent(route.id)}` : "/manage";
+    case "garment":
+      return `/garment/${encodeURIComponent(route.id)}`;
+    case "materials":
+      return "/materials";
   }
 }
 

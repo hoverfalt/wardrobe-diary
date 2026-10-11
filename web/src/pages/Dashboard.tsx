@@ -13,6 +13,7 @@ import {
   type ScatterPoint,
 } from "../components/CategoryCharts";
 import { CategoryLink } from "../components/CategoryLink";
+import { Link } from "../components/Link";
 import {
   activeItemsOverTime,
   categoryListing,
@@ -105,6 +106,9 @@ export function Dashboard({
   return (
     <section>
       <h2>Category listing</h2>
+      <p className="muted">
+        What the wardrobe is made of, by weight and fibre: see <Link to={{ page: "materials" }}>Materials</Link>.
+      </p>
       {rangeControl}
       <div className="table-wrap">
         <table>

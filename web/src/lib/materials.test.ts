@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Day, Garment } from "../types";
-import { materialBreakdown, parseMaterials } from "./materials";
+import { fibreClass, materialBreakdown, materialsByMonth, materialsIssue, parseMaterials } from "./materials";
 
 const main = (t: string) => parseMaterials(t).main.map((c) => [c.fibre, Math.round(c.share * 100)]);
 
@@ -31,6 +31,7 @@ describe("parseMaterials", () => {
     expect(p.parts.map((x) => x.label)).toEqual(["shell", "lining"]);
     expect(main("Shell: 55% wool, 35% polyester, 10% polyamide; Lining: 100% viscose")).toEqual([["wool", 55], ["polyester", 35], ["polyamide", 10]]);
     expect(main("Fabric 100% linen; Lining 65% polyester, 35% cotton; padding 90% down, 10% feather")).toEqual([["linen", 100]]);
+    expect(parseMaterials("Padding: 100% polyester; Shell: 100% polyamide").mainLabel).toBe("shell"); // not the first part
     expect(parseMaterials("Shell and lining: 100% polyamide, Padding 100% polyester").parts.map((x) => x.label)).toEqual(["shell & lining", "padding"]);
     expect(main("Padding: 50% polyester-recycled, 50% polyester. Sheel and lining: 100% polyester-recycled.")).toEqual([["polyester", 100]]);
   });
@@ -84,5 +85,32 @@ describe("materialBreakdown", () => {
     expect(b.totalKg).toBeCloseTo(0.45); // shirt twice, socks once
     expect(b.coverage).toMatchObject({ included: 3, total: 4, missingWeight: 1 });
     expect(b.averageOutfitKg).toBeCloseTo((0.25 + 0.2) / 2);
+  });
+});
+
+describe("fibre classes, monthly figures and review issues", () => {
+  it("classifies fibres", () => {
+    expect(["cotton", "lyocell", "polyester", "rubber"].map(fibreClass)).toEqual(["natural", "regenerated", "synthetic", "other"]);
+  });
+
+  it("computes outfit weight and synthetic share per month", () => {
+    const g = (over: Partial<Garment>): Garment => ({
+      id: "g", category: "Shirts", item: "", details: "", photo: "", price: 10, purchased: "2018-01-01",
+      divested: null, timesUsedInit: 0, materials: "", weightG: null, ...over,
+    });
+    const tee = g({ id: "t", materials: "50% cotton, 50% polyester", weightG: 200 });
+    const shoe = g({ id: "s", materials: "Leather, rubber", weightG: 800 });
+    const months = materialsByMonth([tee, shoe], [
+      { date: "2018-01-01", worn: ["t", "s"] },
+      { date: "2018-01-02", worn: ["t"] },
+      { date: "2018-02-01", worn: ["s"] },
+    ], { from: "2018-01-01", to: "2018-02-28" });
+    expect(months.map((m) => [m.month, m.averageOutfitKg])).toEqual([["2018-01", 0.6], ["2018-02", 0.8]]);
+    expect(months[0].syntheticShare).toBeCloseTo(0.2 / 1.2); // 2 × 0.1 kg polyester of 1.2 kg
+  });
+
+  it("flags materials texts to review", () => {
+    expect(["95% cotton, 5% elastane", "Leather, rubber", "NA", "80% cotton, 20% unobtainium"].map(materialsIssue))
+      .toEqual([null, "estimated", "missing", "unreadable"]);
   });
 });

@@ -37,17 +37,6 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Later
 
-- **R-30 Garment details, materials and weight** (agreed 2026-10-11). Done: (1) materials parser and
-  (2) fibre mass metrics in `web/src/lib/materials.ts`; (3) MCP: materials/composition/weight in garment
-  rows, fibre and weight filters, `get_material_breakdown`. Still to do: a review list on the Manage page of
-  materials texts that are estimates or unreadable (for cleaning up the source text); (4) web: a public
-  page per garment `/garment/<id>` (photo, all fields, composition bar, stats, wear history; Edit for the
-  owner) and a "Materials" section on the Dashboard (fibre mass owned / worn, small multiples per D-3).
-
-- **R-29 phase 2: hosted MCP server + REST API** (when needed beyond Olof's Mac, e.g. claude.ai connectors
-  or the phone app): run the same server on Cloud Run with MCP over HTTP, plus plain REST endpoints
-  (e.g. `/api/v1/categories?from&to`). Needs the Blaze plan; adds CORS and rate limiting.
-
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
@@ -130,6 +119,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-30** 2026-10-11 Garment details, materials and weight: materials parser (all 108 real texts read; NA
+  texts count as unknown) and fibre mass metrics (`web/src/lib/materials.ts`); MCP materials/composition/
+  weight, filters and `get_material_breakdown`; a "Review" filter on the Manage page (materials unreadable /
+  estimated / missing, weight missing); public garment pages `/garment/<id>`; a public `/materials` page
+  (fibre mass owned and worn, fibre mix per category, monthly outfit weight and synthetic share) with
+  fibre-type colours validated for colour-blind safety.
 
 - **R-29 phase 1** 2026-10-11 Local read-only MCP server (`mcp/`): 7 tools + a definitions resource over the
   public data, computed with the web app's own metrics (bundled); `.mcp.json` for Claude Code, Claude

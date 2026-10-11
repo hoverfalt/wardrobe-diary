@@ -7,17 +7,33 @@ import { CATEGORY_ORDER, compareCategories } from "../lib/categories";
 import { formatFi, todayIso } from "../lib/dates";
 import { updateGarments } from "../data/repo";
 import { applyBulk, type BulkAction } from "../lib/garmentForm";
+import { materialsIssue, type MaterialsIssue } from "../lib/materials";
 import { itemListing, TRACKING_START } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
 import type { Garment } from "../types";
 
 type Status = "all" | "active" | "divested";
+type Review = "" | MaterialsIssue | "no-weight";
+
+const REVIEW_LABELS: Record<Exclude<Review, "">, string> = {
+  unreadable: "Materials: words not understood",
+  estimated: "Materials: shares estimated (no % or not summing to 100)",
+  missing: "Materials: missing or NA",
+  "no-weight": "Weight: missing",
+};
+
+function reviewReason(g: Garment, review: Review): boolean {
+  if (review === "") return true;
+  if (review === "no-weight") return !g.weightG;
+  return materialsIssue(g.materials) === review;
+}
 
 export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | null }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState<Status>("all");
+  const [review, setReview] = useState<Review>("");
 
   const rows = useMemo(() => {
     if (!wardrobe) return [];
@@ -41,6 +57,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
     (r) =>
       (!category || r.garment.category === category) &&
       (status === "all" || (status === "active") === r.active) &&
+      reviewReason(r.garment, review) &&
       (!q || `${r.garment.item} ${r.garment.details} ${r.garment.materials} ${r.garment.id}`.toLowerCase().includes(q)),
   );
 
@@ -79,6 +96,14 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
           <option value="active">Active</option>
           <option value="divested">Divested</option>
         </select>
+        <select value={review} onChange={(e) => setReview(e.target.value as Review)} aria-label="Review">
+          <option value="">No review filter</option>
+          {(Object.keys(REVIEW_LABELS) as Exclude<Review, "">[]).map((k) => (
+            <option key={k} value={k}>
+              Review – {REVIEW_LABELS[k]} ({rows.filter((r) => reviewReason(r.garment, k)).length})
+            </option>
+          ))}
+        </select>
         <span className="muted">{shown.length} of {rows.length}</span>
       </div>
       {selected.size > 0 && (
@@ -102,6 +127,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
               <th>Purchased</th>
               <th>Divested</th>
               <th className="num">Times worn</th>
+              {review && <th>{review === "no-weight" ? "Weight" : "Materials"}</th>}
             </tr>
           </thead>
           <tbody>
@@ -119,6 +145,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
                   <td>{formatFi(g.purchased)}</td>
                   <td>{formatFi(g.divested)}</td>
                   <td className="num">{worn}</td>
+                  {review && <td className="review-cell">{review === "no-weight" ? "–" : g.materials || "–"}</td>}
                 </tr>
               );
             })}

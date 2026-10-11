@@ -11,6 +11,8 @@ describe("routes", () => {
     expect(parseRoute("/manage")).toEqual({ page: "manage" });
     expect(parseRoute("/manage/Socks-012")).toEqual({ page: "manage", id: "Socks-012" });
     expect(routePath({ page: "manage", id: "Socks-012" })).toBe("/manage/Socks-012");
+    expect(parseRoute("/garment/Shirts-031")).toEqual({ page: "garment", id: "Shirts-031" });
+    expect(parseRoute("/materials")).toEqual({ page: "materials" });
   });
 
   it("maps categories to slugs and back", () => {

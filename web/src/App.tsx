@@ -7,6 +7,8 @@ import { navigate, useRoute } from "./lib/route";
 import { AddGarmentPage } from "./pages/AddGarmentPage";
 import { CategoryPage } from "./pages/CategoryPage";
 import { GarmentEditPage } from "./pages/GarmentEditPage";
+import { GarmentPage } from "./pages/GarmentPage";
+import { MaterialsPage } from "./pages/MaterialsPage";
 import { ManagePage } from "./pages/ManagePage";
 import { Dashboard } from "./pages/Dashboard";
 import { LogDay } from "./pages/LogDay";
@@ -27,7 +29,8 @@ export function App() {
       <header>
         <h1>Wardrobe Diary</h1>
         <nav>
-          <button aria-pressed={route.page === "dashboard" || route.page === "category"} onClick={() => navigate({ page: "dashboard" })}>Dashboard</button>
+          <button aria-pressed={route.page === "dashboard" || route.page === "category" || route.page === "garment"} onClick={() => navigate({ page: "dashboard" })}>Dashboard</button>
+          <button aria-pressed={route.page === "materials"} onClick={() => navigate({ page: "materials" })}>Materials</button>
           <button aria-pressed={route.page === "log"} onClick={() => navigate({ page: "log" })}>Log</button>
           {isOwner && (
             <button aria-pressed={route.page === "manage"} onClick={() => navigate({ page: "manage" })}>Manage</button>
@@ -39,6 +42,8 @@ export function App() {
       {route.page === "category" && (
         <CategoryPage slug={route.slug} wardrobe={wardrobe} range={range} rangeControl={control} canEdit={isOwner} />
       )}
+      {route.page === "garment" && <GarmentPage id={route.id} wardrobe={wardrobe} canEdit={isOwner} />}
+      {route.page === "materials" && <MaterialsPage wardrobe={wardrobe} range={range} rangeControl={control} />}
       {route.page === "manage" &&
         (isOwner ? (
           route.id === "new" ? (

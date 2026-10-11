@@ -100,7 +100,7 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
         <div>
           <h2>{stored.item}</h2>
           <p className="muted">
-            {id}
+            <Link to={{ page: "garment", id }}>Public page</Link> · {id}
             {stats && <> · worn {stats.lifetimeWears} times · {stats.costPerWear == null ? "–" : formatEur2(stats.costPerWear)} per wear</>}
           </p>
         </div>
