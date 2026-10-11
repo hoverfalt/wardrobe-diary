@@ -96,6 +96,12 @@ describe("materials in tools", () => {
     expect(listGarments(m, { range: resolveRange(m), sort: "weight" }).garments.map((g) => g.name)).toEqual(["Wool shirt", "Cotton shirt", "Mystery shirt"]);
   });
 
+  it("shows and filters tags", () => {
+    const tagged: Wardrobe = { ...m, garments: m.garments.map((g) => (g.id === "Shirts-002" ? { ...g, tags: ["second-hand"] } : g)) };
+    const r = listGarments(tagged, { range: resolveRange(tagged), tag: "second-hand" });
+    expect(r.garments.map((g) => [g.name, g.tags])).toEqual([["Cotton shirt", ["second hand"]]]);
+  });
+
   it("breaks down fibre mass", () => {
     const t = materialTable(m, resolveRange(m), "owned");
     expect(t.totalKg).toBe(0.5);

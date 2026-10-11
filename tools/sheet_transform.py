@@ -50,6 +50,8 @@ class Garment:
     photoVersion: Optional[str] = None
     # Set by the app on divested garments whose missing details can't be filled in (left out of review).
     detailsUnavailable: Optional[bool] = None
+    # Descriptive tags from the app's vocabulary (web/src/lib/tags.ts), e.g. "second-hand".
+    tags: Optional[List[str]] = None
 
     def to_firestore(self) -> Dict[str, Any]:
         d = asdict(self)

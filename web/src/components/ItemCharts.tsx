@@ -6,6 +6,8 @@ import { photoUrl } from "../firebase";
 import { divestedAverages, type ItemRow } from "../lib/metrics";
 import { formatEur2 } from "./CategoryCharts";
 import { PlotFigure } from "./PlotFigure";
+import { photoBadgeMarks, tagLines } from "./photoBadges";
+import { TagBadge } from "./TagBadges";
 
 const DIVESTED = "#3CB371"; // live site: mediumseagreen
 const GUIDE = "#7fb8d6"; // live site: lightblue
@@ -32,7 +34,8 @@ function itemMarks(points: Point[], r: number, tip: (p: Point) => string): Plot.
     Plot.dot(divested, { x: "x", y: "y", r: r + 3, fill: DIVESTED, fillOpacity: 0.8 }),
     Plot.image(divested, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
     Plot.image(active, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
-    Plot.tip(points, Plot.pointer({ x: "x", y: "y", title: tip })),
+    ...photoBadgeMarks(points.map((p) => ({ ...p, garment: p.row.garment })), "x", "y", r),
+    Plot.tip(points, Plot.pointer({ x: "x", y: "y", title: (p: Point) => tip(p) + tagLines(p.row.garment) })),
   ];
 }
 
@@ -115,6 +118,7 @@ export function CostVsWearsChart({ rows }: { rows: ItemRow[] }) {
     <figure className="chart">
       <ul className="chart-legend" aria-label="Legend">
         <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
+        <li><TagBadge tag="second-hand" /> Second hand</li>
         <li><span className="line" style={{ background: "currentColor", opacity: 0.3 }} /> Item's cost per wear over time</li>
         <li><span className="line" style={{ background: GUIDE }} /> Price ÷ times worn for set prices</li>
       </ul>
@@ -176,6 +180,7 @@ export function CostVsFrequencyChart({
     <figure className="chart">
       <ul className="chart-legend" aria-label="Legend">
         <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
+        <li><TagBadge tag="second-hand" /> Second hand</li>
         {avg && (
           <li>
             <span className="line dotted" style={{ borderColor: DIVESTED }} /> Divested items' averages:{" "}

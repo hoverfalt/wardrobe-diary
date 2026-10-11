@@ -53,7 +53,8 @@ Python is not used for the core metrics.
 users/{uid}/garments/{garmentId}          // source of truth for garment details (D-4)
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
   timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced),
-  detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list)
+  detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list),
+  tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand")
 users/{uid}/garments/{garmentId}/history/{autoId}
   savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
 users/{uid}/deletedGarments/{garmentId}
@@ -226,6 +227,10 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
+- **Tags** (`lib/tags.ts`) are descriptive only and never change a calculation (second hand: price as paid,
+  wears from the purchase; no estimated earlier use). Show them as badges: `TagBadges` next to names,
+  `photoBadgeMarks` on chart photos, `tagLines` in tooltips; mention the badge in chart legends. Typing
+  "(SH)" at the end of a name becomes the tag on save.
 - Fibre types (natural / regenerated / synthetic / other) have fixed colours (`--fibre-*` in `styles.css`, from the
   validated reference palette: aqua, blue, orange, grey); always pair them with text labels.
 - On category pages, item names link to the public `/garment/<id>`; the owner edits from there (Edit button).

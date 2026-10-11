@@ -85,6 +85,26 @@ describe("details can't be completed", () => {
   });
 });
 
+describe("tags", () => {
+  it("round-trips tags and reports them as changed fields", () => {
+    const sh = { ...vest, tags: ["second-hand"] };
+    expect(parseGarmentForm(toForm(sh), sh)).toEqual({ ok: true, fields: sh });
+    expect(changedFields(vest, sh)).toEqual(["tags"]);
+    const r = parseGarmentForm({ ...toForm(sh), tags: [] }, sh);
+    expect(r.ok && r.fields.tags).toBeUndefined();
+  });
+
+  it("turns (SH) typed in a name into the tag", () => {
+    const r = parseGarmentForm({ ...toForm(vest), item: "Old jacket (SH)" }, vest);
+    expect(r.ok && [r.fields.item, r.fields.tags]).toEqual(["Old jacket", ["second-hand"]]);
+  });
+
+  it("adds and removes a tag in bulk", () => {
+    expect(applyBulk(vest, { type: "tag", tag: "second-hand", value: true })).toMatchObject({ tags: ["second-hand"] });
+    expect(applyBulk({ ...vest, tags: ["second-hand"] }, { type: "tag", tag: "second-hand", value: false })).not.toHaveProperty("tags");
+  });
+});
+
 describe("bulk changes", () => {
   it("divests, reactivates and recategorises", () => {
     expect(applyBulk(vest, { type: "divest", date: "2026-10-09" })).toMatchObject({ divested: "2026-10-09" });

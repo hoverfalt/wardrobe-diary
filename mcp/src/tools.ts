@@ -16,6 +16,9 @@ import {
 } from "../../web/src/lib/metrics";
 import { materialBreakdown, parseMaterials, type Composition } from "../../web/src/lib/materials";
 import type { Wardrobe } from "../../web/src/lib/publicData";
+import { hasTag, TAGS, tagsOf, type Tag } from "../../web/src/lib/tags";
+
+const tagLabels = (g: Garment) => tagsOf(g).map((t) => TAGS[t].label.toLowerCase());
 import type { Garment } from "../../web/src/types";
 import { PROJECT_ID } from "./publicData";
 
@@ -87,6 +90,7 @@ function garmentRow(r: ItemRow) {
     id: g.id,
     name: g.item,
     category: g.category,
+    tags: tagLabels(g),
     details: g.details || null,
     materials: g.materials || null,
     composition: m.main.length ? compositionText(m.main) : null,
@@ -113,6 +117,7 @@ export function listGarments(
     status?: "active" | "divested" | "all";
     search?: string;
     fibre?: string;
+    tag?: Tag;
     minWeightG?: number;
     maxWeightG?: number;
     sort?: GarmentSort;
@@ -126,6 +131,7 @@ export function listGarments(
     .filter((r) => !opts.status || opts.status === "all" || (opts.status === "active") === r.active)
     .filter((r) => !q || `${r.garment.item} ${r.garment.details} ${r.garment.materials}`.toLowerCase().includes(q))
     .filter((r) => !fibre || parseMaterials(r.garment.materials).main.some((c) => c.fibre.includes(fibre)))
+    .filter((r) => !opts.tag || hasTag(r.garment, opts.tag))
     .filter((r) => opts.minWeightG == null || (r.garment.weightG ?? -1) >= opts.minWeightG)
     .filter((r) => opts.maxWeightG == null || (r.garment.weightG != null && r.garment.weightG <= opts.maxWeightG));
   const key: Record<GarmentSort, (r: ItemRow) => number | string> = {
@@ -158,6 +164,7 @@ export function getGarment(w: Wardrobe, id: string) {
     id: g.id,
     name: g.item,
     category: g.category,
+    tags: tagLabels(g),
     details: g.details,
     materials: g.materials,
     composition: (() => {
@@ -283,6 +290,8 @@ All metrics accept a date range (from, to); by default from ${TRACKING_START} to
 - **Wears per month:** times worn ÷ (days owned in the range ÷ 30.5).
 - **Daily cost:** sum of the cost per wear of the garments worn that day; "final" when all of them are
   divested (the value can no longer fall). The Dashboard leaves Sportswear out of daily cost.
+- **Tags:** descriptive only, e.g. "second hand" (bought used; the price is what was paid and wears count
+  from the purchase, with no estimate of earlier use). Tags never change any calculation.
 - **Materials / composition:** read from the free-text Materials field (typos and synonyms normalised:
   lycra = spandex = elastane, nylon = polyamide, tencel = lyocell, rayon = viscose). For garments with
   several parts (shell, lining, padding…) the **main part** counts (shell / main / outer / body / fabric,

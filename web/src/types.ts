@@ -12,6 +12,8 @@ export interface Garment {
   /** Owner's mark on a divested garment: its missing details (materials, weight) can't be filled in any more,
    *  so it is left out of the review list. */
   detailsUnavailable?: boolean;
+  /** Descriptive tags from the fixed vocabulary in lib/tags.ts, e.g. "second-hand". */
+  tags?: string[];
   price: number | null;
   purchased: IsoDate | null;
   divested: IsoDate | null;

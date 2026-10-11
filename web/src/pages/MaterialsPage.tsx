@@ -7,6 +7,7 @@ import { formatFi } from "../lib/dates";
 import { fibreClass, materialBreakdown, materialsByMonth } from "../lib/materials";
 import type { DateRange } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
+import { hasTag } from "../lib/tags";
 
 const kg = (v: number) => `${v.toLocaleString("fi-FI", { maximumFractionDigits: 1 })} kg`;
 const pct = (v: number) => `${Math.round(v * 100)} %`;
@@ -22,6 +23,7 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
       return { category, fibres: b.fibres, totalKg: b.totalKg };
     });
     const months = materialsByMonth(garments, days, range);
+    const secondHandKg = materialBreakdown(garments.filter((g) => hasTag(g, "second-hand")), days, range, "owned").totalKg;
     const synthetic = (fibres: typeof worn.fibres) => fibres.filter((f) => fibreClass(f.fibre) === "synthetic").reduce((s, f) => s + f.share, 0);
     const share = (fibres: typeof owned.fibres, key: "recycledKg" | "organicKg", total: number) => (total ? fibres.reduce((s, f) => s + f[key], 0) / total : 0);
     return {
@@ -32,6 +34,7 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
       syntheticWorn: synthetic(worn.fibres),
       recycledOwned: share(owned.fibres, "recycledKg", owned.totalKg),
       organicOwned: share(owned.fibres, "organicKg", owned.totalKg),
+      secondHandOwned: owned.totalKg ? secondHandKg / owned.totalKg : 0,
     };
   }, [wardrobe, range]);
 
@@ -54,6 +57,7 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
         <div><strong>{kg(worn.averageOutfitKg ?? 0)}</strong><span>average outfit per day</span></div>
         <div><strong>{pct(data.syntheticWorn)}</strong><span>of the worn mass is synthetic</span></div>
         <div><strong>{pct(data.recycledOwned)} / {pct(data.organicOwned)}</strong><span>recycled / organic (owned)</span></div>
+        <div><strong>{pct(data.secondHandOwned)}</strong><span>of the owned mass bought second hand</span></div>
       </div>
 
       <h3>Fibres owned</h3>

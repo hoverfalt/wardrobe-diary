@@ -2,6 +2,7 @@
 // them into the stored fields (Sheet columns A–K). Photo is not editable in phase (a).
 import type { Garment } from "../types";
 import { CATEGORY_ORDER } from "./categories";
+import { secondHandFromName, TAG_IDS, type Tag } from "./tags";
 
 export type GarmentFields = Omit<Garment, "id">;
 
@@ -17,6 +18,7 @@ export interface GarmentForm {
   weightG: string;
   /** Only offered for divested garments. */
   detailsUnavailable: boolean;
+  tags: string[];
 }
 
 export type FormErrors = Partial<Record<keyof GarmentForm, string>>;
@@ -35,6 +37,7 @@ export function toForm(g: GarmentFields): GarmentForm {
     materials: g.materials,
     weightG: num(g.weightG),
     detailsUnavailable: !!g.detailsUnavailable,
+    tags: g.tags ?? [],
   };
 }
 
@@ -53,7 +56,10 @@ export function parseGarmentForm(
   base: { photo: string; photoVersion?: string | null },
 ): { ok: true; fields: GarmentFields } | { ok: false; errors: FormErrors } {
   const errors: FormErrors = {};
-  const item = form.item.trim();
+  // "(SH)" typed at the end of a name becomes the second-hand tag.
+  const fromName = secondHandFromName(form.item.trim());
+  const item = fromName.item;
+  const formTags = fromName.secondHand && !form.tags.includes("second-hand") ? [...form.tags, "second-hand"] : form.tags;
   if (!item) errors.item = "Name is required.";
   if (!CATEGORY_ORDER.includes(form.category)) errors.category = "Choose a category.";
 
@@ -91,6 +97,7 @@ export function parseGarmentForm(
       weightG: weight,
       // Meaningful only for divested garments; cleared when the garment is active again.
       ...(form.detailsUnavailable && divested ? { detailsUnavailable: true } : {}),
+      ...(formTags.length ? { tags: TAG_IDS.filter((t) => formTags.includes(t)) } : {}),
     },
   };
 }
@@ -98,7 +105,9 @@ export function parseGarmentForm(
 /** Field names that differ between two versions (for the history list; the photo version is shown
  *  as the "Photo replaced" note instead). */
 export function changedFields(before: GarmentFields, after: GarmentFields): (keyof GarmentFields)[] {
-  return (Object.keys(after) as (keyof GarmentFields)[]).filter((k) => k !== "photoVersion" && before[k] !== after[k]);
+  const keys = new Set([...Object.keys(before), ...Object.keys(after)] as (keyof GarmentFields)[]);
+  const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  return [...keys].filter((k) => k !== "photoVersion" && !same(before[k], after[k]));
 }
 
 /** Photo id prefix of a category, as in the Sheet: "T-shirts and tanks" → "T-shirts_and_tanks". */
@@ -138,7 +147,8 @@ export type BulkAction =
   | { type: "divest"; date: string }
   | { type: "activate" }
   | { type: "category"; category: string }
-  | { type: "unavailable"; value: boolean };
+  | { type: "unavailable"; value: boolean }
+  | { type: "tag"; tag: Tag; value: boolean };
 
 /** One bulk change applied to one garment: the new fields, or why it can't be applied to this one. */
 export function applyBulk(g: GarmentFields, action: BulkAction): GarmentFields | string {
@@ -150,6 +160,12 @@ export function applyBulk(g: GarmentFields, action: BulkAction): GarmentFields |
     case "activate": {
       const { detailsUnavailable: _, ...rest } = g;
       return { ...rest, divested: null };
+    }
+    case "tag": {
+      const rest = (g.tags ?? []).filter((t) => t !== action.tag);
+      const tags = action.value ? TAG_IDS.filter((t) => t === action.tag || rest.includes(t)) : rest;
+      const { tags: _, ...without } = g;
+      return tags.length ? { ...without, tags } : without;
     }
     case "unavailable": {
       if (!g.divested) return "still active";

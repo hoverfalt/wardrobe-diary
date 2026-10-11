@@ -37,6 +37,13 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Later
 
+- **R-32 User-defined tags** (for the multi-user version, R-17): today's tags are a fixed vocabulary
+  (`web/src/lib/tags.ts`); let users create their own tags with a badge text, filter by them everywhere.
+- **R-33 Garment location** (suggestion): "(Hanko)" in names marks garments kept at the summer home in
+  Hanko rather than the main home in Helsinki (51 garments; "ex Hanko" for moved ones). Location strongly
+  affects wear frequency, so a location field (with move dates) could split or filter the statistics by
+  home, rather than being a plain tag. To discuss with Olof.
+
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
@@ -119,6 +126,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-31** 2026-10-11 Garment tags, starting with "Second hand": tags field with a fixed vocabulary; the
+  23 "(SH)" garments migrated (tag set, "(SH)" removed from names, history kept, backup taken); "SH" badges
+  next to names (category tables, Manage, garment page) and on photos in the item charts, tooltips and
+  legends; tag checkboxes in the forms, bulk add/remove and a tag filter on Manage; second-hand counts on
+  category pages and the owned-mass share on Materials; MCP tags and filter. No calculation changes.
 
 - **R-30** 2026-10-11 Garment details, materials and weight: materials parser (all 108 real texts read; NA
   texts count as unknown) and fibre mass metrics (`web/src/lib/materials.ts`); MCP materials/composition/

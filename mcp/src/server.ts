@@ -61,7 +61,7 @@ server.registerTool(
   {
     title: "List garments",
     description:
-      "Garments with details, materials (as written and as a parsed fibre composition), weight, price, dates, status, times worn in the range, lifetime wears, cost per wear and wears per month. Filter by category, status, search text, fibre or weight; sort and limit.",
+      "Garments with tags (e.g. second hand), details, materials (as written and as a parsed fibre composition), weight, price, dates, status, times worn in the range, lifetime wears, cost per wear and wears per month. Filter by category, status, search text, fibre, tag or weight; sort and limit.",
     inputSchema: {
       from,
       to,
@@ -69,6 +69,7 @@ server.registerTool(
       status: z.enum(["active", "divested", "all"]).optional().describe("Default: all"),
       search: z.string().optional().describe("Text to find in the name, details or materials"),
       fibre: z.string().optional().describe('Only garments whose main fabric contains this fibre, e.g. "wool", "polyester", "elastane"'),
+      tag: z.enum(["second-hand"]).optional().describe("Only garments with this tag (second-hand = bought used)"),
       minWeightG: z.number().optional().describe("Minimum weight in grams"),
       maxWeightG: z.number().optional().describe("Maximum weight in grams"),
       sort: z.enum(["times_worn", "cost_per_wear", "wears_per_month", "price", "purchased", "name", "weight"]).optional().describe("Default: times_worn (most first)"),

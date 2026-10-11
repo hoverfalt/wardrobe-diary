@@ -7,6 +7,8 @@ import { useCallback, useMemo } from "react";
 import { photoUrl } from "../firebase";
 import { quantile, type ItemRow } from "../lib/metrics";
 import { PlotFigure } from "./PlotFigure";
+import { photoBadgeMarks, tagLines } from "./photoBadges";
+import { TagBadge } from "./TagBadges";
 
 const DIVESTED = "#3CB371"; // live site: mediumseagreen
 const ROW = 28;
@@ -90,13 +92,14 @@ export function TimesWornChart({ rows, minRows = 0, xMax }: {
           }),
           Plot.dot(data.filter((d) => !d.active), { x: "timesWorn", y: "id", r: r + 2.5, fill: DIVESTED }),
           Plot.image(data, { x: "timesWorn", y: "id", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
+          ...photoBadgeMarks(data, "timesWorn", "id", r),
           Plot.tip(
             data,
             Plot.pointerY({
               x: "timesWorn",
               y: "id",
               title: (d: (typeof data)[number]) =>
-                `${d.name}\nTimes worn: ${d.timesWorn}\n${d.active ? "Active" : "Divested"}`,
+                `${d.name}\nTimes worn: ${d.timesWorn}\n${d.active ? "Active" : "Divested"}${tagLines(d.garment)}`,
             }),
           ),
         ],
@@ -111,6 +114,7 @@ export function TimesWornChart({ rows, minRows = 0, xMax }: {
         <ul className="chart-legend" aria-label="Legend">
           <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
           <li><span className="dot" style={{ background: "var(--bar-grey)" }} /> Active</li>
+          <li><TagBadge tag="second-hand" /> Second hand</li>
           <li>
             <span className="box" style={{ background: "rgba(60, 179, 113, 0.25)" }} /> How often divested items
             were worn: middle 90 % ({Math.round(bands[0].x1)}–{Math.round(bands[0].x2)}) and middle 36 % (

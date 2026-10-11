@@ -14,6 +14,9 @@
   --fibre-regenerated: #2a78d6;
   --fibre-synthetic: #eb6834;
   --fibre-other: #9a9a9a;
+  /* Tag badges (neutral, so they don't compete with category or fibre colours) */
+  --tag-bg: #3b3b3b;
+  --tag-fg: #ffffff;
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
 }
@@ -22,6 +25,7 @@
     --bg: #141414; --fg: #eee; --muted: #9a9a9a; --line: #333; --accent: #e05a5a;
     --bar-grey: #3a3a3a; --bar-blue: #1f3a57; --bar-red: #5a2a2a; --bar-green: #24502a;
     --fibre-natural: #199e70; --fibre-regenerated: #3987e5; --fibre-synthetic: #d95926; --fibre-other: #7a7a7a;
+    --tag-bg: #e6e6e6; --tag-fg: #141414;
   }
 }
 body { margin: 0; background: var(--bg); color: var(--fg); }
@@ -188,3 +192,6 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 /* Back links at the top of a page ("← Dashboard") */
 section > a:first-child { display: inline-block; margin-top: 8px; }
 .checkbox-field input[type="checkbox"] { width: 18px; height: 18px; flex: none; }
+.tag-badge { display: inline-block; font-size: 10px; font-weight: 700; line-height: 1; padding: 3px 4px; border-radius: 4px; background: var(--tag-bg); color: var(--tag-fg); text-decoration: none; vertical-align: 1px; margin-left: 4px; letter-spacing: 0.03em; }
+.tag-option { align-items: center; gap: 6px; }
+.tag-option .tag-badge { margin-left: 0; }

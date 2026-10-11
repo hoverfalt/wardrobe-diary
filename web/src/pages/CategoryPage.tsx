@@ -12,6 +12,8 @@ import { itemListing, type DateRange, type ItemRow } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
 import { navigate } from "../lib/route";
 import { Link } from "../components/Link";
+import { TagBadges } from "../components/TagBadges";
+import { hasTag } from "../lib/tags";
 
 // Columns with data bars, as on the live site (bar maximum = the column's largest value).
 const COLUMNS: { title: string; value: (r: ItemRow) => number | null; format: (v: number | null) => string; bar: string }[] = [
@@ -63,6 +65,12 @@ export function CategoryPage({
       {rangeControl}
 
       <h3>Item listing</h3>
+      {rows.some((r) => hasTag(r.garment, "second-hand")) && (
+        <p className="muted">
+          {rows.filter((r) => hasTag(r.garment, "second-hand")).length} of {rows.length} bought second hand
+          (marked <abbr className="tag-badge" title="Second hand">SH</abbr>; price as paid, wears from the purchase).
+        </p>
+      )}
       <div className="table-wrap">
         <table>
           <thead>
@@ -80,7 +88,7 @@ export function CategoryPage({
                 <tr key={r.garment.id} className={r.active ? undefined : "divested"}>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>
                   <td>
-                    <Link to={{ page: "garment", id: r.garment.id }}>{r.garment.item}</Link>
+                    <Link to={{ page: "garment", id: r.garment.id }}>{r.garment.item}</Link> <TagBadges garment={r.garment} />
                   </td>
                   {COLUMNS.map((c, i) => (
                     <td key={c.title} className="num" style={barStyle(c.value(r), maxima[i], c.bar)}>

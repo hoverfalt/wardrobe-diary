@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { CATEGORY_ORDER } from "../lib/categories";
 import { todayIso } from "../lib/dates";
 import type { FormErrors, GarmentForm } from "../lib/garmentForm";
+import { TAG_IDS, TAGS } from "../lib/tags";
+import { TagBadge } from "./TagBadges";
 
 export const LABELS: Record<keyof GarmentForm | "photo" | "photoVersion", string> = {
   category: "Category",
@@ -17,6 +19,7 @@ export const LABELS: Record<keyof GarmentForm | "photo" | "photoVersion", string
   materials: "Materials",
   weightG: "Weight (g)",
   detailsUnavailable: "Details can't be completed",
+  tags: "Tags",
 };
 
 export function GarmentFormFields({
@@ -63,6 +66,17 @@ export function GarmentFormFields({
       {field("timesUsedInit", <input inputMode="numeric" value={form.timesUsedInit} onChange={set("timesUsedInit")} />, "Wears before tracking began on 1.1.2018.")}
       {field("materials", <input value={form.materials} onChange={set("materials")} />)}
       {field("weightG", <input inputMode="decimal" value={form.weightG} onChange={set("weightG")} />)}
+      <div className="field">
+        <span>{LABELS.tags}</span>
+        {TAG_IDS.map((t) => (
+          <label key={t} className="row tag-option">
+            <input type="checkbox" checked={form.tags.includes(t)}
+              onChange={(e) => onChange({ ...form, tags: e.target.checked ? [...form.tags, t] : form.tags.filter((x) => x !== t) })} />
+            <TagBadge tag={t} /> {TAGS[t].label}
+            <small className="muted">{TAGS[t].description}</small>
+          </label>
+        ))}
+      </div>
       {form.divested && (
         <label className="field checkbox-field">
           <span>{LABELS.detailsUnavailable}</span>

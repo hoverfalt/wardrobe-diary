@@ -8,6 +8,8 @@ import { formatFi, todayIso } from "../lib/dates";
 import { updateGarments } from "../data/repo";
 import { applyBulk, type BulkAction } from "../lib/garmentForm";
 import { materialsIssue, type MaterialsIssue } from "../lib/materials";
+import { hasTag, TAG_IDS, TAGS, type Tag } from "../lib/tags";
+import { TagBadges } from "../components/TagBadges";
 import { itemListing, TRACKING_START } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
 import type { Garment } from "../types";
@@ -35,6 +37,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState<Status>("all");
   const [review, setReview] = useState<Review>("");
+  const [tagFilter, setTagFilter] = useState<"" | Tag>("");
 
   const rows = useMemo(() => {
     if (!wardrobe) return [];
@@ -59,6 +62,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
       (!category || r.garment.category === category) &&
       (status === "all" || (status === "active") === r.active) &&
       reviewReason(r.garment, review) &&
+      (!tagFilter || hasTag(r.garment, tagFilter)) &&
       (!q || `${r.garment.item} ${r.garment.details} ${r.garment.materials} ${r.garment.id}`.toLowerCase().includes(q)),
   );
 
@@ -105,6 +109,10 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
             </option>
           ))}
         </select>
+        <select value={tagFilter} onChange={(e) => setTagFilter(e.target.value as "" | Tag)} aria-label="Tag">
+          <option value="">Any tags</option>
+          {TAG_IDS.map((t) => <option key={t} value={t}>Tag: {TAGS[t].label} ({rows.filter((r) => hasTag(r.garment, t)).length})</option>)}
+        </select>
         <span className="muted">{shown.length} of {rows.length}</span>
       </div>
       {selected.size > 0 && (
@@ -140,7 +148,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
                     <input type="checkbox" checked={selected.has(g.id)} onChange={() => toggle(g.id)} aria-label={`Select ${g.item}`} />
                   </td>
                   <td className="img">{src && <img className="category-image" src={src} alt="" loading="lazy" />}</td>
-                  <td><Link to={{ page: "manage", id: g.id }}>{g.item}</Link></td>
+                  <td><Link to={{ page: "manage", id: g.id }}>{g.item}</Link> <TagBadges garment={g} /></td>
                   <td>{g.category}</td>
                   <td className="num">{g.price == null ? "–" : formatEur2(g.price)}</td>
                   <td>{formatFi(g.purchased)}</td>
@@ -157,7 +165,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
   );
 }
 
-type ActionType = BulkAction["type"] | "available";
+type ActionType = Exclude<BulkAction["type"], "tag"> | "available" | `tag:${Tag}` | `untag:${Tag}`;
 
 /** Bulk changes for the selected garments: divest on a date, mark active again, or set the category.
  *  Garments a change can't apply to are listed and left out. */
@@ -171,7 +179,9 @@ function BulkBar({ uid, garments, onDone }: { uid: string; garments: Garment[]; 
     : type === "category" ? { type, category }
     : type === "unavailable" ? { type, value: true }
     : type === "available" ? { type: "unavailable", value: false }
-    : { type };
+    : type.startsWith("tag:") ? { type: "tag", tag: type.slice(4) as Tag, value: true }
+    : type.startsWith("untag:") ? { type: "tag", tag: type.slice(6) as Tag, value: false }
+    : { type: type as "activate" };
   const results = garments.map((g) => ({ g, r: applyBulk(g, action) }));
   const ok = results.filter((x) => typeof x.r !== "string").map((x) => x.g);
   const skipped = results.filter((x) => typeof x.r === "string");
@@ -206,6 +216,8 @@ function BulkBar({ uid, garments, onDone }: { uid: string; garments: Garment[]; 
         <option value="category">Set category to</option>
         <option value="unavailable">Mark: details can't be completed (divested only)</option>
         <option value="available">Unmark: details can be completed</option>
+        {TAG_IDS.map((t) => <option key={`tag:${t}`} value={`tag:${t}`}>Add tag: {TAGS[t].label}</option>)}
+        {TAG_IDS.map((t) => <option key={`untag:${t}`} value={`untag:${t}`}>Remove tag: {TAGS[t].label}</option>)}
       </select>
       {type === "divest" && <input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Divest date" />}
       {type === "category" && (
