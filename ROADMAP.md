@@ -126,7 +126,8 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 - **R-29 phase 1** 2026-10-11 Local read-only MCP server (`mcp/`): 7 tools + a definitions resource over the
   public data, computed with the web app's own metrics (bundled); `.mcp.json` for Claude Code, Claude
-  Desktop setup in `mcp/README.md`; unit tests and a live end-to-end test.
+  Desktop setup in `mcp/README.md`; unit tests and a live end-to-end test. Connected in Olof's Claude
+  Desktop and working (2026-10-11).
 
 - **R-27** 2026-10-10 Garment management in the app (owner-only `/manage`), all tested on iPhone:
   (a) edit and divest, history with restore; (b) add with PNG photo upload (next free Photo id);
