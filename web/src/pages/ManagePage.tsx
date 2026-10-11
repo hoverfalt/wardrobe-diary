@@ -24,6 +24,7 @@ const REVIEW_LABELS: Record<Exclude<Review, "">, string> = {
 
 function reviewReason(g: Garment, review: Review): boolean {
   if (review === "") return true;
+  if (g.detailsUnavailable) return false; // marked: details can't be completed
   if (review === "no-weight") return !g.weightG;
   return materialsIssue(g.materials) === review;
 }
@@ -156,7 +157,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
   );
 }
 
-type ActionType = BulkAction["type"];
+type ActionType = BulkAction["type"] | "available";
 
 /** Bulk changes for the selected garments: divest on a date, mark active again, or set the category.
  *  Garments a change can't apply to are listed and left out. */
@@ -165,7 +166,12 @@ function BulkBar({ uid, garments, onDone }: { uid: string; garments: Garment[]; 
   const [date, setDate] = useState(todayIso());
   const [category, setCategory] = useState(CATEGORY_ORDER[0]);
   const [status, setStatus] = useState("");
-  const action: BulkAction = type === "divest" ? { type, date } : type === "category" ? { type, category } : { type };
+  const action: BulkAction =
+    type === "divest" ? { type, date }
+    : type === "category" ? { type, category }
+    : type === "unavailable" ? { type, value: true }
+    : type === "available" ? { type: "unavailable", value: false }
+    : { type };
   const results = garments.map((g) => ({ g, r: applyBulk(g, action) }));
   const ok = results.filter((x) => typeof x.r !== "string").map((x) => x.g);
   const skipped = results.filter((x) => typeof x.r === "string");
@@ -198,6 +204,8 @@ function BulkBar({ uid, garments, onDone }: { uid: string; garments: Garment[]; 
         <option value="divest">Divest on</option>
         <option value="activate">Mark active again</option>
         <option value="category">Set category to</option>
+        <option value="unavailable">Mark: details can't be completed (divested only)</option>
+        <option value="available">Unmark: details can be completed</option>
       </select>
       {type === "divest" && <input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Divest date" />}
       {type === "category" && (

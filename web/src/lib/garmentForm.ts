@@ -15,6 +15,8 @@ export interface GarmentForm {
   timesUsedInit: string;
   materials: string;
   weightG: string;
+  /** Only offered for divested garments. */
+  detailsUnavailable: boolean;
 }
 
 export type FormErrors = Partial<Record<keyof GarmentForm, string>>;
@@ -32,6 +34,7 @@ export function toForm(g: GarmentFields): GarmentForm {
     timesUsedInit: String(g.timesUsedInit),
     materials: g.materials,
     weightG: num(g.weightG),
+    detailsUnavailable: !!g.detailsUnavailable,
   };
 }
 
@@ -86,6 +89,8 @@ export function parseGarmentForm(
       timesUsedInit: init ?? 0,
       materials: form.materials.trim(),
       weightG: weight,
+      // Meaningful only for divested garments; cleared when the garment is active again.
+      ...(form.detailsUnavailable && divested ? { detailsUnavailable: true } : {}),
     },
   };
 }
@@ -132,7 +137,8 @@ export function checkPhoto(file: { type: string; size: number }, dims: { width: 
 export type BulkAction =
   | { type: "divest"; date: string }
   | { type: "activate" }
-  | { type: "category"; category: string };
+  | { type: "category"; category: string }
+  | { type: "unavailable"; value: boolean };
 
 /** One bulk change applied to one garment: the new fields, or why it can't be applied to this one. */
 export function applyBulk(g: GarmentFields, action: BulkAction): GarmentFields | string {
@@ -141,8 +147,15 @@ export function applyBulk(g: GarmentFields, action: BulkAction): GarmentFields |
       if (!isIsoDate(action.date)) return "Enter a valid date.";
       if (g.purchased && action.date < g.purchased) return `purchased ${g.purchased}, after the divest date`;
       return { ...g, divested: action.date };
-    case "activate":
-      return { ...g, divested: null };
+    case "activate": {
+      const { detailsUnavailable: _, ...rest } = g;
+      return { ...rest, divested: null };
+    }
+    case "unavailable": {
+      if (!g.divested) return "still active";
+      const { detailsUnavailable: _, ...rest } = g;
+      return action.value ? { ...rest, detailsUnavailable: true } : rest;
+    }
     case "category":
       if (!CATEGORY_ORDER.includes(action.category)) return "Choose a category.";
       return { ...g, category: action.category };

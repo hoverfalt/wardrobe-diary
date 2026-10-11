@@ -9,6 +9,9 @@ export interface Garment {
   photo: string;
   /** Changes whenever the photo is replaced; part of the photo URL so browsers don't show a cached old one. */
   photoVersion?: string | null;
+  /** Owner's mark on a divested garment: its missing details (materials, weight) can't be filled in any more,
+   *  so it is left out of the review list. */
+  detailsUnavailable?: boolean;
   price: number | null;
   purchased: IsoDate | null;
   divested: IsoDate | null;

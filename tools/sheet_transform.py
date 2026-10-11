@@ -48,6 +48,8 @@ class Garment:
     weightG: Optional[float]
     # Set by the app when a photo is replaced (part of the photo URL, defeats browser caches).
     photoVersion: Optional[str] = None
+    # Set by the app on divested garments whose missing details can't be filled in (left out of review).
+    detailsUnavailable: Optional[bool] = None
 
     def to_firestore(self) -> Dict[str, Any]:
         d = asdict(self)

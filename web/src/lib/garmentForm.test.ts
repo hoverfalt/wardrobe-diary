@@ -69,6 +69,22 @@ describe("new garment photos", () => {
   });
 });
 
+describe("details can't be completed", () => {
+  it("is kept for divested garments and cleared for active ones", () => {
+    const divested = { ...vest, divested: "2020-01-01", detailsUnavailable: true };
+    expect(parseGarmentForm(toForm(divested), divested)).toEqual({ ok: true, fields: divested });
+    const r = parseGarmentForm({ ...toForm(divested), divested: "" }, divested);
+    expect(r.ok && r.fields.detailsUnavailable).toBeUndefined();
+  });
+
+  it("can be set in bulk, only on divested garments", () => {
+    expect(applyBulk({ ...vest, divested: "2020-01-01" }, { type: "unavailable", value: true })).toMatchObject({ detailsUnavailable: true });
+    expect(applyBulk(vest, { type: "unavailable", value: true })).toBe("still active");
+    expect(applyBulk({ ...vest, divested: "2020-01-01", detailsUnavailable: true }, { type: "unavailable", value: false })).not.toHaveProperty("detailsUnavailable");
+    expect(applyBulk({ ...vest, divested: "2020-01-01", detailsUnavailable: true }, { type: "activate" })).not.toHaveProperty("detailsUnavailable");
+  });
+});
+
 describe("bulk changes", () => {
   it("divests, reactivates and recategorises", () => {
     expect(applyBulk(vest, { type: "divest", date: "2026-10-09" })).toMatchObject({ divested: "2026-10-09" });

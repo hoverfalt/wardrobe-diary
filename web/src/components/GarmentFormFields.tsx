@@ -16,6 +16,7 @@ export const LABELS: Record<keyof GarmentForm | "photo" | "photoVersion", string
   timesUsedInit: "Times used before tracking",
   materials: "Materials",
   weightG: "Weight (g)",
+  detailsUnavailable: "Details can't be completed",
 };
 
 export function GarmentFormFields({
@@ -62,6 +63,16 @@ export function GarmentFormFields({
       {field("timesUsedInit", <input inputMode="numeric" value={form.timesUsedInit} onChange={set("timesUsedInit")} />, "Wears before tracking began on 1.1.2018.")}
       {field("materials", <input value={form.materials} onChange={set("materials")} />)}
       {field("weightG", <input inputMode="decimal" value={form.weightG} onChange={set("weightG")} />)}
+      {form.divested && (
+        <label className="field checkbox-field">
+          <span>{LABELS.detailsUnavailable}</span>
+          <span className="row">
+            <input type="checkbox" checked={form.detailsUnavailable}
+              onChange={(e) => onChange({ ...form, detailsUnavailable: e.target.checked })} />
+            <small className="muted">Missing materials or weight can't be filled in any more; leave it off the review list.</small>
+          </span>
+        </label>
+      )}
     </>
   );
 }

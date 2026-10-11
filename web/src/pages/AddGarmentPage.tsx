@@ -21,6 +21,7 @@ const EMPTY: GarmentForm = {
   timesUsedInit: "0",
   materials: "",
   weightG: "",
+  detailsUnavailable: false,
 };
 
 export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | null }) {

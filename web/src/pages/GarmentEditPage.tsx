@@ -188,6 +188,7 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
 
 function show(v: unknown): string {
   if (v == null || v === "") return "—";
+  if (typeof v === "boolean") return v ? "yes" : "no";
   if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return formatFi(v);
   return String(v);
 }
