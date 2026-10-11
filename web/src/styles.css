@@ -116,7 +116,6 @@ button.primary { border-color: var(--accent); background: var(--accent); color: 
 button:disabled { opacity: 0.5; cursor: default; }
 .history { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .history li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
-.edit-link { font-size: 12px; margin-left: 6px; color: var(--accent); }
 .manage-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 a.button { display: inline-block; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: inherit; }
 a.button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
