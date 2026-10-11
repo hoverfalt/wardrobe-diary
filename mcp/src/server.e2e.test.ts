@@ -14,7 +14,7 @@ describe.skipIf(!existsSync(SERVER) || process.env.OFFLINE)("MCP server (live da
     await client.connect(new StdioClientTransport({ command: process.execPath, args: [SERVER] }));
     try {
       const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-      expect(tools).toEqual(["get_category_listing", "get_daily_cost", "get_garment", "get_inventory_over_time", "get_overview", "get_wears", "list_garments"]);
+      expect(tools).toEqual(["get_category_listing", "get_daily_cost", "get_garment", "get_inventory_over_time", "get_material_breakdown", "get_overview", "get_wears", "list_garments"]);
       const text = (r: Awaited<ReturnType<typeof client.callTool>>) => JSON.parse((r.content as { text: string }[])[0].text);
 
       const overview = text(await client.callTool({ name: "get_overview", arguments: {} }));

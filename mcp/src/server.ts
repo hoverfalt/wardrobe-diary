@@ -12,6 +12,7 @@ import {
   getWears,
   inventoryOverTime,
   listGarments,
+  materialTable,
   MAX_DAILY_DAYS,
   overview,
   resolveRange,
@@ -60,14 +61,17 @@ server.registerTool(
   {
     title: "List garments",
     description:
-      "Garments with price, dates, status, times worn in the range, lifetime wears, cost per wear and wears per month. Filter by category, status or a search text; sort and limit.",
+      "Garments with details, materials (as written and as a parsed fibre composition), weight, price, dates, status, times worn in the range, lifetime wears, cost per wear and wears per month. Filter by category, status, search text, fibre or weight; sort and limit.",
     inputSchema: {
       from,
       to,
       category,
       status: z.enum(["active", "divested", "all"]).optional().describe("Default: all"),
       search: z.string().optional().describe("Text to find in the name, details or materials"),
-      sort: z.enum(["times_worn", "cost_per_wear", "wears_per_month", "price", "purchased", "name"]).optional().describe("Default: times_worn (most first)"),
+      fibre: z.string().optional().describe('Only garments whose main fabric contains this fibre, e.g. "wool", "polyester", "elastane"'),
+      minWeightG: z.number().optional().describe("Minimum weight in grams"),
+      maxWeightG: z.number().optional().describe("Maximum weight in grams"),
+      sort: z.enum(["times_worn", "cost_per_wear", "wears_per_month", "price", "purchased", "name", "weight"]).optional().describe("Default: times_worn (most first)"),
       limit: z.number().int().min(1).max(700).optional().describe("Default 50"),
     },
     annotations: readOnly,
@@ -117,6 +121,18 @@ server.registerTool(
     annotations: readOnly,
   },
   ({ from, to, measure, category }) => run(async () => { const w = await loadWardrobe(); return inventoryOverTime(w, resolveRange(w, from, to), measure, category); }),
+);
+
+server.registerTool(
+  "get_material_breakdown",
+  {
+    title: "Material breakdown",
+    description:
+      "Fibre mass (kg, share, recycled and organic kg) from weight × material composition: either owned (garments active at the end of the range) or worn (every wear counts the garment's weight; also the average outfit weight). Includes how much of the data had weights and readable materials.",
+    inputSchema: { from, to, basis: z.enum(["owned", "worn"]).describe("owned = wardrobe at the end of the range; worn = what was worn in the range"), category },
+    annotations: readOnly,
+  },
+  ({ from, to, basis, category }) => run(async () => { const w = await loadWardrobe(); return materialTable(w, resolveRange(w, from, to), basis, category); }),
 );
 
 server.registerResource(

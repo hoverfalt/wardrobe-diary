@@ -157,6 +157,12 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 
 - Daily cost (`dailyCost`) = Σ lifetime cost per wear of the garments worn (and owned) that day; "final"
   when all of them are divested; `average` = 30-day rolling mean centred on the day (values i−14 … i+15).
+- **Materials** (`lib/materials.ts`, R-30): `parseMaterials` reads the free-text Materials field into fibre
+  compositions on read (the text is never changed): synonyms/typos normalised, labelled parts (shell, lining…)
+  recognised, the **main part** used for metrics, percentages normalised to 100 % (equal split + `estimated`
+  without percentages), organic/recycled flags, `unknown` words reported. `materialBreakdown` = fibre mass
+  from weight × composition, owned (active at `to`) or worn (each wear counts the full weight), with coverage
+  counts and the average outfit weight. A test checks every materials text in the latest backup parses.
 - **Animations** ("… animated by date") use `asOf` (`dailyCost`, `itemListing`): everything as known on that
   date, i.e. only wears up to then. This is the one deliberate exception to D-2.
 
@@ -184,7 +190,8 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 
 Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key), caches
 it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own. Tools: overview, category listing,
-garments (list/one), wears by day, daily cost, inventory over time; resource `wardrobe://definitions`.
+garments (list/one, incl. materials, composition and weight, fibre and weight filters), wears by day, daily
+cost, inventory over time, material breakdown; resource `wardrobe://definitions`.
 Registered for Claude Code by `.mcp.json`; Claude Desktop setup in `mcp/README.md`. **Rebuild it
 (`cd mcp && npm run build`) after changing `web/src/lib/`.**
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Wardrobe } from "../../web/src/lib/publicData";
 import type { Garment } from "../../web/src/types";
 import { decodeFields } from "./publicData";
-import { categoryTable, getGarment, getWears, inventoryOverTime, listGarments, overview, resolveRange } from "./tools";
+import { categoryTable, getGarment, getWears, inventoryOverTime, listGarments, materialTable, overview, resolveRange } from "./tools";
 
 const garment = (over: Partial<Garment>): Garment => ({
   id: "g", category: "Shirts", item: "", details: "", photo: "", price: 30, purchased: "2018-01-01",
@@ -76,5 +76,30 @@ describe("tools", () => {
       { date: "2018-02-28", Shirts: 1, Socks: 1 },
       { date: "2018-03-15", Shirts: 1, Socks: 1 },
     ]);
+  });
+});
+
+describe("materials in tools", () => {
+  const m: Wardrobe = {
+    garments: [
+      garment({ id: "Shirts-001", item: "Wool shirt", materials: "80% wool, 20% polyester", weightG: 300 }),
+      garment({ id: "Shirts-002", item: "Cotton shirt", materials: "95% cotton\n5% elastane", weightG: 200 }),
+      garment({ id: "Shirts-003", item: "Mystery shirt", materials: "NA" }),
+    ],
+    days: [{ date: "2018-01-01", worn: ["Shirts-001", "Shirts-002"] }],
+  };
+
+  it("adds materials and weight to garment rows, with fibre and weight filters", () => {
+    const r = listGarments(m, { range: resolveRange(m), fibre: "wool" });
+    expect(r.garments.map((g) => [g.name, g.composition, g.weightG])).toEqual([["Wool shirt", ["wool 80%", "polyester 20%"], 300]]);
+    expect(listGarments(m, { range: resolveRange(m), maxWeightG: 250 }).garments.map((g) => g.name)).toEqual(["Cotton shirt"]);
+    expect(listGarments(m, { range: resolveRange(m), sort: "weight" }).garments.map((g) => g.name)).toEqual(["Wool shirt", "Cotton shirt", "Mystery shirt"]);
+  });
+
+  it("breaks down fibre mass", () => {
+    const t = materialTable(m, resolveRange(m), "owned");
+    expect(t.totalKg).toBe(0.5);
+    expect(t.fibres.map((f) => [f.fibre, f.kg])).toEqual([["wool", 0.24], ["cotton", 0.19], ["polyester", 0.06], ["elastane", 0.01]]);
+    expect(t.coverage).toMatchObject({ included: 2, total: 3, missingWeight: 1, missingMaterials: 1 });
   });
 });

@@ -37,6 +37,13 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Later
 
+- **R-30 Garment details, materials and weight** (agreed 2026-10-11). Done: (1) materials parser and
+  (2) fibre mass metrics in `web/src/lib/materials.ts`; (3) MCP: materials/composition/weight in garment
+  rows, fibre and weight filters, `get_material_breakdown`. Still to do: a review list on the Manage page of
+  materials texts that are estimates or unreadable (for cleaning up the source text); (4) web: a public
+  page per garment `/garment/<id>` (photo, all fields, composition bar, stats, wear history; Edit for the
+  owner) and a "Materials" section on the Dashboard (fibre mass owned / worn, small multiples per D-3).
+
 - **R-29 phase 2: hosted MCP server + REST API** (when needed beyond Olof's Mac, e.g. claude.ai connectors
   or the phone app): run the same server on Cloud Run with MCP over HTTP, plus plain REST endpoints
   (e.g. `/api/v1/categories?from&to`). Needs the Blaze plan; adds CORS and rate limiting.

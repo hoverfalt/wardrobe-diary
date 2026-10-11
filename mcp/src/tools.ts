@@ -14,6 +14,7 @@ import {
   type DateRange,
   type ItemRow,
 } from "../../web/src/lib/metrics";
+import { materialBreakdown, parseMaterials, type Composition } from "../../web/src/lib/materials";
 import type { Wardrobe } from "../../web/src/lib/publicData";
 import type { Garment } from "../../web/src/types";
 import { PROJECT_ID } from "./publicData";
@@ -74,12 +75,23 @@ export function categoryTable(w: Wardrobe, range: DateRange) {
   };
 }
 
+/** Composition as compact strings: ["cotton 95%", "elastane 5% (recycled)"]. */
+function compositionText(main: Composition[]): string[] {
+  return main.map((c) => `${c.fibre} ${Math.round(c.share * 100)}%${c.recycled ? " (recycled)" : ""}${c.organic ? " (organic)" : ""}`);
+}
+
 function garmentRow(r: ItemRow) {
   const g = r.garment;
+  const m = parseMaterials(g.materials);
   return {
     id: g.id,
     name: g.item,
     category: g.category,
+    details: g.details || null,
+    materials: g.materials || null,
+    composition: m.main.length ? compositionText(m.main) : null,
+    compositionEstimated: m.main.length ? m.estimated : undefined,
+    weightG: g.weightG,
     priceEur: g.price,
     purchased: g.purchased,
     divested: g.divested,
@@ -91,17 +103,31 @@ function garmentRow(r: ItemRow) {
   };
 }
 
-export type GarmentSort = "times_worn" | "cost_per_wear" | "wears_per_month" | "price" | "purchased" | "name";
+export type GarmentSort = "times_worn" | "cost_per_wear" | "wears_per_month" | "price" | "purchased" | "name" | "weight";
 
 export function listGarments(
   w: Wardrobe,
-  opts: { range: DateRange; category?: string; status?: "active" | "divested" | "all"; search?: string; sort?: GarmentSort; limit?: number },
+  opts: {
+    range: DateRange;
+    category?: string;
+    status?: "active" | "divested" | "all";
+    search?: string;
+    fibre?: string;
+    minWeightG?: number;
+    maxWeightG?: number;
+    sort?: GarmentSort;
+    limit?: number;
+  },
 ) {
+  const fibre = opts.fibre?.trim().toLowerCase();
   const q = opts.search?.trim().toLowerCase();
   const rows = itemListing(w.garments, w.days, opts.range)
     .filter((r) => !opts.category || r.garment.category.toLowerCase() === opts.category.toLowerCase())
     .filter((r) => !opts.status || opts.status === "all" || (opts.status === "active") === r.active)
-    .filter((r) => !q || `${r.garment.item} ${r.garment.details} ${r.garment.materials}`.toLowerCase().includes(q));
+    .filter((r) => !q || `${r.garment.item} ${r.garment.details} ${r.garment.materials}`.toLowerCase().includes(q))
+    .filter((r) => !fibre || parseMaterials(r.garment.materials).main.some((c) => c.fibre.includes(fibre)))
+    .filter((r) => opts.minWeightG == null || (r.garment.weightG ?? -1) >= opts.minWeightG)
+    .filter((r) => opts.maxWeightG == null || (r.garment.weightG != null && r.garment.weightG <= opts.maxWeightG));
   const key: Record<GarmentSort, (r: ItemRow) => number | string> = {
     times_worn: (r) => -r.timesWorn,
     cost_per_wear: (r) => -(r.costPerWear ?? 0),
@@ -109,6 +135,7 @@ export function listGarments(
     price: (r) => -(r.garment.price ?? 0),
     purchased: (r) => r.garment.purchased ?? "",
     name: (r) => r.garment.item,
+    weight: (r) => -(r.garment.weightG ?? -1),
   };
   const k = key[opts.sort ?? "times_worn"];
   rows.sort((a, b) => {
@@ -133,6 +160,10 @@ export function getGarment(w: Wardrobe, id: string) {
     category: g.category,
     details: g.details,
     materials: g.materials,
+    composition: (() => {
+      const m = parseMaterials(g.materials);
+      return m.main.length ? { mainPart: compositionText(m.main), estimated: m.estimated, parts: m.parts.map((p) => p.label ?? "main") } : null;
+    })(),
     weightG: g.weightG,
     priceEur: g.price,
     purchased: g.purchased,
@@ -214,6 +245,24 @@ export function inventoryOverTime(w: Wardrobe, range: DateRange, measure: "items
   };
 }
 
+export function materialTable(w: Wardrobe, range: DateRange, basis: "owned" | "worn", category?: string) {
+  const garments = category ? w.garments.filter((g) => g.category.toLowerCase() === category.toLowerCase()) : w.garments;
+  const b = materialBreakdown(garments, w.days, range, basis);
+  return {
+    range,
+    scope: category ?? "all categories",
+    basis: basis === "owned" ? "garments active at the end of the range" : "every wear in the range counts the garment's full weight",
+    totalKg: r2(b.totalKg),
+    fibres: b.fibres.map((f) => ({ fibre: f.fibre, kg: r2(f.kg), share: r3(f.share), recycledKg: r2(f.recycledKg), organicKg: r2(f.organicKg) })),
+    ...(b.averageOutfitKg != null ? { averageOutfitKg: r2(b.averageOutfitKg) } : {}),
+    coverage: {
+      ...b.coverage,
+      unit: basis === "owned" ? "garments" : "wears",
+      note: "Only items with both a weight and readable materials are included; 'estimated' = shares guessed (no percentages given, or not summing to 100).",
+    },
+  };
+}
+
 export const DEFINITIONS = `# Wardrobe Diary: definitions
 
 Data: one person's daily wardrobe log since ${TRACKING_START}; every garment with purchase price and dates.
@@ -234,6 +283,15 @@ All metrics accept a date range (from, to); by default from ${TRACKING_START} to
 - **Wears per month:** times worn ÷ (days owned in the range ÷ 30.5).
 - **Daily cost:** sum of the cost per wear of the garments worn that day; "final" when all of them are
   divested (the value can no longer fall). The Dashboard leaves Sportswear out of daily cost.
+- **Materials / composition:** read from the free-text Materials field (typos and synonyms normalised:
+  lycra = spandex = elastane, nylon = polyamide, tencel = lyocell, rayon = viscose). For garments with
+  several parts (shell, lining, padding…) the **main part** counts (shell / main / outer / body / fabric,
+  else the first). Percentages are normalised to 100 %; without percentages the fibres share equally and
+  the result is marked estimated. Organic and recycled are kept as flags.
+- **Fibre mass:** weight × composition. "Owned": garments active at the end of the range. "Worn": every wear
+  counts the garment's full weight. Only garments with both a weight and readable materials are included;
+  coverage figures say how many.
+- **Average outfit weight:** the weight of the garments worn per logged day (garments with a known weight).
 - Categories (standard order): ${["Jackets and hoodies", "Blazers and vests", "Knits", "Shirts", "T-shirts and tanks", "Pants", "Shorts", "Belts", "Socks", "Shoes", "Underwear shirts", "Underwear boxers", "Sportswear"].join(", ")}.
 - Prices are in euros. Web app: https://wardrobediary.web.app
 `;
