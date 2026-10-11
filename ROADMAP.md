@@ -39,11 +39,13 @@ _(nothing in progress; waiting for the next scope)_
 
 - **R-32 User-defined tags** (for the multi-user version, R-17): today's tags are a fixed vocabulary
   (`web/src/lib/tags.ts`); let users create their own tags with a badge text, filter by them everywhere.
-- **R-33 Garment location** (suggestion): "(Hanko)" in names marks garments kept at the summer home in
-  Hanko rather than the main home in Helsinki (51 garments; "ex Hanko" for moved ones). Location strongly
-  affects wear frequency, so a location field (with move dates) could split or filter the statistics by
-  home, rather than being a plain tag. To discuss with Olof.
-
+- **R-33 Garment location** (refined with Olof 2026-10-11, parked for now): garments are kept either at the
+  main home in Helsinki (available year-round) or at the summer home in Hanko (where they are worn only during stays there), so the two sets have very different statistics, and Olof keeps them separate. Goal:
+  **filter the Dashboard (and category pages) and the Log page by location.** Today "(Hanko)" in the name
+  marks the 51 Hanko garments ("ex Hanko" = moved to Helsinki). Likely design: a location field per garment
+  (Helsinki / Hanko; migrated from the names like "(SH)" was), a location filter next to the date range,
+  and on the Log page showing only the garments at the chosen home. Open points: whether to record move
+  dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
