@@ -148,6 +148,11 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 @media (max-width: 640px) {
   .log-outfit .chips { display: none; }
   .log-outfit { padding: 6px 0; font-size: 14px; }
+  /* Day navigation on one row: phones mostly log today or yesterday, so the date picker is left out. */
+  .log-day { flex-wrap: nowrap; }
+  .log-day input[type="date"] { display: none; }
+  .log-day h2 { min-width: 0; flex: 1; font-size: 17px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log-day > button { flex: none; }
 }
 @media (max-width: 520px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
