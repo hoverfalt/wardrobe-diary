@@ -40,7 +40,7 @@ export function App() {
       </header>
       {route.page === "dashboard" && <Dashboard wardrobe={wardrobe} range={range} rangeControl={control} />}
       {route.page === "category" && (
-        <CategoryPage slug={route.slug} wardrobe={wardrobe} range={range} rangeControl={control} canEdit={isOwner} />
+        <CategoryPage slug={route.slug} wardrobe={wardrobe} range={range} rangeControl={control} />
       )}
       {route.page === "garment" && <GarmentPage id={route.id} wardrobe={wardrobe} canEdit={isOwner} />}
       {route.page === "materials" && <MaterialsPage wardrobe={wardrobe} range={range} rangeControl={control} />}

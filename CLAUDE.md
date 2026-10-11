@@ -227,7 +227,7 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
 - Fibre types (natural / regenerated / synthetic / other) have fixed colours (`--fibre-*` in `styles.css`, from the
   validated reference palette: aqua, blue, orange, grey); always pair them with text labels.
-- On category pages, item names link to `/garment/<id>` for visitors and to `/manage/<id>` for the owner.
+- On category pages, item names link to the public `/garment/<id>`; the owner edits from there (Edit button).
 - Item photos and category images come from Storage (`photoUrl(garment)`, `categoryImageUrl`). Always pass
   the garment to `photoUrl`: a replaced photo keeps its file name, and the `photoVersion` in the URL is what
   makes browsers (notably Safari) load the new one; divested items get a
