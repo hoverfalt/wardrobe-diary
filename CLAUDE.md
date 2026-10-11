@@ -52,7 +52,8 @@ Python is not used for the core metrics.
 ```
 users/{uid}/garments/{garmentId}          // source of truth for garment details (D-4)
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
-  timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced)
+  timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced),
+  detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list)
 users/{uid}/garments/{garmentId}/history/{autoId}
   savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
 users/{uid}/deletedGarments/{garmentId}
