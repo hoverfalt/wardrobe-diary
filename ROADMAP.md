@@ -37,6 +37,10 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Later
 
+- **R-29 phase 2: hosted MCP server + REST API** (when needed beyond Olof's Mac, e.g. claude.ai connectors
+  or the phone app): run the same server on Cloud Run with MCP over HTTP, plus plain REST endpoints
+  (e.g. `/api/v1/categories?from&to`). Needs the Blaze plan; adds CORS and rate limiting.
+
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
@@ -119,6 +123,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-29 phase 1** 2026-10-11 Local read-only MCP server (`mcp/`): 7 tools + a definitions resource over the
+  public data, computed with the web app's own metrics (bundled); `.mcp.json` for Claude Code, Claude
+  Desktop setup in `mcp/README.md`; unit tests and a live end-to-end test.
 
 - **R-27** 2026-10-10 Garment management in the app (owner-only `/manage`), all tested on iPhone:
   (a) edit and divest, history with restore; (b) add with PNG photo upload (next free Photo id);

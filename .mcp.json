@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "wardrobe-diary": {
+      "command": "node",
+      "args": ["mcp/dist/server.mjs"]
+    }
+  }
+}

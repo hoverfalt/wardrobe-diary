@@ -180,12 +180,21 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
 | `components/DateRangeControl.tsx`, `AsOfControl.tsx`, `PlotFigure.tsx` | Date range (slider + boxes), "as of" player, Plot wrapper |
 
+## MCP server (`mcp/`, R-29)
+
+Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key), caches
+it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own. Tools: overview, category listing,
+garments (list/one), wears by day, daily cost, inventory over time; resource `wardrobe://definitions`.
+Registered for Claude Code by `.mcp.json`; Claude Desktop setup in `mcp/README.md`. **Rebuild it
+(`cd mcp && npm run build`) after changing `web/src/lib/`.**
+
 ## Commands
 
 ```bash
 cd web && npm install && npm run dev       # local dev server
 cd web && npm test                         # vitest
 cd tools && .venv/bin/pytest               # Python tests
+cd mcp && npm run build && npm test        # MCP server: bundle + unit and live end-to-end tests
 tools/backup.sh                            # manual backup to backups/ (nightly backups run on GitHub)
 tools/restore.sh <backup.json> [--write]   # restore from a backup (dry run by default)
 tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
