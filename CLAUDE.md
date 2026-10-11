@@ -16,7 +16,8 @@ data entry, storage, tables and charts all live in one Firebase-backed web app.
 2026-10-09 (D-4), and **wears have been logged in the app (`/log`) since the cut-over on 2026-10-09** (the
 Google Sheet is retired; logged through 2026-10-09). The public app at https://wardrobediary.web.app rebuilds
 everything on the live site except the monthly cost comparison (waiting for data, Q-4) and the static text
-pages. The live site must not be touched until the domain switch (ROADMAP R-16).
+pages, and goes beyond it: garment pages, a materials page, second-hand tags, sortable tables, nightly
+backups and a read-only MCP server. The live site must not be touched until the domain switch (ROADMAP R-16).
 
 ## Environment
 
@@ -42,7 +43,8 @@ pages. The live site must not be touched until the domain switch (ROADMAP R-16).
 | Data | Cloud Firestore |
 | Photos | Firebase Storage (existing photo assets, see above) |
 | Hosting | Firebase Hosting, separate site per above |
-| Python | `tools/`: Sheet → Firestore sync (also writes the public data document) |
+| Python | `tools/`: backup, restore and one-off migrations (the Sheet → Firestore sync is retired) |
+| MCP | `mcp/`: read-only Node MCP server over the public data (see below) |
 
 Analytics run **client-side in TypeScript**: data volume is small (~3,200 days, ~650 garments).
 Python is not used for the core metrics.
@@ -63,7 +65,7 @@ users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
 users/{uid}/settings/app
   sheetRetired: "2026-10-09"   // cut-over date; the Sheet sync refuses to write while this is set
-users/{uid}/public/data     // world-readable copy for public pages (decision D-1), written by the sync:
+users/{uid}/public/data     // world-readable copy for public pages (D-1), kept in step by every app write:
   version: 1, garments: Garment[] (all fields), days: { "YYYY-MM-DD": number[] }  // indexes into garments
 ```
 
@@ -71,8 +73,8 @@ users/{uid}/public/data     // world-readable copy for public pages (decision D-
 - One doc per day: logging a day = one write; full history ≈ 3,200 docs, cached offline by the SDK.
 - **Public pages read only `public/data`** (one document read), never the raw garments/days collections
   (Firestore bills per doc read). It holds the full day-by-day log so any metric can be computed for any
-  time span in the browser. ~435 kB in 2026 of the 1 MiB document limit (grows ~30 kB/year); the sync
-  prints its size and warns above 800 kB.
+  time span in the browser. ~435 kB in 2026 of the 1 MiB document limit (grows ~30 kB/year); check its
+  size in the backups now and then (`tools/restore.sh` rebuilds it).
 - `firestore.indexes.json` exempts `public.garments` and `public.days` from indexing: otherwise the log
   exceeds Firestore's 40,000 index entries per document.
 - The app reads `VITE_OWNER_UID` (in `web/.env.local`) to know whose public data to show.
@@ -186,7 +188,10 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
 | `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |
 | `data/repo.ts` | Firestore access. Every garment write is one transaction that also updates `public/data`: `updateGarments` (single and bulk edits, computed from the stored version), `createGarment`, `deleteGarment` (re-indexes the days via `withoutGarment`) |
-| `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` |
+| `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` (`withGarments`, `withoutGarment`) |
+| `lib/materials.ts` | Materials parser, fibre classes, `materialBreakdown`, `materialsByMonth` (tested) |
+| `lib/tags.ts`, `components/TagBadges.tsx`, `components/photoBadges.ts` | Tag vocabulary and helpers (`hasTag`, "(SH)" in names), badges next to names and on chart photos |
+| `lib/sorting.ts`, `components/SortHeader.tsx` | Sortable table state and clickable headers (Dashboard and category pages) |
 | `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |

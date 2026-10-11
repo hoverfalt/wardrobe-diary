@@ -10,13 +10,16 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-10)
+## Where we left off (2026-10-11)
 
-- **Everything built so far is done and tested on Olof's iPhone:** public Dashboard and category pages,
-  garment management (R-27: edit, add, replace photo, delete, bulk changes), logging in the app (R-13/R-15,
-  the Sheet is retired), nightly backups with restore (R-28).
+- **Everything built so far is done, deployed to wardrobediary.web.app and committed:** public Dashboard,
+  category, garment and materials pages; garment management (R-27); logging in the app (R-13/R-15, the Sheet
+  is retired); nightly backups with restore (R-28); the read-only MCP server, connected in Claude Desktop
+  (R-29 phase 1); materials, weight and details (R-30); second-hand tags (R-31) and the Second hand column on
+  the Dashboard (R-34); sortable tables (R-35).
 - **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-26 monthly comparison once the Q-4 data is in the Sheet, R-17 multi-user, R-18 housekeeping.
+  R-26 monthly comparison once the Q-4 data is in, R-33 garment location (parked; design notes below),
+  R-18 housekeeping, R-17 multi-user (with R-32 user-defined tags).
 
 ## Inbox
 
@@ -29,8 +32,8 @@ _(nothing in progress; waiting for the next scope)_
 ## Next
 
 1. **R-26 Monthly cost and comparison to other consumption** (the last live-site chart). **Blocked:** waiting
-   for Olof to enter the comparison data in the Google Sheet (Q-4). Then import that tab in the sync, add it
-   to `public/data`, port R's monthly cost (`yearly_cost / 12` per category, `Threddit.R`) and build the chart.
+   for the comparison data (Q-4). Then import it once with a small tool (the Sheet sync is retired; read-only
+   access to the Sheet still works), add it to `public/data`, port R's monthly cost (`yearly_cost / 12` per category, `Threddit.R`) and build the chart.
 2. **R-12 Remaining open questions** (Q-2; Q-4 is covered by R-26).
 3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
@@ -60,7 +63,8 @@ _(none open)_
 
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-4** Comparison data for the monthly cost chart (external consumption benchmarks). **Waiting for
-  Olof** to enter it in the Google Sheet (R read it from a "Comparison" tab). Blocks R-26.
+  Olof** to provide it, e.g. in a "Comparison" tab of the Google Sheet (where R read it) or as a CSV.
+  Blocks R-26.
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.
@@ -149,8 +153,8 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   (fibre mass owned and worn, fibre mix per category, monthly outfit weight and synthetic share) with
   fibre-type colours validated for colour-blind safety.
 
-- **R-29 phase 1** 2026-10-11 Local read-only MCP server (`mcp/`): 7 tools + a definitions resource over the
-  public data, computed with the web app's own metrics (bundled); `.mcp.json` for Claude Code, Claude
+- **R-29 phase 1** 2026-10-11 Local read-only MCP server (`mcp/`): 7 tools (8 with R-30's material breakdown) + a
+  definitions resource over the public data, computed with the web app's own metrics (bundled); `.mcp.json` for Claude Code, Claude
   Desktop setup in `mcp/README.md`; unit tests and a live end-to-end test. Connected in Olof's Claude
   Desktop and working (2026-10-11).
 
