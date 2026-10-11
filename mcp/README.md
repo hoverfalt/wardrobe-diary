@@ -31,17 +31,19 @@ Rebuild after changing `web/src/lib/` so the server uses the same metrics as the
 ## Use it
 
 - **Claude Code** in this repo: the project's `.mcp.json` registers it; approve it when asked (or `/mcp`).
-- **Claude Desktop**: Settings → Developer → Edit Config, and add to `claude_desktop_config.json`:
+- **Claude Desktop**: quit it first (it rewrites the file while running), then open
+  `~/Library/Application Support/Claude/claude_desktop_config.json` (Settings → Developer → Edit Config).
+  The file already holds Claude Desktop's own preferences: keep them and add `mcpServers` as one more
+  top-level key, right after the opening `{`:
 
   ```json
-  {
     "mcpServers": {
       "wardrobe-diary": {
-        "command": "node",
+        "command": "/usr/local/bin/node",
         "args": ["/Users/olofhoverfalt/Dropbox (Personal)/VS Code/threddit2/mcp/dist/server.mjs"]
       }
-    }
-  }
+    },
   ```
 
-  Then restart Claude Desktop. If it can't find `node`, use its full path (`which node`, e.g. `/usr/local/bin/node`).
+  Use the full path of `node` (`which node`): apps started from the Dock don't see `/usr/local/bin`.
+  Then start Claude Desktop; Settings → Developer shows the server's status.
