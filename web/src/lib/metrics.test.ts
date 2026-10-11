@@ -102,6 +102,13 @@ describe("categoryListing", () => {
     expect(c.costPerWear).toBe((12.5 * 1 + 150 * 1) / 2); // unworn garment left out
   });
 
+  it("gives the second-hand share of active garments, per category and in total", () => {
+    const used = garment({ id: "used", tags: ["second-hand"] });
+    const shirt = garment({ id: "shirt", category: "Shirts" });
+    const [t, j, sh] = categoryListing([vest, warmer, used, shirt], days, all);
+    expect([t.secondHandShare, j.secondHandShare, sh.secondHandShare]).toEqual([1 / 3, 1 / 2, 0]); // warmer divested
+  });
+
   it("adds a total row", () => {
     expect(total.category).toBe("Total");
     expect(total.activeItems).toBe(1);

@@ -74,6 +74,7 @@ export function categoryTable(w: Wardrobe, range: DateRange) {
       daysUsedShare: r3(r.daysUsed),
       yearlyCostEur: r2(r.yearlyCost),
       inventoryTurnover: r3(r.turnover),
+      secondHandShare: r3(r.secondHandShare),
     })),
   };
 }
@@ -285,6 +286,7 @@ All metrics accept a date range (from, to); by default from ${TRACKING_START} to
   least once in the range.
 - **Days used (category):** share of days in the range on which any garment of the category was worn.
 - **Yearly cost (category):** cost per wear × 365 × days used.
+- **Second hand (category):** share of the active garments at the end of the range that were bought second hand.
 - **Inventory value / turnover:** sum of purchase prices of active garments at the end of the range;
   turnover = yearly cost ÷ inventory value.
 - **Wears per month:** times worn ÷ (days owned in the range ÷ 30.5).

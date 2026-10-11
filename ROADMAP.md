@@ -129,6 +129,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-34** 2026-10-11 "Second hand" column on the Dashboard category listing (share of active items bought
+  second hand, fixed 100 % bar scale; also in the MCP category listing), to promote buying second hand.
+  Column titles shortened: Items, Value, Turnover.
+
 - **R-31** 2026-10-11 Garment tags, starting with "Second hand": tags field with a fixed vocabulary; the
   23 "(SH)" garments migrated (tag set, "(SH)" removed from names, history kept, backup taken); "SH" badges
   next to names (category tables, Manage, garment page) and on photos in the item charts, tooltips and

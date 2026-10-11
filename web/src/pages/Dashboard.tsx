@@ -38,12 +38,14 @@ const COLUMNS: {
   bar: string;
   fixedMax?: number;
 }[] = [
-  { key: "activeItems", title: "Active items", format: (v) => String(v ?? "–"), bar: "var(--bar-grey)" },
-  { key: "inventoryValue", title: "Inventory value", format: eur0, bar: "var(--bar-blue)" },
+  { key: "activeItems", title: "Items", format: (v) => String(v ?? "–"), bar: "var(--bar-grey)" },
+  { key: "inventoryValue", title: "Value", format: eur0, bar: "var(--bar-blue)" },
   { key: "costPerWear", title: "Cost per wear", format: eur2, bar: "var(--bar-red)" },
   { key: "daysUsed", title: "Days used", format: pct, bar: "var(--bar-green)", fixedMax: 1 },
   { key: "yearlyCost", title: "Yearly cost", format: eur0, bar: "var(--bar-red)" },
-  { key: "turnover", title: "Inventory turnover", format: pct, bar: "var(--bar-grey)" },
+  { key: "turnover", title: "Turnover", format: pct, bar: "var(--bar-grey)" },
+  // Share of active items bought second hand; a share, so its bar maximum is fixed at 100 %.
+  { key: "secondHandShare", title: "Second hand", format: pct, bar: "var(--bar-green)", fixedMax: 1 },
 ];
 
 const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];

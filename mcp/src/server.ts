@@ -49,7 +49,7 @@ server.registerTool(
   {
     title: "Category listing",
     description:
-      "Per category for a date range: active items and inventory value at the end, cost per wear, share of days used, yearly cost and inventory turnover (the Dashboard table). Includes a Total row.",
+      "Per category for a date range: active items and inventory value at the end, cost per wear, share of days used, yearly cost, inventory turnover and the share of active items bought second hand (the Dashboard table). Includes a Total row.",
     inputSchema: { from, to },
     annotations: readOnly,
   },

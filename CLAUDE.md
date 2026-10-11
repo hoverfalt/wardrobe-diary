@@ -147,6 +147,8 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   - Days used = share of days from the category's first ownership day to `to` with ≥ 1 wear in the category.
   - Yearly cost = cost per wear × 365 × days used.
   - Inventory turnover = yearly cost / inventory value. Total row: sums, turnover = Σ yearly / Σ value.
+  - Second hand = share of the garments active on `to` tagged second hand (count). Dashboard column titles:
+    Items, Value, Cost per wear, Days used, Yearly cost, Turnover, Second hand.
 - Charts over time (`activeOverTime`): active items / inventory value per category as step series.
 - Item listing (`itemListing`, category pages): times worn and wears per month in the range; `lifetimeWears`
   and cost per wear over the whole ownership (D-2). `divestedAverages` = R's avg_*_divested (divested items

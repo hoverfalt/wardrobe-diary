@@ -9,6 +9,7 @@
 // pre-tracking wears), even wears after the range's end, so the concept is treated consistently.
 import type { Day, Garment, IsoDate } from "../types";
 import { compareCategories } from "./categories";
+import { hasTag } from "./tags";
 
 export const TRACKING_START: IsoDate = "2018-01-01";
 const FOREVER: IsoDate = "9999-12-31";
@@ -164,6 +165,8 @@ export interface CategoryRow {
   yearlyCost: number | null;
   /** yearlyCost / inventoryValue: share of the active inventory's value "used up" per year. */
   turnover: number | null;
+  /** Share of the garments active on range.to that were bought second hand (null when none are active). */
+  secondHandShare: number | null;
 }
 
 /** The live site's category listing, plus a Total row first. */
@@ -207,6 +210,7 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
         daysUsed,
         yearlyCost,
         turnover: yearlyCost != null && inventoryValue > 0 ? yearlyCost / inventoryValue : null,
+        secondHandShare: active.length ? active.filter((g) => hasTag(g, "second-hand")).length / active.length : null,
       };
     });
 
@@ -220,6 +224,10 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
     daysUsed: null,
     yearlyCost,
     turnover: inventoryValue > 0 ? yearlyCost / inventoryValue : null,
+    secondHandShare: (() => {
+      const active = garments.filter((g) => ownedDuring(g, range) && isActive(g, range.to));
+      return active.length ? active.filter((g) => hasTag(g, "second-hand")).length / active.length : null;
+    })(),
   };
   return [total, ...rows];
 }
