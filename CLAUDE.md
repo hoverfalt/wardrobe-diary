@@ -229,6 +229,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
+- **Sortable tables** (`lib/sorting.ts`, `components/SortHeader.tsx`): numbers largest first, then smallest;
+  texts A–Z first; empty values last. A "default order" header (Category on the Dashboard, Status on category
+  pages) restores the original order and shows no arrow; the Dashboard's Total row stays first.
 - **Tags** (`lib/tags.ts`) are descriptive only and never change a calculation (second hand: price as paid,
   wears from the purchase; no estimated earlier use). Show them as badges: `TagBadges` next to names,
   `photoBadgeMarks` on chart photos, `tagLines` in tooltips; mention the badge in chart legends. Typing

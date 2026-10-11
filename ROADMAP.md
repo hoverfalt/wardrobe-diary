@@ -129,6 +129,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-35** 2026-10-11 Sortable tables (Dashboard category listing and category item listings): click a header
+  to sort largest first, again for smallest first; Category / Status restore the default order.
+
 - **R-34** 2026-10-11 "Second hand" column on the Dashboard category listing (share of active items bought
   second hand, fixed 100 % bar scale; also in the MCP category listing), to promote buying second hand.
   Column titles shortened: Items, Value, Turnover.

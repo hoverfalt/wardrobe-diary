@@ -1,5 +1,7 @@
 // One page per category (live site: jackets.html etc.): item listing and charts per item.
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { SortHeader } from "../components/SortHeader";
+import { nextSort, sortRows, type SortDir } from "../lib/sorting";
 import { formatEur2 } from "../components/CategoryCharts";
 import { CostVsFrequencyAnimation, TimesWornAnimation } from "../components/CategoryAnimations";
 import { DailyCostChart } from "../components/DailyCostCharts";
@@ -48,6 +50,15 @@ export function CategoryPage({
   }, [wardrobe, category, garments, range]);
   const maxima = useMemo(() => COLUMNS.map((c) => barMax(rows.map(c.value))), [rows]);
 
+  // Sorting: "status" = the default order (active first, then most worn); "item" = by name; numbers by column.
+  const [sort, setSort] = useState<{ key: string; dir: SortDir }>({ key: "status", dir: "asc" });
+  const sortedRows = useMemo(() => {
+    if (sort.key === "status") return rows;
+    if (sort.key === "item") return sortRows(rows, (r) => r.garment.item, sort.dir);
+    const col = COLUMNS.find((c) => c.title === sort.key);
+    return col ? sortRows(rows, col.value, sort.dir) : rows;
+  }, [rows, sort]);
+
   const back = (
     <a href="/" onClick={(e) => { e.preventDefault(); navigate({ page: "dashboard" }); }}>← Dashboard</a>
   );
@@ -76,13 +87,17 @@ export function CategoryPage({
           <thead>
             <tr>
               <th aria-label="Image" />
-              <th>Item</th>
-              {COLUMNS.map((c) => <th key={c.title} className="num">{c.title}</th>)}
-              <th>Status</th>
+              <SortHeader title="Item" active={sort.key === "item"} dir={sort.dir} onClick={() => setSort(nextSort(sort, "item", "text"))} />
+              {COLUMNS.map((c) => (
+                <SortHeader key={c.title} className="num" title={c.title} active={sort.key === c.title} dir={sort.dir}
+                  onClick={() => setSort(nextSort(sort, c.title, "number"))} />
+              ))}
+              <SortHeader title="Status" active={sort.key === "status"} dir="asc" showArrow={false}
+                hint="Back to the default order: active first, then most worn" onClick={() => setSort({ key: "status", dir: "asc" })} />
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
+            {sortedRows.map((r) => {
               const src = photoUrl(r.garment);
               return (
                 <tr key={r.garment.id} className={r.active ? undefined : "divested"}>

@@ -1,4 +1,6 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { SortHeader } from "../components/SortHeader";
+import { nextSort, sortRows, type SortDir } from "../lib/sorting";
 import type { Wardrobe } from "../lib/publicData";
 import { categoryImageUrl } from "../firebase";
 import { barMax, barStyle } from "../lib/dataBars";
@@ -98,6 +100,16 @@ export function Dashboard({
       ),
     [rows],
   );
+  // Sorting: "category" = the standard category order (default); the Total row always stays first.
+  type SortKey = "category" | (typeof COLUMNS)[number]["key"];
+  const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "category", dir: "asc" });
+  const sortedRows = useMemo(() => {
+    if (sort.key === "category") return rows;
+    const key = sort.key;
+    const [total, ...categories] = rows;
+    return total ? [total, ...sortRows(categories, (r) => r[key], sort.dir)] : rows;
+  }, [rows, sort]);
+
   const maxima = useMemo(() => {
     const categories = rows.filter((r) => r.category !== "Total");
     return Object.fromEntries(COLUMNS.map((c) => [c.key, c.fixedMax ?? barMax(categories.map((r) => r[c.key]))]));
@@ -117,14 +129,16 @@ export function Dashboard({
           <thead>
             <tr>
               <th aria-label="Image" />
-              <th>Category</th>
+              <SortHeader title="Category" active={sort.key === "category"} dir="asc" showArrow={false} hint="Back to the standard category order"
+                onClick={() => setSort({ key: "category", dir: "asc" })} />
               {COLUMNS.map((c) => (
-                <th key={c.key} className="num">{c.title}</th>
+                <SortHeader key={c.key} className="num" title={c.title} active={sort.key === c.key} dir={sort.dir}
+                  onClick={() => setSort(nextSort(sort, c.key, "number"))} />
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
+            {sortedRows.map((r) => {
               const img = r.category === "Total" ? null : categoryImageUrl(r.category);
               return (
                 <tr key={r.category} className={r.category === "Total" ? "total" : undefined}>
