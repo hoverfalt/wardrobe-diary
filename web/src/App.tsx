@@ -29,8 +29,7 @@ export function App() {
       <header>
         <h1>Wardrobe Diary</h1>
         <nav>
-          <button aria-pressed={route.page === "dashboard" || route.page === "category" || route.page === "garment"} onClick={() => navigate({ page: "dashboard" })}>Dashboard</button>
-          <button aria-pressed={route.page === "materials"} onClick={() => navigate({ page: "materials" })}>Materials</button>
+          <button aria-pressed={route.page === "dashboard" || route.page === "category" || route.page === "garment" || route.page === "materials"} onClick={() => navigate({ page: "dashboard" })}>Dashboard</button>
           <button aria-pressed={route.page === "log"} onClick={() => navigate({ page: "log" })}>Log</button>
           {isOwner && (
             <button aria-pressed={route.page === "manage"} onClick={() => navigate({ page: "manage" })}>Manage</button>

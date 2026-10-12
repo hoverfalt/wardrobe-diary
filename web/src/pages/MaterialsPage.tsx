@@ -1,6 +1,7 @@
 // Materials page (R-30): fibre mass owned and worn, the fibre mix per category, and monthly trends, all from
 // weight × the composition read from the Materials field. Follows the app-wide date range.
 import { useMemo, type ReactNode } from "react";
+import { Link } from "../components/Link";
 import { CategoryFibreMultiples, FibreBars, FibreLegend, MonthLine } from "../components/MaterialsCharts";
 import { compareCategories } from "../lib/categories";
 import { formatFi } from "../lib/dates";
@@ -44,6 +45,7 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
 
   return (
     <section>
+      <Link to={{ page: "dashboard" }}>← Dashboard</Link>
       <h2>Materials</h2>
       <p className="muted">
         What the wardrobe is made of, by weight: each garment's weight × the fibre composition read from its

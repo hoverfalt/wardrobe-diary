@@ -230,6 +230,8 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
 - Pages: `/` Dashboard, `/category/<slug>`, `/garment/<id>`, `/materials`, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
+  The top nav (Dashboard, Log, Manage, Sign in/out) must fit a phone; sub-pages such as `/materials` are linked
+  from the Dashboard instead, with Dashboard highlighted.
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
