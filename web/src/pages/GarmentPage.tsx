@@ -6,7 +6,7 @@ import { CategoryLink } from "../components/CategoryLink";
 import { Link } from "../components/Link";
 import { PlotFigure } from "../components/PlotFigure";
 import { TagBadge } from "../components/TagBadges";
-import { hasTag } from "../lib/tags";
+import { TAGS, tagsOf } from "../lib/tags";
 import { photoUrl } from "../firebase";
 import { categorySlug } from "../lib/categories";
 import { formatFi, todayIso } from "../lib/dates";
@@ -71,7 +71,9 @@ export function GarmentPage({ id, wardrobe, canEdit }: { id: string; wardrobe: W
           <h2>{g.item}</h2>
           <p className="muted">
             <CategoryLink category={g.category} /> · {active ? "Active" : `Divested ${formatFi(g.divested)}`}
-            {hasTag(g, "second-hand") && <> · <TagBadge tag="second-hand" /> Bought second hand</>}
+            {tagsOf(g).map((t) => (
+              <span key={t}> · <TagBadge tag={t} /> {t === "second-hand" ? "Bought second hand" : TAGS[t].label}</span>
+            ))}
           </p>
           {canEdit && <Link className="button" to={{ page: "manage", id: g.id }}>Edit</Link>}
         </div>

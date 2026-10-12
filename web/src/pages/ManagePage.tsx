@@ -8,7 +8,7 @@ import { formatFi, todayIso } from "../lib/dates";
 import { updateGarments } from "../data/repo";
 import { applyBulk, type BulkAction } from "../lib/garmentForm";
 import { materialsIssue, type MaterialsIssue } from "../lib/materials";
-import { hasTag, TAG_IDS, TAGS, type Tag } from "../lib/tags";
+import { hasTag, TAG_IDS, TAGS, tagSearchText, type Tag } from "../lib/tags";
 import { TagBadges } from "../components/TagBadges";
 import { itemListing, TRACKING_START } from "../lib/metrics";
 import type { Wardrobe } from "../lib/publicData";
@@ -63,7 +63,7 @@ export function ManagePage({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe 
       (status === "all" || (status === "active") === r.active) &&
       reviewReason(r.garment, review) &&
       (!tagFilter || hasTag(r.garment, tagFilter)) &&
-      (!q || `${r.garment.item} ${r.garment.details} ${r.garment.materials} ${r.garment.id}`.toLowerCase().includes(q)),
+      (!q || `${r.garment.item} ${r.garment.details} ${r.garment.materials} ${r.garment.id} ${tagSearchText(r.garment)}`.toLowerCase().includes(q)),
   );
 
   const toggle = (id: string) => {

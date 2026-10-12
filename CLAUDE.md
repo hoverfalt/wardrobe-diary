@@ -55,7 +55,7 @@ users/{uid}/garments/{garmentId}          // source of truth for garment details
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
   timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced),
   detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list),
-  tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand")
+  tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand", "hanko", "bicycle", "motorcycle")
 users/{uid}/garments/{garmentId}/history/{autoId}
   savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
 users/{uid}/deletedGarments/{garmentId}
@@ -250,8 +250,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   pages) restores the original order and shows no arrow; the Dashboard's Total row stays first.
 - **Tags** (`lib/tags.ts`) are descriptive only and never change a calculation (second hand: price as paid,
   wears from the purchase; no estimated earlier use). Show them as badges: `TagBadges` next to names,
-  `photoBadgeMarks` on chart photos, `tagLines` in tooltips; mention the badge in chart legends. Typing
-  "(SH)" at the end of a name becomes the tag on save.
+  `photoBadgeMarks` on chart photos (the first tag only), `tagLines` in tooltips, `TagLegendItems` in chart
+  legends (the tags present). Typing "(SH)" or "(Hanko)" in a name becomes the tag on save (`tagsFromName`).
+  Search boxes (Log, Manage) also match tag labels and badges (`tagSearchText`), e.g. "motorcycle", "bike".
 - Fibre types (natural / regenerated / synthetic / other) have fixed colours (`--fibre-*` in `styles.css`, from the
   validated reference palette: aqua, blue, orange, grey); always pair them with text labels.
 - On category pages, item names link to the public `/garment/<id>`; the owner edits from there (Edit button).

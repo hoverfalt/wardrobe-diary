@@ -16,6 +16,22 @@ export const TAGS = {
     badge: "SH",
     description: "Bought second hand: used before; the price is what was paid, and wears count from the purchase.",
   },
+  // Kept at the summer home in Hanko (blue rows in the Sheet; "(Hanko)" in the name). See ROADMAP R-33.
+  hanko: {
+    label: "Hanko",
+    badge: "HKO",
+    description: "Kept at the summer home in Hanko, so only worn there.",
+  },
+  bicycle: {
+    label: "Bicycle gear",
+    badge: "BIKE",
+    description: "Cycling gear.",
+  },
+  motorcycle: {
+    label: "Motorcycle gear",
+    badge: "MC",
+    description: "Motorcycle gear.",
+  },
 } satisfies Record<string, TagDef>;
 
 export type Tag = keyof typeof TAGS;
@@ -28,6 +44,29 @@ export function hasTag(g: Pick<Garment, "tags">, tag: Tag): boolean {
 /** The garment's known tags, in vocabulary order. */
 export function tagsOf(g: Pick<Garment, "tags">): Tag[] {
   return TAG_IDS.filter((t) => g.tags?.includes(t));
+}
+
+/** Text a search box matches against a garment's tags: labels and badges, e.g. "motorcycle gear mc". */
+export function tagSearchText(g: Pick<Garment, "tags">): string {
+  return tagsOf(g).map((t) => `${TAGS[t].label} ${TAGS[t].badge}`).join(" ").toLowerCase();
+}
+
+/** Markers typed in a name that become tags on save: "(SH)" → second hand, "(Hanko)" → Hanko. */
+const NAME_MARKERS: [RegExp, Tag][] = [
+  [/\s*\(SH\)/gi, "second-hand"],
+  [/\s*\(Hanko\)/gi, "hanko"],
+];
+
+/** The name without its tag markers, and the tags they stand for. */
+export function tagsFromName(item: string): { item: string; tags: Tag[] } {
+  let name = item;
+  const tags: Tag[] = [];
+  for (const [re, tag] of NAME_MARKERS) {
+    const next = name.replace(re, "");
+    if (next !== name) tags.push(tag);
+    name = next;
+  }
+  return { item: name.trim(), tags };
 }
 
 /** "(SH)" in an item name → the second-hand tag (the one-time migration and the add form use this). */

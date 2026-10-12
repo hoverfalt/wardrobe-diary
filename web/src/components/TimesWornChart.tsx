@@ -8,7 +8,7 @@ import { photoUrl } from "../firebase";
 import { quantile, type ItemRow } from "../lib/metrics";
 import { PlotFigure } from "./PlotFigure";
 import { photoBadgeMarks, tagLines } from "./photoBadges";
-import { TagBadge } from "./TagBadges";
+import { TagLegendItems } from "./TagBadges";
 
 const DIVESTED = "#3CB371"; // live site: mediumseagreen
 const ROW = 28;
@@ -114,7 +114,7 @@ export function TimesWornChart({ rows, minRows = 0, xMax }: {
         <ul className="chart-legend" aria-label="Legend">
           <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
           <li><span className="dot" style={{ background: "var(--bar-grey)" }} /> Active</li>
-          <li><TagBadge tag="second-hand" /> Second hand</li>
+          <TagLegendItems garments={rows.map((r) => r.garment)} />
           <li>
             <span className="box" style={{ background: "rgba(60, 179, 113, 0.25)" }} /> How often divested items
             were worn: middle 90 % ({Math.round(bands[0].x1)}–{Math.round(bands[0].x2)}) and middle 36 % (

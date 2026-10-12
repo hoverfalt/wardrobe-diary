@@ -2,7 +2,7 @@
 // them into the stored fields (Sheet columns A–K). Photo is not editable in phase (a).
 import type { Garment } from "../types";
 import { CATEGORY_ORDER } from "./categories";
-import { secondHandFromName, TAG_IDS, type Tag } from "./tags";
+import { tagsFromName, TAG_IDS, type Tag } from "./tags";
 
 export type GarmentFields = Omit<Garment, "id">;
 
@@ -56,10 +56,10 @@ export function parseGarmentForm(
   base: { photo: string; photoVersion?: string | null },
 ): { ok: true; fields: GarmentFields } | { ok: false; errors: FormErrors } {
   const errors: FormErrors = {};
-  // "(SH)" typed at the end of a name becomes the second-hand tag.
-  const fromName = secondHandFromName(form.item.trim());
+  // "(SH)" or "(Hanko)" typed in a name becomes the tag.
+  const fromName = tagsFromName(form.item.trim());
   const item = fromName.item;
-  const formTags = fromName.secondHand && !form.tags.includes("second-hand") ? [...form.tags, "second-hand"] : form.tags;
+  const formTags = [...form.tags, ...fromName.tags.filter((t) => !form.tags.includes(t))];
   if (!item) errors.item = "Name is required.";
   if (!CATEGORY_ORDER.includes(form.category)) errors.category = "Choose a category.";
 

@@ -1,4 +1,4 @@
-// Tag badges drawn on item photos in charts: a small rounded label ("SH") on the photo's top-right edge.
+// Tag badges drawn on item photos in charts: a small rounded label ("SH", "HKO", "BIKE", "MC") on the photo's top-right edge.
 import * as Plot from "@observablehq/plot";
 import { TAGS, tagsOf } from "../lib/tags";
 import type { Garment } from "../types";
@@ -7,9 +7,11 @@ export function photoBadgeMarks<T extends { garment: Garment }>(data: T[], x: st
   const tagged = data.flatMap((d) => tagsOf(d.garment).slice(0, 1).map((t) => ({ ...d, badge: TAGS[t].badge })));
   if (tagged.length === 0) return [];
   const offset = { dx: r * 0.8, dy: -r * 0.8 };
+  const fontSize = Math.max(7, r * 0.4);
   return [
-    Plot.dot(tagged, { x, y, r: Math.max(6, r * 0.42), fill: "var(--tag-bg)", stroke: "var(--bg)", strokeWidth: 1, ...offset }),
-    Plot.text(tagged, { x, y, text: "badge", fill: "var(--tag-fg)", fontSize: Math.max(7, r * 0.42), fontWeight: 700, ...offset }),
+    // The badge background is a thick rounded stroke around the text, so it fits "SH" and "BIKE" alike.
+    Plot.text(tagged, { x, y, text: "badge", fill: "var(--tag-bg)", stroke: "var(--tag-bg)", strokeWidth: fontSize * 1.1, strokeLinejoin: "round", fontSize, fontWeight: 700, ...offset }),
+    Plot.text(tagged, { x, y, text: "badge", fill: "var(--tag-fg)", fontSize, fontWeight: 700, ...offset }),
   ];
 }
 

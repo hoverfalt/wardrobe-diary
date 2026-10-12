@@ -33,8 +33,7 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Next
 
-1. **R-12 Remaining open questions** (Q-2).
-2. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
+1. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
@@ -46,7 +45,8 @@ _(nothing in progress; waiting for the next scope)_
   **filter the Dashboard (and category pages) and the Log page by location.** Today "(Hanko)" in the name
   marks the 51 Hanko garments ("ex Hanko" = moved to Helsinki). Likely design: a location field per garment
   (Helsinki / Hanko; migrated from the names like "(SH)" was), a location filter next to the date range,
-  and on the Log page showing only the garments at the chosen home. Open points: whether to record move
+  and on the Log page showing only the garments at the chosen home. Since R-37 the "hanko" tag marks the Hanko
+  garments (the Log search "hanko" already lists them), so a location filter can build on it. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
@@ -60,7 +60,6 @@ _(none open)_
 
 ## Open questions
 
-- **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.
@@ -78,6 +77,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-12 Q-2** Sheet row colours in column B: light blue = kept in Hanko (not consistently applied, so
+  combined with "(Hanko)" in names), grey-blue = bicycle gear, pink = motorcycle gear. Now tags (R-37).
 
 - **2026-10-09 Cut-over (R-15):** the app is the source of truth for wears from 2026-10-10 on; the Sheet holds
   the log through 2026-10-09 and is retired (`settings/app.sheetRetired`, the sync refuses to write).
@@ -128,6 +130,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-37** 2026-10-12 Tags Hanko (HKO), Bicycle gear (BIKE) and Motorcycle gear (MC), managed like Second hand;
+  the Log and Manage searches match tags ("motorcycle", "bike"). Migrated from the Sheet's row colours (Q-2,
+  answered by Olof: blue = Hanko, grey-blue = bicycle, pink = motorcycle) with `tools/migrate_colour_tags.sh`:
+  Hanko = "(Hanko)" in the name or a blue row, except "ex Hanko" (87; "(Hanko)" removed from names), bicycle 5,
+  motorcycle 10 (incl. Warmpeace trekking shorts, Olof's call). Backup taken, history kept. Chart legends list
+  the tags present; photo badges became rounded pills that fit longer badges.
 
 - **R-36** 2026-10-12 Comparison photos: Olof uploaded the 19 `Comparison-*.png` (228 × 228) next to the garment
   photos; they show in the chart (grey rings) and at `/manage/comparison` (thumbnails, replace), like garment photos.

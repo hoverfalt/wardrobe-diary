@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasTag, secondHandFromName, tagsOf } from "./tags";
+import { hasTag, secondHandFromName, tagsOf, tagSearchText, tagsFromName } from "./tags";
 
 describe("tags", () => {
   it("reads (SH) from names", () => {
@@ -11,5 +11,16 @@ describe("tags", () => {
   it("lists known tags only", () => {
     expect(tagsOf({ tags: ["unknown", "second-hand"] })).toEqual(["second-hand"]);
     expect(hasTag({}, "second-hand")).toBe(false);
+  });
+
+  it("makes tags searchable by label and badge", () => {
+    expect(tagSearchText({ tags: ["motorcycle", "second-hand"] })).toBe("second hand sh motorcycle gear mc");
+    expect(tagSearchText({})).toBe("");
+  });
+
+  it("turns name markers into tags", () => {
+    expect(tagsFromName("Diesel gray 05 (Hanko)")).toEqual({ item: "Diesel gray 05", tags: ["hanko"] });
+    expect(tagsFromName("North Bend white 01 (40-44) (Hanko) (SH)")).toEqual({ item: "North Bend white 01 (40-44)", tags: ["second-hand", "hanko"] });
+    expect(tagsFromName("Jockey white 05 (ex Hanko)")).toEqual({ item: "Jockey white 05 (ex Hanko)", tags: [] });
   });
 });

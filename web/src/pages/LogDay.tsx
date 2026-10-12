@@ -1,6 +1,7 @@
 // Daily logging (R-13/R-15, owner only): the app is the source of truth for wears since 2026-10-09.
 // Mobile-first: day navigation, the day's outfit on top, search, and the garments worn most in the last
 // 60 days first in each category. Works offline (the SDK queues writes).
+import { tagSearchText } from "../lib/tags";
 import { useEffect, useMemo, useState } from "react";
 import { setDayWorn, usePendingWrites } from "../data/repo";
 import { photoUrl } from "../firebase";
@@ -30,7 +31,8 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
     const map = new Map<string, Garment[]>();
     for (const g of wardrobe.garments) {
       if (!isActive(g, date) && !worn.has(g.id)) continue;
-      if (q && !`${g.item} ${g.details}`.toLowerCase().includes(q)) continue;
+      // Tags count too, so "motorcycle" or "bike" lists that gear.
+      if (q && !`${g.item} ${g.details} ${tagSearchText(g)}`.toLowerCase().includes(q)) continue;
       map.set(g.category, [...(map.get(g.category) ?? []), g]);
     }
     for (const items of map.values())

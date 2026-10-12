@@ -7,7 +7,7 @@ import { divestedAverages, type ItemRow } from "../lib/metrics";
 import { formatEur2 } from "./CategoryCharts";
 import { PlotFigure } from "./PlotFigure";
 import { photoBadgeMarks, tagLines } from "./photoBadges";
-import { TagBadge } from "./TagBadges";
+import { TagLegendItems } from "./TagBadges";
 
 const DIVESTED = "#3CB371"; // live site: mediumseagreen
 const GUIDE = "#7fb8d6"; // live site: lightblue
@@ -118,7 +118,7 @@ export function CostVsWearsChart({ rows }: { rows: ItemRow[] }) {
     <figure className="chart">
       <ul className="chart-legend" aria-label="Legend">
         <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
-        <li><TagBadge tag="second-hand" /> Second hand</li>
+        <TagLegendItems garments={rows.map((r) => r.garment)} />
         <li><span className="line" style={{ background: "currentColor", opacity: 0.3 }} /> Item's cost per wear over time</li>
         <li><span className="line" style={{ background: GUIDE }} /> Price ÷ times worn for set prices</li>
       </ul>
@@ -180,7 +180,7 @@ export function CostVsFrequencyChart({
     <figure className="chart">
       <ul className="chart-legend" aria-label="Legend">
         <li><span className="dot" style={{ background: DIVESTED }} /> Divested</li>
-        <li><TagBadge tag="second-hand" /> Second hand</li>
+        <TagLegendItems garments={rows.map((r) => r.garment)} />
         {avg && (
           <li>
             <span className="line dotted" style={{ borderColor: DIVESTED }} /> Divested items' averages:{" "}

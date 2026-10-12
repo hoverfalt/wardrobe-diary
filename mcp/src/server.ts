@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { loadWardrobe } from "./publicData";
+import { TAG_IDS, type Tag } from "../../web/src/lib/tags";
 import {
   categoryTable,
   DEFINITIONS,
@@ -69,7 +70,7 @@ server.registerTool(
       status: z.enum(["active", "divested", "all"]).optional().describe("Default: all"),
       search: z.string().optional().describe("Text to find in the name, details or materials"),
       fibre: z.string().optional().describe('Only garments whose main fabric contains this fibre, e.g. "wool", "polyester", "elastane"'),
-      tag: z.enum(["second-hand"]).optional().describe("Only garments with this tag (second-hand = bought used)"),
+      tag: z.enum(TAG_IDS as [Tag, ...Tag[]]).optional().describe("Only garments with this tag: second-hand (bought used), hanko (kept at the summer home in Hanko), bicycle or motorcycle (gear)"),
       minWeightG: z.number().optional().describe("Minimum weight in grams"),
       maxWeightG: z.number().optional().describe("Maximum weight in grams"),
       sort: z.enum(["times_worn", "cost_per_wear", "wears_per_month", "price", "purchased", "name", "weight"]).optional().describe("Default: times_worn (most first)"),
