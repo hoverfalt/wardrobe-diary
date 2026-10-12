@@ -136,7 +136,8 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   every tag: tap to cycle neutral → green (show only garments with a green tag) → red (hide garments with that
   tag; red wins) → neutral. Kept between sessions in the browser (per device); garments already worn that day
   stay listed; "N hidden · Clear". E.g. Hanko and Summer red when logging in Helsinki off-season. The season
-  tags start empty: set them on Manage (bulk "Add tag").
+  tags start empty: set them on Manage (bulk "Add tag"). The toggles sit in a "Filters" popup next to "All
+  changes saved" (highlighted, with the number of active toggles, while filtering).
 
 - **R-37** 2026-10-12 Tags Hanko (HKO), Bicycle gear (BIKE) and Motorcycle gear (MC), managed like Second hand;
   the Log and Manage searches match tags ("motorcycle", "bike"). Migrated from the Sheet's row colours (Q-2,

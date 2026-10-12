@@ -2,7 +2,7 @@
 // Mobile-first: day navigation, the day's outfit on top, search, and the garments worn most in the last
 // 60 days first in each category. Works offline (the SDK queues writes).
 import { TAG_IDS, TAGS, tagSearchText } from "../lib/tags";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { setDayWorn, usePendingWrites } from "../data/repo";
 import { photoUrl } from "../firebase";
 import { compareCategories } from "../lib/categories";
@@ -70,6 +70,7 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
         <span className={pending ? "muted" : "ok"}>
           {error ? <span className="error">Not saved: {error}</span> : pending ? (online ? "Saving…" : "Saved on this device; will sync when online") : "All changes saved"}
         </span>
+        <TagFilterMenu filter={tagFilter} onChange={setTagFilter} hidden={byCategory.hidden} />
         <div className="chips">
           {wornIds.map((id) => {
             const g = byId.get(id);
@@ -84,29 +85,6 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
             );
           })}
         </div>
-      </div>
-
-      <div className="tag-toggles" role="group" aria-label="Tag filters">
-        {TAG_IDS.map((t) => {
-          const state = tagFilter[t];
-          return (
-            <button
-              key={t}
-              className={`tag-toggle ${state ?? ""}`}
-              onClick={() => setTagFilter({ ...tagFilter, [t]: nextTagState(state) })}
-              title={state === "include" ? "Showing only garments with this tag (or another green one). Tap to hide them." : state === "exclude" ? "Hiding garments with this tag. Tap to reset." : "Tap to show only garments with this tag."}
-            >
-              <span aria-hidden="true">{state === "include" ? "✓ " : state === "exclude" ? "✕ " : ""}</span>
-              {TAGS[t].label}
-              <span className="sr-only">{state === "include" ? " (only)" : state === "exclude" ? " (hidden)" : ""}</span>
-            </button>
-          );
-        })}
-        {byCategory.hidden > 0 && (
-          <span className="muted">
-            {byCategory.hidden} hidden · <button className="link" onClick={() => setTagFilter({})}>Clear</button>
-          </span>
-        )}
       </div>
 
       <input type="search" className="log-search" placeholder="Search garments" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search garments" />
@@ -171,4 +149,53 @@ function useStoredTagFilter(): [TagFilter, (f: TagFilter) => void] {
     }
   };
   return [filter, save];
+}
+
+/** "Filters" button with a popup of tag toggles (changed seldom, so kept out of the way). Highlighted, with the
+ *  number of active toggles, while any filter is on. */
+function TagFilterMenu({ filter, onChange, hidden }: { filter: TagFilter; onChange: (f: TagFilter) => void; hidden: number }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const active = Object.keys(filter).length;
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: Event) => {
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open]);
+  return (
+    <div className="filter-menu" ref={ref}>
+      <button className={active ? "filter-button active" : "filter-button"} aria-expanded={open} aria-haspopup="true" onClick={() => setOpen(!open)}>
+        Filters{active ? ` (${active})` : ""}
+      </button>
+      {open && (
+        <div className="filter-pop" role="group" aria-label="Tag filters">
+          <p className="muted">Tap a tag: ✓ green = show only garments with it, ✕ red = hide them. Worn items always stay listed.</p>
+          <div className="tag-toggles">
+            {TAG_IDS.map((t) => {
+              const state = filter[t];
+              return (
+                <button key={t} className={`tag-toggle ${state ?? ""}`} onClick={() => onChange({ ...filter, [t]: nextTagState(state) })}>
+                  <span aria-hidden="true">{state === "include" ? "✓ " : state === "exclude" ? "✕ " : ""}</span>
+                  {TAGS[t].label}
+                  <span className="sr-only">{state === "include" ? " (only)" : state === "exclude" ? " (hidden)" : ""}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="filter-pop-foot">
+            <span className="muted">{hidden ? `${hidden} garments hidden` : "Nothing hidden"}</span>
+            {active > 0 && <button onClick={() => onChange({})}>Clear</button>}
+            <button className="primary" onClick={() => setOpen(false)}>Done</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
