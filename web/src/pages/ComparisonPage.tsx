@@ -132,9 +132,11 @@ function ComparisonForm({ uid, items, current, onClose }: { uid: string; items: 
     setMessage("");
     try {
       const id = current?.id ?? comparisonId(form.item, items.map((c) => c.id));
-      const photoName = current?.photo || comparisonPhotoName(form.item);
+      // Like garments: the photo name is set once a photo is uploaded, and kept when it is replaced.
+      let photoName = current?.photo ?? "";
       let photoVersion = current?.photoVersion ?? null;
       if (photo) {
+        photoName ||= comparisonPhotoName(form.item);
         await uploadComparisonPhoto(photoName, photo.file);
         photoVersion = new Date().toISOString();
       }

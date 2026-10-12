@@ -32,9 +32,10 @@ export function photoUrl(g: { photo: string; photoVersion?: string | null }): st
   return url && g.photoVersion ? `${url}&v=${encodeURIComponent(g.photoVersion)}` : url;
 }
 
-/** A comparison item's photo (R-26), only once one has been uploaded in the app (`photoVersion` set). */
+/** A comparison item's photo (R-26): Comparison-<Name>.png next to the garment photos; like garments, the
+ *  photo version makes a replaced photo a new URL. Items without a photo have an empty `photo`. */
 export function comparisonPhotoUrl(c: { photo: string; photoVersion?: string | null }): string | null {
-  return c.photo && c.photoVersion ? photoUrl(c) : null;
+  return photoUrl(c);
 }
 
 /** Category images, as on the live site: Category_image-Jackets_and_hoodies.png */

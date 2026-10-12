@@ -9,7 +9,7 @@ export interface ComparisonItem {
   type: string;
   item: string;
   details: string;
-  /** Storage file name without .png, e.g. "Comparison-HSL". Shown only once uploaded (`photoVersion` set). */
+  /** Storage file name without .png, e.g. "Comparison-HSL"; "" when no photo has been uploaded. */
   photo: string;
   photoVersion?: string | null;
   /** € per month (entered) */

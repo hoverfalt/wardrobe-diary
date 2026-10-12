@@ -18,9 +18,9 @@ How this file works:
   (R-29 phase 1); materials, weight and details (R-30); second-hand tags (R-31) and the Second hand column on
   the Dashboard (R-34); sortable tables (R-35).
 - **2026-10-12:** R-26 done: the monthly cost comparison is the last live-site chart, so every live chart is
-  now rebuilt. Its photos are still to be uploaded (R-36).
+  now rebuilt, with photos (R-36).
 - **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-36 comparison photos, R-33 garment location (parked; design notes below),
+  R-33 garment location (parked; design notes below),
   R-18 housekeeping, R-17 multi-user (with R-32 user-defined tags).
 
 ## Inbox
@@ -34,10 +34,7 @@ _(nothing in progress; waiting for the next scope)_
 ## Next
 
 1. **R-12 Remaining open questions** (Q-2).
-2. **R-36 Comparison photos:** the 19 comparison items have no photos in the app (the live site's
-   `Comparison-*.png` files exist only as online-only placeholders in Dropbox `Threddit/Comparisons/`).
-   Make that folder available offline and ask Claude to upload them, or upload each at `/manage/comparison`.
-3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
+2. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
@@ -131,6 +128,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-36** 2026-10-12 Comparison photos: Olof uploaded the 19 `Comparison-*.png` (228 × 228) next to the garment
+  photos; they show in the chart (grey rings) and at `/manage/comparison` (thumbnails, replace), like garment photos.
 
 - **R-26** 2026-10-12 Monthly cost compared with other spending (the last live-site chart), at the bottom of the
   Dashboard: categories' yearly cost / 12 against Days used, with 19 other spending items in grey (labels; photos

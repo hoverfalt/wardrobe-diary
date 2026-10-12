@@ -178,7 +178,8 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   cost = yearly cost / 12 against Days used, next to other spending in grey. For those items only Monthly cost and
   Use frequency are stored (imported once from the Sheet's "Comparison" tab as values, `tools/import_comparison.sh`);
   yearly cost = monthly × 12 and cost per use = monthly / (30,5 × use frequency) are derived. They don't follow the
-  date range. Their photo shows only once uploaded in the app (`photoVersion` set; the originals weren't in Storage).
+  date range. Photos are `Comparison-<Name>.png` next to the garment photos, handled like garment photos
+  (`comparisonPhotoUrl`; `photoVersion` in the URL; a new item gets a photo name only when a photo is uploaded).
 
 ## Code map (`web/src`)
 
