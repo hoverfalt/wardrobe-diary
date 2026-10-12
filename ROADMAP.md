@@ -46,7 +46,8 @@ _(nothing in progress; waiting for the next scope)_
   marks the 51 Hanko garments ("ex Hanko" = moved to Helsinki). Likely design: a location field per garment
   (Helsinki / Hanko; migrated from the names like "(SH)" was), a location filter next to the date range,
   and on the Log page showing only the garments at the chosen home. Since R-37 the "hanko" tag marks the Hanko
-  garments (the Log search "hanko" already lists them), so a location filter can build on it. Open points: whether to record move
+  garments, and since R-38 the Log page's tag toggles can hide or show them, which covers the logging half;
+  what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
@@ -130,6 +131,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-38** 2026-10-12 Season tags Winter (WIN) and Summer (SUM), and tag toggles at the top of the Log page for
+  every tag: tap to cycle neutral → green (show only garments with a green tag) → red (hide garments with that
+  tag; red wins) → neutral. Kept between sessions in the browser (per device); garments already worn that day
+  stay listed; "N hidden · Clear". E.g. Hanko and Summer red when logging in Helsinki off-season. The season
+  tags start empty: set them on Manage (bulk "Add tag").
 
 - **R-37** 2026-10-12 Tags Hanko (HKO), Bicycle gear (BIKE) and Motorcycle gear (MC), managed like Second hand;
   the Log and Manage searches match tags ("motorcycle", "bike"). Migrated from the Sheet's row colours (Q-2,

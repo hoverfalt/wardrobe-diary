@@ -157,6 +157,13 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border-radius: 999px; font-size: 13px; }
 .chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
 .log-search { width: 100%; margin: 12px 0 0; }
+/* Log page tag toggles: neutral (plain), include (green, ✓), exclude (red, ✕). */
+.tag-toggles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
+.tag-toggle { border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.tag-toggle.include { background: #1f7a3d; border-color: #1f7a3d; color: #fff; }
+.tag-toggle.exclude { background: #b3261e; border-color: #b3261e; color: #fff; }
+button.link { border: 0; padding: 0; background: none; color: var(--accent); text-decoration: underline; font-size: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tile { border-radius: 10px; }
 /* Phones: the outfit chips would cover the garments, so only the slim count + save-status bar stays;
    worn garments are highlighted in the grid anyway. */

@@ -32,6 +32,17 @@ export const TAGS = {
     badge: "MC",
     description: "Motorcycle gear.",
   },
+  // Seasons: mainly for narrowing the Log page's list (tag toggles), e.g. hiding summer clothes in winter.
+  winter: {
+    label: "Winter",
+    badge: "WIN",
+    description: "Worn mainly in winter.",
+  },
+  summer: {
+    label: "Summer",
+    badge: "SUM",
+    description: "Worn mainly in summer.",
+  },
 } satisfies Record<string, TagDef>;
 
 export type Tag = keyof typeof TAGS;

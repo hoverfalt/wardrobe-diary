@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Garment } from "../types";
-import { dayLabel, recentWears, toggleWorn } from "./logging";
+import { dayLabel, recentWears, toggleWorn, nextTagState, passesTagFilter } from "./logging";
 
 const g = (id: string) => ({ id }) as Garment;
 const garments = [g("a"), g("b"), g("c")];
@@ -26,5 +26,24 @@ describe("logging", () => {
   it("labels days", () => {
     expect(dayLabel("2026-10-09", "2026-10-09")).toBe("Today, Friday 9.10.2026");
     expect(dayLabel("2026-10-08", "2026-10-09")).toBe("Yesterday, Thursday 8.10.2026");
+  });
+});
+
+describe("tag toggles", () => {
+  const hanko = { tags: ["hanko", "summer"] };
+  const winter = { tags: ["winter"] };
+  const plain = {};
+  it("cycles neutral → include → exclude → neutral", () => {
+    expect(nextTagState(undefined)).toBe("include");
+    expect(nextTagState("include")).toBe("exclude");
+    expect(nextTagState("exclude")).toBeUndefined();
+  });
+  it("hides red tags and, with green tags, shows only garments having one", () => {
+    expect([hanko, winter, plain].map((g) => passesTagFilter(g, {}))).toEqual([true, true, true]);
+    expect([hanko, winter, plain].map((g) => passesTagFilter(g, { hanko: "exclude", summer: "exclude" }))).toEqual([false, true, true]);
+    expect([hanko, winter, plain].map((g) => passesTagFilter(g, { winter: "include" }))).toEqual([false, true, false]);
+    expect([hanko, winter, plain].map((g) => passesTagFilter(g, { winter: "include", hanko: "include" }))).toEqual([true, true, false]);
+    // Red wins over green
+    expect(passesTagFilter(hanko, { summer: "include", hanko: "exclude" })).toBe(false);
   });
 });

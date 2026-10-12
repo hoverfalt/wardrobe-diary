@@ -55,7 +55,7 @@ users/{uid}/garments/{garmentId}          // source of truth for garment details
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
   timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced),
   detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list),
-  tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand", "hanko", "bicycle", "motorcycle")
+  tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand", "hanko", "bicycle", "motorcycle", "winter", "summer")
 users/{uid}/garments/{garmentId}/history/{autoId}
   savedAt, before (null = created in the app), after, note?   // every save keeps the previous version
 users/{uid}/deletedGarments/{garmentId}
@@ -190,7 +190,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/GarmentPage.tsx` | `/garment/<id>` (public): photo, all fields, composition bar, stats, wears per month; Edit for the owner |
 | `pages/MaterialsPage.tsx`, `components/MaterialsCharts.tsx` | `/materials` (public): fibre mass owned/worn, fibre mix per category (small multiples), monthly outfit weight and synthetic share |
-| `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, search, recent-first order, offline status |
+| `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, tag toggles (neutral / green = only these / red = hide; kept in localStorage per device; garments worn that day always listed), search, recent-first order, offline status |
 | `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters and bulk changes; `/manage/<id>` edit, divest, replace photo, delete (never worn), history; `/manage/new` add with photo upload |
 | `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
 | `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |
