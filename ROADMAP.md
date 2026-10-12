@@ -10,18 +10,21 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-11)
+## Where we left off (2026-10-12)
 
-- **Everything built so far is done, deployed to wardrobediary.web.app and committed:** public Dashboard,
-  category, garment and materials pages; garment management (R-27); logging in the app (R-13/R-15, the Sheet
-  is retired); nightly backups with restore (R-28); the read-only MCP server, connected in Claude Desktop
-  (R-29 phase 1); materials, weight and details (R-30); second-hand tags (R-31) and the Second hand column on
-  the Dashboard (R-34); sortable tables (R-35).
-- **2026-10-12:** R-26 done: the monthly cost comparison is the last live-site chart, so every live chart is
-  now rebuilt, with photos (R-36).
+- **Every chart on the live site is rebuilt**, and everything is deployed to wardrobediary.web.app and committed.
+  Built so far: public Dashboard, category, garment and materials pages; garment management (R-27); logging in
+  the app (R-13/R-15, the Sheet is retired); nightly backups with restore (R-28); read-only MCP server (R-29
+  phase 1); materials, weight and details (R-30); sortable tables (R-35).
+- **This session (2026-10-12):** monthly cost compared with other spending, managed at `/manage/comparison`,
+  with photos (R-26, R-36); tags Hanko / Bicycle / Motorcycle from the Sheet's row colours (R-37, Q-2) and
+  Winter / Summer (R-38), with a "Filters" popup of tag toggles on the Log page; only the SH badge on charts;
+  Materials moved out of the top nav; filter selects fit on phones.
+- **Waiting for Olof:** tag the Winter and Summer garments on Manage (bulk "Add tag"); try the Log Filters
+  popup and `/manage/comparison` on the iPhone (not checked in a signed-in browser).
 - **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-33 garment location (parked; design notes below),
-  R-18 housekeeping, R-17 multi-user (with R-32 user-defined tags).
+  R-33 location filter for the Dashboard and category pages (the logging half is done by R-38), R-18
+  housekeeping, R-17 multi-user (with R-32 user-defined tags).
 
 ## Inbox
 
@@ -42,10 +45,8 @@ _(nothing in progress; waiting for the next scope)_
   (`web/src/lib/tags.ts`); let users create their own tags with a badge text, filter by them everywhere.
 - **R-33 Garment location** (refined with Olof 2026-10-11, parked for now): garments are kept either at the
   main home in Helsinki (available year-round) or at the summer home in Hanko (where they are worn only during stays there), so the two sets have very different statistics, and Olof keeps them separate. Goal:
-  **filter the Dashboard (and category pages) and the Log page by location.** Today "(Hanko)" in the name
-  marks the 51 Hanko garments ("ex Hanko" = moved to Helsinki). Likely design: a location field per garment
-  (Helsinki / Hanko; migrated from the names like "(SH)" was), a location filter next to the date range,
-  and on the Log page showing only the garments at the chosen home. Since R-37 the "hanko" tag marks the Hanko
+  **filter the Dashboard (and category pages) and the Log page by location.** "ex Hanko" in a name = moved to
+  Helsinki. Likely design: a location filter next to the date range, built on the Hanko tag. Since R-37 the "hanko" tag marks the Hanko
   garments, and since R-38 the Log page's tag toggles can hide or show them, which covers the logging half;
   what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.

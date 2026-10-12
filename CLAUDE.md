@@ -15,8 +15,9 @@ data entry, storage, tables and charts all live in one Firebase-backed web app.
 **Current phase:** the app is the single source of truth. Garment details have been edited in the app since
 2026-10-09 (D-4), and **wears have been logged in the app (`/log`) since the cut-over on 2026-10-09** (the
 Google Sheet is retired; logged through 2026-10-09). The public app at https://wardrobediary.web.app rebuilds
-everything on the live site except the static text pages, and goes beyond it: garment pages, a materials page, second-hand tags, sortable tables, nightly
-backups and a read-only MCP server. The live site must not be touched until the domain switch (ROADMAP R-16).
+everything on the live site except the static text pages, and goes beyond it: garment pages, a materials page, tags (second hand, Hanko, bicycle, motorcycle,
+winter, summer) with Log page filters, sortable tables, a managed spending comparison, nightly backups and a
+read-only MCP server. The live site must not be touched until the domain switch (ROADMAP R-16).
 
 ## Environment
 
@@ -225,6 +226,7 @@ tools/backup.sh                            # manual backup to backups/ (nightly 
 tools/restore.sh <backup.json> [--write]   # restore from a backup (dry run by default)
 tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
 tools/import_comparison.sh                 # one-off: Sheet "Comparison" tab → settings/comparison (done 2026-10-12)
+tools/migrate_colour_tags.sh               # one-off: Sheet row colours → Hanko/bicycle/motorcycle tags (done 2026-10-12)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
