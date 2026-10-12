@@ -6,6 +6,7 @@ import { auth, OWNER_UID, signIn, signOutUser } from "./firebase";
 import { navigate, useRoute } from "./lib/route";
 import { AddGarmentPage } from "./pages/AddGarmentPage";
 import { CategoryPage } from "./pages/CategoryPage";
+import { ComparisonPage } from "./pages/ComparisonPage";
 import { GarmentEditPage } from "./pages/GarmentEditPage";
 import { GarmentPage } from "./pages/GarmentPage";
 import { MaterialsPage } from "./pages/MaterialsPage";
@@ -47,6 +48,8 @@ export function App() {
         (isOwner ? (
           route.id === "new" ? (
             <AddGarmentPage uid={user!.uid} wardrobe={wardrobe} />
+          ) : route.id === "comparison" ? (
+            <ComparisonPage uid={user!.uid} />
           ) : route.id ? (
             <GarmentEditPage uid={user!.uid} id={route.id} wardrobe={wardrobe} />
           ) : (

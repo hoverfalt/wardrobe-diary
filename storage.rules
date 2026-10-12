@@ -1,7 +1,8 @@
 rules_version = '2';
 // Bucket threddit-297417.appspot.com: garment photos and category images, shared with the live site.
 // Everything stays publicly readable (the live site and the app load photos by URL). Only the owner may
-// write, and only a garment photo: <Photo id>.png at the bucket root, PNG, under 5 MB (R-27 phase b).
+// write, and only a garment photo (<Photo id>.png, R-27 phase b) or a comparison photo (Comparison-<Name>.png,
+// R-26) at the bucket root, PNG, under 5 MB.
 // Nobody may delete through the apps. (The 2021 rules let any signed-in user write anything.)
 service firebase.storage {
   match /b/{bucket}/o {
@@ -11,7 +12,7 @@ service firebase.storage {
     match /{photo} {
       allow create, update: if request.auth != null
         && request.auth.uid == '0q0I90W7W3RAcgFN1c1JX6pZupG3'
-        && photo.matches('[A-Za-z_-]+-[0-9]{3}[.]png')
+        && (photo.matches('[A-Za-z_-]+-[0-9]{3}[.]png') || photo.matches('Comparison-[A-Za-z0-9_]+[.]png'))
         && request.resource.contentType == 'image/png'
         && request.resource.size < 5 * 1024 * 1024;
     }

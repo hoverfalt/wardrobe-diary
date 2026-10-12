@@ -15,8 +15,7 @@ data entry, storage, tables and charts all live in one Firebase-backed web app.
 **Current phase:** the app is the single source of truth. Garment details have been edited in the app since
 2026-10-09 (D-4), and **wears have been logged in the app (`/log`) since the cut-over on 2026-10-09** (the
 Google Sheet is retired; logged through 2026-10-09). The public app at https://wardrobediary.web.app rebuilds
-everything on the live site except the monthly cost comparison (waiting for data, Q-4) and the static text
-pages, and goes beyond it: garment pages, a materials page, second-hand tags, sortable tables, nightly
+everything on the live site except the static text pages, and goes beyond it: garment pages, a materials page, second-hand tags, sortable tables, nightly
 backups and a read-only MCP server. The live site must not be touched until the domain switch (ROADMAP R-16).
 
 ## Environment
@@ -27,7 +26,7 @@ backups and a read-only MCP server. The live site must not be touched until the 
 | Live site (do not deploy to) | Hosting site `threddit-297417` → wardrobediary.io |
 | New app | Hosting site `wardrobediary` → https://wardrobediary.web.app (deploy target `app`) |
 | Firestore | `(default)` database, Native mode (switched from empty Datastore mode), location `eur3` |
-| Storage buckets | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (228 × 228 PNG; always use these originals, not the `thumbs/` copies) and category images, shared with the live site. `threddit-plots`: the live site's chart images. Rules are versioned here (`storage.rules`, `storage-plots.rules`, deploy targets `photos` / `plots`): everything publicly readable; only the owner may upload, and only `<Photo id>.png`; no deletes. Deploy deliberately with `cd web && npx firebase deploy --only storage` and re-check that the live site's images still load |
+| Storage buckets | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (228 × 228 PNG; always use these originals, not the `thumbs/` copies) and category images, shared with the live site. `threddit-plots`: the live site's chart images. Rules are versioned here (`storage.rules`, `storage-plots.rules`, deploy targets `photos` / `plots`): everything publicly readable; only the owner may upload, and only `<Photo id>.png` or `Comparison-<Name>.png`; no deletes. Deploy deliberately with `cd web && npx firebase deploy --only storage` and re-check that the live site's images still load |
 | Owner uid | `0q0I90W7W3RAcgFN1c1JX6pZupG3` |
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
@@ -65,8 +64,11 @@ users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
 users/{uid}/settings/app
   sheetRetired: "2026-10-09"   // cut-over date; the Sheet sync refuses to write while this is set
+users/{uid}/settings/comparison  // other spending for the monthly cost comparison (R-26), edited at /manage/comparison
+  items: [{ id, type, item, details, photo, photoVersion?, monthlyCost, useFrequency (0…1) }]
 users/{uid}/public/data     // world-readable copy for public pages (D-1), kept in step by every app write:
-  version: 1, garments: Garment[] (all fields), days: { "YYYY-MM-DD": number[] }  // indexes into garments
+  version: 1, garments: Garment[] (all fields), days: { "YYYY-MM-DD": number[] },  // indexes into garments
+  comparison: the settings/comparison items (copied on every save)
 ```
 
 - `garmentId` = the Sheet's Photo id (e.g. `Jackets_and_hoodies-006`); fallback slug if blank.
@@ -172,7 +174,11 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 - **Animations** ("… animated by date") use `asOf` (`dailyCost`, `itemListing`): everything as known on that
   date, i.e. only wears up to then. This is the one deliberate exception to D-2.
 
-Still to port: monthly cost and the benchmark comparison (waiting for the comparison data, Q-4).
+- **Comparison** (`lib/comparison.ts`, R-26, R's `Portfolio-Monthly_cost_and_Category_use`): categories' monthly
+  cost = yearly cost / 12 against Days used, next to other spending in grey. For those items only Monthly cost and
+  Use frequency are stored (imported once from the Sheet's "Comparison" tab as values, `tools/import_comparison.sh`);
+  yearly cost = monthly × 12 and cost per use = monthly / (30,5 × use frequency) are derived. They don't follow the
+  date range. Their photo shows only once uploaded in the app (`photoVersion` set; the originals weren't in Storage).
 
 ## Code map (`web/src`)
 
@@ -191,8 +197,9 @@ Still to port: monthly cost and the benchmark comparison (waiting for the compar
 | `lib/metrics.ts` | All metric logic (pure, tested); `lib/categories.ts` order, colours, slugs; `lib/dates.ts`, `lib/route.ts`, `lib/dataBars.ts`, `lib/publicData.ts` (`withGarments`, `withoutGarment`) |
 | `lib/materials.ts` | Materials parser, fibre classes, `materialBreakdown`, `materialsByMonth` (tested) |
 | `lib/tags.ts`, `components/TagBadges.tsx`, `components/photoBadges.ts` | Tag vocabulary and helpers (`hasTag`, "(SH)" in names), badges next to names and on chart photos |
+| `pages/ComparisonPage.tsx`, `lib/comparison.ts` | `/manage/comparison` (owner only, linked from Manage): comparison items, add/edit/delete, photo upload; derived costs (tested) |
 | `lib/sorting.ts`, `components/SortHeader.tsx` | Sortable table state and clickable headers (Dashboard and category pages) |
-| `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter, number formats |
+| `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter (optionally with grey `others`, e.g. the comparison), number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
 | `components/DateRangeControl.tsx`, `AsOfControl.tsx`, `PlotFigure.tsx` | Date range (slider + boxes), "as of" player, Plot wrapper |
@@ -216,6 +223,7 @@ cd mcp && npm run build && npm test        # MCP server: bundle + unit and live 
 tools/backup.sh                            # manual backup to backups/ (nightly backups run on GitHub)
 tools/restore.sh <backup.json> [--write]   # restore from a backup (dry run by default)
 tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
+tools/import_comparison.sh                 # one-off: Sheet "Comparison" tab → settings/comparison (done 2026-10-12)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 

@@ -17,8 +17,10 @@ How this file works:
   is retired); nightly backups with restore (R-28); the read-only MCP server, connected in Claude Desktop
   (R-29 phase 1); materials, weight and details (R-30); second-hand tags (R-31) and the Second hand column on
   the Dashboard (R-34); sortable tables (R-35).
+- **2026-10-12:** R-26 done: the monthly cost comparison is the last live-site chart, so every live chart is
+  now rebuilt. Its photos are still to be uploaded (R-36).
 - **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-26 monthly comparison once the Q-4 data is in, R-33 garment location (parked; design notes below),
+  R-36 comparison photos, R-33 garment location (parked; design notes below),
   R-18 housekeeping, R-17 multi-user (with R-32 user-defined tags).
 
 ## Inbox
@@ -31,10 +33,10 @@ _(nothing in progress; waiting for the next scope)_
 
 ## Next
 
-1. **R-26 Monthly cost and comparison to other consumption** (the last live-site chart). **Blocked:** waiting
-   for the comparison data (Q-4). Then import it once with a small tool (the Sheet sync is retired; read-only
-   access to the Sheet still works), add it to `public/data`, port R's monthly cost (`yearly_cost / 12` per category, `Threddit.R`) and build the chart.
-2. **R-12 Remaining open questions** (Q-2; Q-4 is covered by R-26).
+1. **R-12 Remaining open questions** (Q-2).
+2. **R-36 Comparison photos:** the 19 comparison items have no photos in the app (the live site's
+   `Comparison-*.png` files exist only as online-only placeholders in Dropbox `Threddit/Comparisons/`).
+   Make that folder available offline and ask Claude to upload them, or upload each at `/manage/comparison`.
 3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
@@ -62,9 +64,6 @@ _(none open)_
 ## Open questions
 
 - **Q-2** Meaning of the row background colours in Sheet column B (pink / orange / blue).
-- **Q-4** Comparison data for the monthly cost chart (external consumption benchmarks). **Waiting for
-  Olof** to provide it, e.g. in a "Comparison" tab of the Google Sheet (where R read it) or as a CSV.
-  Blocks R-26.
 - **Q-9** 13 garments still have 1–3 wears outside their purchase-to-divest period (listed by
   `tools/sync.sh`; ignored by the metrics, as in R). Mostly a single wear just after the divest date.
   Fix the dates in the Sheet if they are wrong; otherwise nothing to do.
@@ -132,6 +131,14 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-26** 2026-10-12 Monthly cost compared with other spending (the last live-site chart), at the bottom of the
+  Dashboard: categories' yearly cost / 12 against Days used, with 19 other spending items in grey (labels; photos
+  once uploaded). The Sheet's "Comparison" tab was imported once as values (`tools/import_comparison.sh`) into
+  `settings/comparison` + the public data; managed at `/manage/comparison` (linked from Manage, not in the
+  nav), where monthly cost and use frequency (% or a fraction like 6/7) are entered and yearly cost and cost
+  per use calculated. Storage rules allow owner uploads of `Comparison-<Name>.png`. Q-4 resolved. Unlike R
+  (y-axis capped at 65 €), all items are shown, including Audible (150 €) and Charities (77 €).
 
 - **R-35** 2026-10-11 Sortable tables (Dashboard category listing and category item listings): click a header
   to sort largest first, again for smallest first; Category / Status restore the default order.

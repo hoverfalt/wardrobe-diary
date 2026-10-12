@@ -12,9 +12,12 @@ import {
   formatEur,
   formatEur2,
   TotalChart,
+  type OtherPoint,
   type ScatterPoint,
 } from "../components/CategoryCharts";
 import { CategoryLink } from "../components/CategoryLink";
+import { comparisonPhotoUrl } from "../firebase";
+import { costPerUse } from "../lib/comparison";
 import { Link } from "../components/Link";
 import {
   activeItemsOverTime,
@@ -52,6 +55,7 @@ const COLUMNS: {
 
 const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];
 const YEARLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Yearly cost"];
+const MONTHLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Monthly cost"];
 
 export function Dashboard({
   wardrobe,
@@ -99,6 +103,31 @@ export function Dashboard({
           : [],
       ),
     [rows],
+  );
+  // Monthly cost and frequency of use (R-26, as R's Portfolio-Monthly_cost_and_Category_use): categories'
+  // yearly cost / 12, next to other spending entered at /manage/comparison (fixed, not affected by the range).
+  const monthlyVsUse = useMemo(
+    () =>
+      rows.flatMap((r): ScatterPoint[] =>
+        r.category !== "Total" && r.yearlyCost != null && r.daysUsed != null
+          ? [{ category: r.category, x: r.daysUsed, y: r.yearlyCost / 12 }]
+          : [],
+      ),
+    [rows],
+  );
+  const comparison = useMemo(
+    () =>
+      (wardrobe?.comparison ?? []).map((c): OtherPoint => {
+        const perUse = costPerUse(c);
+        return {
+          label: c.item,
+          x: c.useFrequency,
+          y: c.monthlyCost,
+          src: comparisonPhotoUrl(c),
+          tip: `${c.item}${c.details ? ` (${c.details})` : ""}\n${c.type}\nFrequency of use: ${(c.useFrequency * 100).toFixed(0)} %\nMonthly cost: ${formatEur2(c.monthlyCost)}${perUse == null ? "" : `\nCost per use: ${formatEur2(perUse)}`}`,
+        };
+      }),
+    [wardrobe?.comparison],
   );
   // Sorting: "category" = the standard category order (default); the Total row always stays first.
   type SortKey = "category" | (typeof COLUMNS)[number]["key"];
@@ -222,6 +251,23 @@ export function Dashboard({
             to watch the cost of past days fall as the garments worn on them get more use.
           </p>
           <DailyCostAnimation garments={charts.notSportswear} days={days!} range={range} />
+          {rangeControl}
+
+          <h2>Monthly cost compared with other spending</h2>
+          <p className="muted">
+            Monthly cost of each clothing category (its yearly cost / 12) against how often it is used, next to other
+            everyday spending in grey: transport, subscriptions, tools. The other items' figures are fixed and don't
+            follow the date range. Hover or tap a point for its details.
+          </p>
+          <CategoryScatter
+            points={monthlyVsUse}
+            others={comparison}
+            xLabel="Frequency of use (share of all days)"
+            yLabel="Monthly cost"
+            yFormat={formatEur2}
+            yTickFormat={formatEur}
+            tipLabels={MONTHLY_VS_USE_TIP}
+          />
           {rangeControl}
         </>
       )}

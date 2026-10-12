@@ -33,3 +33,10 @@ def test_public_data_rebuilt_from_backup():
     pub = public_from(snapshot(days={"2020-01-02": ["Shirts-001", "Gone-001"]}))
     assert [g["id"] for g in pub["garments"]] == ["Shirts-001"]
     assert pub["days"] == {"2020-01-02": [0]}  # unknown garment dropped
+def test_public_from_includes_comparison():
+    from restore import public_from
+
+    items = [{"id": "hsl", "item": "HSL", "monthlyCost": 59.7, "useFrequency": 0.857}]
+    target = {"garments": {}, "days": {}, "settings": {"comparison": {"items": items}}}
+    assert public_from(target)["comparison"] == items
+    assert "comparison" not in public_from({"garments": {}, "days": {}, "settings": {}})

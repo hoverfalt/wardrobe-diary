@@ -49,7 +49,12 @@ def public_from(target: dict) -> dict:
     garments = [Garment.from_firestore(gid, g) for gid, g in sorted(comparable(target)["garments"].items())]
     known = {g.id for g in garments}
     days = {d: [gid for gid in worn if gid in known] for d, worn in target["days"].items()}
-    return public_document(SheetData(garments=garments, days=days))
+    doc = public_document(SheetData(garments=garments, days=days))
+    # The comparison items (R-26) live in settings/comparison and are copied to the public data.
+    comparison = target.get("settings", {}).get("comparison", {}).get("items")
+    if comparison:
+        doc["comparison"] = comparison
+    return doc
 
 
 def main() -> int:

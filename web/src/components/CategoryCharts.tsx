@@ -145,8 +145,23 @@ export interface ScatterPoint {
   y: number;
 }
 
+/** A non-wardrobe point drawn with the categories (R-26 comparison): grey, with its photo when there is one
+ *  and otherwise its name as a label. */
+export interface OtherPoint {
+  label: string;
+  x: number;
+  y: number;
+  src: string | null;
+  /** Tooltip text */
+  tip: string;
+}
+
+/** Labels near the left or right edge are anchored inward so they aren't cut off. */
+const labelAnchor = (x: number) => (x > 0.85 ? "end" : x < 0.08 ? "start" : "middle");
+
 /** One point per category, drawn as its image in a ring of the category colour (as on the live site),
- *  with a tooltip. Identity comes from the image, so colour is never the only cue. */
+ *  with a tooltip. Identity comes from the image, so colour is never the only cue. `others` are drawn
+ *  behind the categories in grey. */
 export function CategoryScatter({
   points,
   xLabel,
@@ -154,8 +169,10 @@ export function CategoryScatter({
   yFormat,
   yTickFormat = yFormat,
   tipLabels,
+  others = [],
 }: {
   points: ScatterPoint[];
+  others?: OtherPoint[];
   xLabel: string;
   yLabel: string;
   /** Values in the tooltip. */
@@ -169,6 +186,13 @@ export function CategoryScatter({
     (width: number): Plot.PlotOptions => {
       const r = Math.round(Math.min(26, Math.max(14, width / 40)));
       const data = points.map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
+      const withPhoto = others.filter((o) => o.src);
+      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), 0);
+      // On narrow charts the low, crowded band would be unreadable: label only the points above it there
+      // (all points keep their tooltips).
+      const labelled = others.filter((o) => !o.src && (width >= 600 || o.y > yTop * 0.2));
+      const unlabelled = others.filter((o) => !o.src && !labelled.includes(o));
+      const grey = dark ? "#5c5c5c" : "#d0d0d0";
       return {
         width,
         height: Math.min(560, Math.max(320, width * 0.6)),
@@ -177,24 +201,46 @@ export function CategoryScatter({
         marginRight: r + 8,
         marginBottom: 44,
         x: { domain: [0, 1], label: xLabel, labelAnchor: "center", labelArrow: "none", tickFormat: ".0%", grid: true },
-        y: { domain: [0, Math.max(...points.map((p) => p.y), 0) * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
+        y: { domain: [0, yTop * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
         marks: [
           Plot.ruleY([0]),
+          Plot.dot(withPhoto, { x: "x", y: "y", r: r + 3, fill: grey }),
+          Plot.image(withPhoto, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
           Plot.dot(data, { x: "x", y: "y", r: r + 3, fill: (d) => categoryColor(d.category, dark) }),
           Plot.image(data, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
+          // Others without a photo: a small grey dot and its name, drawn on top with a background halo so the
+          // name stays readable over category images; anchored inward near the edges so it isn't cut off.
+          Plot.dot([...labelled, ...unlabelled], { x: "x", y: "y", r: 5, fill: grey, stroke: dark ? "#8a8a8a" : "#9a9a9a" }),
+          ...(["start", "middle", "end"] as const).map((anchor) =>
+            Plot.text(
+              labelled.filter((d) => labelAnchor(d.x) === anchor),
+              {
+                x: "x",
+                y: "y",
+                text: "label",
+                dy: -11,
+                dx: anchor === "start" ? -6 : anchor === "end" ? 6 : 0,
+                textAnchor: anchor,
+                fontSize: 11,
+                fill: "currentColor",
+                stroke: "var(--bg)",
+                strokeWidth: 3,
+                paintOrder: "stroke",
+              },
+            ),
+          ),
+          // One tooltip layer for categories and others, so only the nearest point gets a tooltip.
           Plot.tip(
-            data,
-            Plot.pointer({
-              x: "x",
-              y: "y",
-              title: (d: ScatterPoint) =>
-                `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}`,
-            }),
+            [
+              ...points.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
+              ...others,
+            ],
+            Plot.pointer({ x: "x", y: "y", title: "tip" }),
           ),
         ],
       };
     },
-    [points, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
+    [points, others, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
   );
   if (points.length === 0) return null;
   return (

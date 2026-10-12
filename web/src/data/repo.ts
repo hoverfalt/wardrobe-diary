@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
+import type { ComparisonItem } from "../lib/comparison";
 import type { GarmentFields } from "../lib/garmentForm";
 import { decodePublicData, withGarments, withoutGarment, type PublicData, type Wardrobe } from "../lib/publicData";
 import type { IsoDate } from "../types";
@@ -48,7 +49,7 @@ export function usePublicWardrobe(ownerUid: string): Wardrobe | null {
   useEffect(
     () =>
       onSnapshot(doc(db, "users", ownerUid, "public", "data"), (snap) =>
-        setWardrobe(snap.exists() ? decodePublicData(snap.data() as PublicData) : { garments: [], days: [] }),
+        setWardrobe(snap.exists() ? decodePublicData(snap.data() as PublicData) : { garments: [], days: [], comparison: [] }),
       ),
     [ownerUid],
   );
@@ -175,5 +176,31 @@ export async function createGarment(uid: string, id: string, fields: GarmentFiel
       const data = pub.data() as PublicData;
       tx.update(publicRef, { garments: [...data.garments, { id, ...fields }] });
     }
+  });
+}
+
+/** The comparison items as stored (users/{uid}/settings/comparison, R-26); [] when none, undefined while loading. */
+export function useComparison(uid: string): ComparisonItem[] | undefined {
+  const [items, setItems] = useState<ComparisonItem[] | undefined>(undefined);
+  useEffect(
+    () =>
+      onSnapshot(doc(db, "users", uid, "settings", "comparison"), (snap) =>
+        setItems(snap.exists() ? ((snap.data().items ?? []) as ComparisonItem[]) : []),
+      ),
+    [uid],
+  );
+  return items;
+}
+
+/** Changes the comparison items in one transaction: the new list is computed from the stored one and
+ *  written both to settings/comparison (backed up with the settings) and to the public data. */
+export async function updateComparison(uid: string, update: (items: ComparisonItem[]) => ComparisonItem[]): Promise<void> {
+  const ref = doc(db, "users", uid, "settings", "comparison");
+  const publicRef = doc(db, "users", uid, "public", "data");
+  await runTransaction(db, async (tx) => {
+    const [current, pub] = [await tx.get(ref), await tx.get(publicRef)];
+    const items = update(current.exists() ? ((current.data().items ?? []) as ComparisonItem[]) : []);
+    tx.set(ref, { items });
+    if (pub.exists()) tx.update(publicRef, { comparison: items });
   });
 }

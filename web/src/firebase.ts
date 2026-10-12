@@ -32,6 +32,11 @@ export function photoUrl(g: { photo: string; photoVersion?: string | null }): st
   return url && g.photoVersion ? `${url}&v=${encodeURIComponent(g.photoVersion)}` : url;
 }
 
+/** A comparison item's photo (R-26), only once one has been uploaded in the app (`photoVersion` set). */
+export function comparisonPhotoUrl(c: { photo: string; photoVersion?: string | null }): string | null {
+  return c.photo && c.photoVersion ? photoUrl(c) : null;
+}
+
 /** Category images, as on the live site: Category_image-Jackets_and_hoodies.png */
 export function categoryImageUrl(category: string): string | null {
   return category ? storageUrl(`Category_image-${category.replaceAll(" ", "_")}.png`) : null;
@@ -45,5 +50,10 @@ function storageUrl(path: string): string | null {
 /** Uploads a garment photo as <photo>.png at the bucket root, next to the existing ones. storage.rules
  *  allow this only for the owner, PNG, under 5 MB, and Photo ids like Jackets_and_hoodies-035. */
 export async function uploadGarmentPhoto(photo: string, file: Blob): Promise<void> {
+  await uploadBytes(ref(getStorage(app), `${photo}.png`), file, { contentType: "image/png" });
+}
+
+/** Uploads a comparison photo as Comparison-<Name>.png (storage.rules allow that name pattern too). */
+export async function uploadComparisonPhoto(photo: string, file: Blob): Promise<void> {
   await uploadBytes(ref(getStorage(app), `${photo}.png`), file, { contentType: "image/png" });
 }

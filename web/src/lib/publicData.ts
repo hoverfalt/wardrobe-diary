@@ -1,16 +1,20 @@
 import type { Day, Garment, IsoDate } from "../types";
+import type { ComparisonItem } from "./comparison";
 
 /** users/{uid}/public/data: world-readable copy of all garments and the full day log, written by the
- *  Sheet sync (decision D-1). Days hold indexes into `garments`. One document read for public pages. */
+ *  app on every change (decision D-1). Days hold indexes into `garments`. One document read for public pages. */
 export interface PublicData {
   version: 1;
   garments: Garment[];
   days: Record<IsoDate, number[]>;
+  /** Other spending for the monthly cost comparison (R-26). */
+  comparison?: ComparisonItem[];
 }
 
 export interface Wardrobe {
   garments: Garment[];
   days: Day[];
+  comparison?: ComparisonItem[];
 }
 
 export function decodePublicData(data: PublicData): Wardrobe {
@@ -19,6 +23,7 @@ export function decodePublicData(data: PublicData): Wardrobe {
     days: Object.entries(data.days)
       .map(([date, worn]) => ({ date, worn: worn.map((i) => data.garments[i].id) }))
       .sort((a, b) => a.date.localeCompare(b.date)),
+    comparison: data.comparison ?? [],
   };
 }
 
