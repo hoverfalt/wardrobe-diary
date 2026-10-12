@@ -36,6 +36,9 @@ export const TAGS = {
 
 export type Tag = keyof typeof TAGS;
 export const TAG_IDS = Object.keys(TAGS) as Tag[];
+/** Tags drawn as badges on chart photos and in chart legends; the others would clutter the charts (they still
+ *  show next to names, in tooltips, filters and search). */
+export const CHART_TAGS: Tag[] = ["second-hand"];
 
 export function hasTag(g: Pick<Garment, "tags">, tag: Tag): boolean {
   return g.tags?.includes(tag) ?? false;

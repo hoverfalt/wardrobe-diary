@@ -1,10 +1,10 @@
-// Tag badges drawn on item photos in charts: a small rounded label ("SH", "HKO", "BIKE", "MC") on the photo's top-right edge.
+// Tag badges drawn on item photos in charts: a small rounded label ("SH"; only CHART_TAGS) on the photo's top-right edge.
 import * as Plot from "@observablehq/plot";
-import { TAGS, tagsOf } from "../lib/tags";
+import { CHART_TAGS, TAGS, tagsOf } from "../lib/tags";
 import type { Garment } from "../types";
 
 export function photoBadgeMarks<T extends { garment: Garment }>(data: T[], x: string, y: string, r: number): Plot.Markish[] {
-  const tagged = data.flatMap((d) => tagsOf(d.garment).slice(0, 1).map((t) => ({ ...d, badge: TAGS[t].badge })));
+  const tagged = data.flatMap((d) => tagsOf(d.garment).filter((t) => CHART_TAGS.includes(t)).slice(0, 1).map((t) => ({ ...d, badge: TAGS[t].badge })));
   if (tagged.length === 0) return [];
   const offset = { dx: r * 0.8, dy: -r * 0.8 };
   const fontSize = Math.max(7, r * 0.4);
