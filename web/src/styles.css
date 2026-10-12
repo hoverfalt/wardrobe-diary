@@ -110,6 +110,8 @@ td a { color: inherit; }
 /* Garment management */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .filters input[type="search"] { flex: 1; min-width: 220px; }
+/* A select is as wide as its longest option (e.g. the review filter); keep it within the screen. */
+.filters select { max-width: 100%; min-width: 0; text-overflow: ellipsis; }
 /* Text-like inputs only: range sliders and checkboxes keep their own sizing (padding and a border would
    make the date slider wider than its box). */
 input:not([type="range"]):not([type="checkbox"]):not([type="file"]), select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: inherit; }
