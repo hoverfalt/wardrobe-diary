@@ -16,3 +16,4 @@ tools/*.json
 *.tsbuildinfo
 backups/
 mcp/dist/
+*-debug.log

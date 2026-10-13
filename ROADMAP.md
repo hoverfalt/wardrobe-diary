@@ -133,6 +133,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-39** 2026-10-13 Local testing of the signed-in UI: Firebase emulators (auth, Firestore, Storage) seeded from
+  a backup (`tools/emulator.sh`, `seed_emulator.py`, local hosts only), the app in emulator mode
+  (`npm run dev:emulator`: banner, stand-in owner sign-in) and a puppeteer smoke check (`npm run ui-check`:
+  logging a wear, Filters popup, Manage, Comparison; all pass). Java 21 (Temurin) installed user-locally.
+  Chosen over a test account (owner-only pages and rules would reject it) and over signing in to production
+  with a custom token (tests would change live data). Possible next step: Firestore rules tests in the emulator.
+
 - **R-38** 2026-10-12 Season tags Winter (WIN) and Summer (SUM), and tag toggles at the top of the Log page for
   every tag: tap to cycle neutral → green (show only garments with a green tag) → red (hide garments with that
   tag; red wins) → neutral. Kept between sessions in the browser (per device); garments already worn that day

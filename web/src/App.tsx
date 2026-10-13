@@ -2,7 +2,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useDateRange } from "./components/DateRangeControl";
 import { usePublicWardrobe } from "./data/repo";
-import { auth, OWNER_UID, signIn, signOutUser } from "./firebase";
+import { auth, EMULATORS, OWNER_UID, signIn, signOutUser } from "./firebase";
 import { navigate, useRoute } from "./lib/route";
 import { AddGarmentPage } from "./pages/AddGarmentPage";
 import { CategoryPage } from "./pages/CategoryPage";
@@ -27,6 +27,7 @@ export function App() {
 
   return (
     <main>
+      {EMULATORS && <p className="emulator-banner">LOCAL EMULATOR – test data, nothing here reaches wardrobediary.web.app</p>}
       <header>
         <h1>Wardrobe Diary</h1>
         <nav>

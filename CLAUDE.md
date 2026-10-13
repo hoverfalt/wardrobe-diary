@@ -215,6 +215,21 @@ cost, inventory over time, material breakdown; resource `wardrobe://definitions`
 Registered for Claude Code by `.mcp.json`; Claude Desktop setup in `mcp/README.md`. **Rebuild it
 (`cd mcp && npm run build`) after changing `web/src/lib/`.**
 
+## Local testing of the signed-in UI (emulators, R-39)
+
+The owner-only pages (Log, Manage, edit, Comparison) are tested against local Firebase emulators, never against
+production: `tools/emulator.sh` starts auth, Firestore and Storage emulators (UI http://127.0.0.1:4000) and seeds
+them from the newest `backups/wardrobe-*.json` (`tools/seed_emulator.py`, which refuses non-local hosts; take a
+fresh `tools/backup.sh` first for current data). `cd web && npm run dev:emulator` serves the app on
+http://localhost:5174 in emulator mode (`.env.emulator`, `EMULATORS` in `firebase.ts`): an orange "LOCAL
+EMULATOR" banner, in-memory cache, and "Sign in" signs in as the stand-in owner (owner@emulator.test, the real
+owner uid) without Google. `npm run ui-check` (`web/e2e/ui-check.mjs`) signs in, logs a wear, uses the Filters
+popup and opens Manage and Comparison, with screenshots in `web/e2e/out/`; `web/e2e/browser.mjs` has helpers
+(`openApp`, `go`, `clickText`, `shot`) for new checks and refuses pages without the banner. Every start is a
+fresh copy, so tests may write freely. Java: the Firestore emulator needs it; a Temurin 21 JDK is in
+`~/.local/share/jdk-21*` (no system install), and `emulator.sh` uses it. Photos still load from the
+production bucket (read-only); photos uploaded in emulator mode go to the Storage emulator and won't show.
+
 ## Commands
 
 ```bash
@@ -227,6 +242,9 @@ tools/restore.sh <backup.json> [--write]   # restore from a backup (dry run by d
 tools/sync.sh                              # dry run against the retired Sheet (writing is refused)
 tools/import_comparison.sh                 # one-off: Sheet "Comparison" tab → settings/comparison (done 2026-10-12)
 tools/migrate_colour_tags.sh               # one-off: Sheet row colours → Hanko/bicycle/motorcycle tags (done 2026-10-12)
+tools/emulator.sh                          # local emulators seeded from the newest backup (see Local testing)
+cd web && npm run dev:emulator             # app on http://localhost:5174 against the emulators
+cd web && npm run ui-check                 # signed-in UI smoke check + screenshots (emulators + dev:emulator running)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
@@ -263,6 +281,7 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   makes browsers (notably Safari) load the new one; divested items get a
   green ring (`#3CB371`, as on the live site).
 - Numbers are formatted Finnish style (`1 000 €`, `0,25 €`); reuse the `Intl.NumberFormat` instances.
+- Check signed-in pages (Log, Manage, edit, Comparison) in the emulators before calling them done (Local testing).
 - Check charts in a real browser before calling them done: the site is public, so headless Chrome via
   `puppeteer-core` (`executablePath` = the installed Google Chrome) can load, hover and screenshot it.
   Full-page screenshots sometimes leave large SVGs unpainted; screenshot the element instead.

@@ -1,7 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { GoogleAuthProvider, getAuth, signInWithPopup, signOut } from "firebase/auth";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { connectAuthEmulator, GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { connectFirestoreEmulator, initializeFirestore, memoryLocalCache, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { connectStorageEmulator, getStorage, ref, uploadBytes } from "firebase/storage";
+
+/** Local testing against the Firebase emulators (`npm run dev:emulator`, see tools/emulator.sh): auth, Firestore
+ *  and Storage are local copies seeded from a backup, so nothing touches production. Never set in production. */
+export const EMULATORS = import.meta.env.VITE_USE_EMULATORS === "true";
+/** The stand-in owner account created by tools/seed_emulator.py (emulator only). */
+export const EMULATOR_OWNER = { email: "owner@emulator.test", password: "emulator-only" };
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -17,11 +23,20 @@ export const auth = getAuth(app);
 export const OWNER_UID: string = import.meta.env.VITE_OWNER_UID;
 
 // Offline cache: the full history is small, so it stays on device and logging works offline.
+// (In emulator mode an in-memory cache, so local test data never mixes with the real offline cache.)
 export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  localCache: EMULATORS ? memoryLocalCache() : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
 });
 
-export const signIn = () => signInWithPopup(auth, new GoogleAuthProvider());
+if (EMULATORS) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectStorageEmulator(getStorage(app), "127.0.0.1", 9199);
+}
+
+// In emulator mode "Sign in" signs in as the seeded stand-in owner directly (no Google popup).
+export const signIn = () =>
+  EMULATORS ? signInWithEmailAndPassword(auth, EMULATOR_OWNER.email, EMULATOR_OWNER.password) : signInWithPopup(auth, new GoogleAuthProvider());
 export const signOutUser = () => signOut(auth);
 
 // Garment photos are public PNGs in the Storage bucket root (<id>.png), the same assets the live site
