@@ -10,7 +10,12 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-12)
+## Where we left off (2026-10-13)
+
+- **Paused mid-R-16 (domain switch):** see Now for the step-by-step pickup, planned for Friday 2026-10-16.
+- 2026-10-13 also: local emulator testing (R-39), code splitting and Python 3.12 (R-18 done).
+
+## Earlier (2026-10-12)
 
 - **Every chart on the live site is rebuilt**, and everything is deployed to wardrobediary.web.app and committed.
   Built so far: public Dashboard, category, garment and materials pages; garment management (R-27); logging in
@@ -32,7 +37,31 @@ _(empty)_
 
 ## Now
 
-- **R-16 Domain switch:** built and tested on wardrobediary.web.app; waiting for the DNS switch (see Later).
+- **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
+  and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
+  23 redirects, sitemap; `node web/e2e/redirect-check.mjs` all OK). wardrobediary.io still shows the old
+  GitHub Pages site, so nothing is broken meanwhile. Olof had trouble with Bluehost's DNS settings.
+
+  **Pick up here** (Olof does steps 1–4 in the consoles; Claude checks each step):
+  1. **Firebase console → Hosting → site `wardrobediary`** (not `threddit-297417`) → *Add custom domain* →
+     `wardrobediary.io`. Then add `www.wardrobediary.io` with "Redirect to wardrobediary.io". Firebase lists
+     the records to create: a TXT record (ownership) and A record(s) (and possibly an ACME TXT/CNAME for the
+     certificate). Screenshot it for Claude.
+  2. **Bluehost → Domains → wardrobediary.io → DNS** (the DNS zone editor; the domain uses Bluehost's
+     nameservers ns1/ns2.bluehost.com, so records are edited there). Today's records: `@` A
+     `185.199.108.153` (GitHub Pages) and `www` CNAME `wardrobediary.io`. Change: add Firebase's TXT; replace
+     the `@` A value(s) with Firebase's; set `www` as Firebase says. Lowest TTL offered. If Bluehost's editor
+     won't allow a change (e.g. a locked or "managed" record), screenshot it for Claude, or ask Bluehost
+     support to set the records (send them Firebase's list).
+  3. Back in Firebase, wait for *Connected* (DNS minutes to hours; certificate usually < 1 h).
+  4. Search Console: submit `https://wardrobediary.io/sitemap.xml`.
+  5. Claude: `dig wardrobediary.io` shows Firebase's IPs; `node web/e2e/redirect-check.mjs https://wardrobediary.io`
+     all OK; old `hoverfalt.github.io/portfolio.html` → `wardrobediary.io/portfolio.html` → `/dashboard`; GA4
+     receives page views; then close R-16.
+
+  Keep: the GitHub Pages repo `hoverfalt/hoverfalt.github.io` and its `CNAME` file (keeps github.io links
+  redirecting) and the Firebase site `threddit-297417` (old chart images). Rollback if anything goes wrong:
+  set the `@` A record back to `185.199.108.153`.
 
 ## Next
 
