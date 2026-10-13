@@ -73,7 +73,6 @@ export function GarmentFormFields({
             <input type="checkbox" checked={form.tags.includes(t)}
               onChange={(e) => onChange({ ...form, tags: e.target.checked ? [...form.tags, t] : form.tags.filter((x) => x !== t) })} />
             <TagBadge tag={t} /> {TAGS[t].label}
-            <small className="muted">{TAGS[t].description}</small>
           </label>
         ))}
       </div>

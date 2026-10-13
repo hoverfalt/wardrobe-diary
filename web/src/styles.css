@@ -210,8 +210,10 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 section > a:first-child { display: inline-block; margin-top: 8px; }
 .checkbox-field input[type="checkbox"] { width: 18px; height: 18px; flex: none; }
 .tag-badge { display: inline-block; font-size: 10px; font-weight: 700; line-height: 1; padding: 3px 4px; border-radius: 4px; background: var(--tag-bg); color: var(--tag-fg); text-decoration: none; vertical-align: 1px; margin-left: 4px; letter-spacing: 0.03em; }
-.tag-option { align-items: center; gap: 6px; }
-.tag-option .tag-badge { margin-left: 0; }
+.tag-option { align-items: center; justify-content: flex-start; gap: 8px; }
+/* Checkboxes keep their size (".field .row input" stretches text inputs to fill the row). */
+.field .row.tag-option input[type="checkbox"] { flex: none; width: 18px; height: 18px; margin: 0; }
+.tag-option .tag-badge { margin-left: 0; min-width: 3.7em; text-align: center; box-sizing: border-box; }
 
 /* Sortable table headers */
 .sort-header { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; font-weight: inherit; }
