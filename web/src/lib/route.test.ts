@@ -15,6 +15,13 @@ describe("routes", () => {
     expect(parseRoute("/materials")).toEqual({ page: "materials" });
   });
 
+  it("serves the Dashboard at /dashboard (/ is the static landing page, R-16)", () => {
+    expect(parseRoute("/dashboard")).toEqual({ page: "dashboard" });
+    expect(routePath({ page: "dashboard" })).toBe("/dashboard");
+    expect(parseRoute("/portfolio.html")).toEqual({ page: "notFound" });
+    expect(parseRoute("/no/such/page")).toEqual({ page: "notFound" });
+  });
+
   it("maps categories to slugs and back", () => {
     expect(categorySlug("T-shirts and tanks")).toBe("t-shirts-and-tanks");
     expect(categoryFromSlug("t-shirts-and-tanks")).toBe("T-shirts and tanks");

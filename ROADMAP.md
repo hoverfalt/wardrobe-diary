@@ -32,7 +32,7 @@ _(empty)_
 
 ## Now
 
-_(nothing in progress; waiting for the next scope)_
+- **R-16 Domain switch:** built and tested on wardrobediary.web.app; waiting for the DNS switch (see Later).
 
 ## Next
 
@@ -63,6 +63,13 @@ _(nothing in progress; waiting for the next scope)_
   (3) add wardrobediary.io (+ www) as a custom domain of Hosting site `wardrobediary`, switch the Bluehost
   A records (lower the TTL a day before); (4) keep the GitHub Pages repo and its CNAME so hoverfalt.github.io
   keeps redirecting; (5) Search Console: verify, submit a sitemap, watch for 404s.
+  **Status 2026-10-13:** steps (1) and (2) done and live on wardrobediary.web.app: landing page at `/`
+  (ported content, preview tags, GA4 only on the real domain), Dashboard at `/dashboard`, 23 redirects incl.
+  `track_your_wardrobe.html` → `/#track-your-own-wardrobe`, a "Page not found" page, robots.txt and sitemap;
+  `redirect-check.mjs` all OK. Search Console's sampled links (18 sites) all point to `/` or `/index.html`.
+  Remaining (Olof, with Claude's checklist): (3) custom domain + Bluehost DNS, (4) keep the GitHub Pages repo,
+  (5) Search Console sitemap; then rerun `redirect-check.mjs https://wardrobediary.io` and update the landing
+  page text.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 
 ## Decisions needed

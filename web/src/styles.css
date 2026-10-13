@@ -222,3 +222,4 @@ th.num .sort-header { justify-content: flex-end; }
 
 /* Local emulator mode only (npm run dev:emulator). */
 .emulator-banner { margin: 0 -16px 8px; padding: 4px 16px; background: #8a5a00; color: #fff; font-size: 13px; font-weight: 600; }
+.home-link { color: inherit; text-decoration: none; }

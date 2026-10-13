@@ -48,7 +48,7 @@ export function App() {
     <main>
       {EMULATORS && <p className="emulator-banner">LOCAL EMULATOR – test data, nothing here reaches wardrobediary.web.app</p>}
       <header>
-        <h1>Wardrobe Diary</h1>
+        <h1><a className="home-link" href="/">Wardrobe Diary</a></h1>
         <nav>
           <button aria-pressed={route.page === "dashboard" || route.page === "category" || route.page === "garment" || route.page === "materials"} onClick={() => navigate({ page: "dashboard" })}>Dashboard</button>
           <button aria-pressed={route.page === "log"} onClick={() => navigate({ page: "log" })}>Log</button>
@@ -64,6 +64,15 @@ export function App() {
           <CategoryPage slug={route.slug} wardrobe={wardrobe} range={range} rangeControl={control} />
         )}
         {route.page === "garment" && <GarmentPage id={route.id} wardrobe={wardrobe} canEdit={isOwner} />}
+        {route.page === "notFound" && (
+          <section>
+            <h2>Page not found</h2>
+            <p>
+              There is no page at this address. See <a href="/">the Wardrobe Diary Project</a> or{" "}
+              <a href="/dashboard">my wardrobe data</a>.
+            </p>
+          </section>
+        )}
         {route.page === "materials" && <MaterialsPage wardrobe={wardrobe} range={range} rangeControl={control} />}
         {route.page === "manage" &&
           (isOwner ? (

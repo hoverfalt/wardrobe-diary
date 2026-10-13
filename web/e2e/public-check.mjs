@@ -3,7 +3,7 @@
 import puppeteer from "puppeteer-core";
 
 const BASE = process.env.UI_BASE ?? "https://wardrobediary.web.app";
-const PAGES = [["/", "Category listing"], ["/category/shirts", "Shirts"], ["/garment/Shirts-031", "cost per wear"], ["/materials", "Materials"]];
+const PAGES = [["/", "The Wardrobe Diary Project"], ["/dashboard", "Category listing"], ["/category/shirts", "Shirts"], ["/garment/Shirts-031", "cost per wear"], ["/materials", "Materials"]];
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true });
 let failed = false;
 for (const [path, text] of PAGES) {

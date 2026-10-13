@@ -1,0 +1,33 @@
+/* Landing page (index.html, R-16). Colours and fonts come from the app's tokens in styles.css. */
+@import "./styles.css";
+
+.landing { max-width: 820px; line-height: 1.55; }
+.landing h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.15; margin: 8px 0 12px; }
+.landing h2 { margin: 40px 0 8px; font-size: 22px; }
+.landing p { margin: 0 0 14px; }
+.landing a { color: inherit; }
+.landing p a, .landing footer a { color: var(--accent); }
+.landing img { max-width: 100%; height: auto; display: block; }
+
+.landing-nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 15px; padding: 4px 0 8px; border-bottom: 1px solid var(--line); }
+.landing-nav a { text-decoration: none; color: var(--muted); }
+.landing-nav a:hover { color: var(--fg); }
+
+.lead { font-size: 18px; }
+.hero-image { width: 100%; border-radius: 10px; margin: 8px 0 12px; }
+.cta { display: inline-block; padding: 10px 18px; border-radius: 8px; background: var(--accent); color: #fff !important; text-decoration: none; font-weight: 600; }
+
+.wide { width: 100%; border-radius: 8px; margin: 4px 0 8px; }
+.image-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.image-row img { width: 100%; border-radius: 8px; }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+.media-grid img { width: 100%; border-radius: 6px; }
+
+.contacts { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+.contacts ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.contacts li a { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.contacts li img { width: 28px; height: 28px; }
+.portrait { width: 160px; border-radius: 50%; }
+
+.landing footer { margin: 48px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.landing footer img { display: inline; vertical-align: middle; margin-right: 6px; }

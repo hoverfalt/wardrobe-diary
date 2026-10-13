@@ -17,7 +17,7 @@ export async function openApp({ width = 390, height = 844, dark = false } = {}) 
   await page.setViewport({ width, height, deviceScaleFactor: 2 });
   if (dark) await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
   page.on("pageerror", (e) => console.error("page error:", e.message));
-  await page.goto(BASE, { waitUntil: "domcontentloaded" });
+  await page.goto(`${BASE}/dashboard`, { waitUntil: "domcontentloaded" }); // "/" is the static landing page
   await page.waitForSelector(".emulator-banner", { timeout: 15000 }).catch(() => {
     throw new Error(`${BASE} is not in emulator mode (no banner); refusing to continue.`);
   });

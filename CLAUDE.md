@@ -186,6 +186,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 
 | Path | What |
 |---|---|
+| `../index.html`, `landing.css`, `../app.html` | Static landing page at `/`; the app's HTML shell for every other path |
 | `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`); every page is lazy-loaded (`page(...)`, R-18) |
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
@@ -247,6 +248,7 @@ tools/emulator.sh                          # local emulators seeded from the new
 cd web && npm run dev:emulator             # app on http://localhost:5174 against the emulators
 cd web && npm run ui-check                 # signed-in UI smoke check + screenshots (emulators + dev:emulator running)
 cd web && node e2e/public-check.mjs        # live public pages: load without errors, JS per first visit (read-only)
+cd web && node e2e/redirect-check.mjs      # every old wardrobediary.io address redirects and loads (read-only)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
@@ -260,7 +262,12 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
-- Pages: `/` Dashboard, `/category/<slug>`, `/garment/<id>`, `/materials`, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
+- `/` is the **static landing page** (`web/index.html` + `src/landing.css`, the old site's project page, R-16:
+  crawlable, preview tags, no JavaScript); the app is `web/app.html`, served for every other path (Firebase
+  rewrite `**` → `/app.html`; the `appFallback` plugin in `vite.config.ts` does the same in dev/preview).
+  `firebase.json` has 301 redirects for every old wardrobediary.io page (`*.html`); check them with
+  `node web/e2e/redirect-check.mjs [base]`. GA4 (G-HYJZNEMFV0, the old site's) loads only on wardrobediary.io.
+- App pages: `/dashboard` Dashboard, `/category/<slug>`, `/garment/<id>`, `/materials`, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
   The top nav (Dashboard, Log, Manage, Sign in/out) must fit a phone; sub-pages such as `/materials` are linked
   from the Dashboard instead, with Dashboard highlighted.
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.

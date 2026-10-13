@@ -10,7 +10,7 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/app.html"
       }
     ],
     "headers": [
@@ -49,6 +49,132 @@
             "value": "no-cache"
           }
         ]
+      },
+      {
+        "source": "/app.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/index.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/portfolio.html",
+        "destination": "/dashboard",
+        "type": 301
+      },
+      {
+        "source": "/jackets.html",
+        "destination": "/category/jackets-and-hoodies",
+        "type": 301
+      },
+      {
+        "source": "/blazers.html",
+        "destination": "/category/blazers-and-vests",
+        "type": 301
+      },
+      {
+        "source": "/knits.html",
+        "destination": "/category/knits",
+        "type": 301
+      },
+      {
+        "source": "/shirts.html",
+        "destination": "/category/shirts",
+        "type": 301
+      },
+      {
+        "source": "/t-shirts.html",
+        "destination": "/category/t-shirts-and-tanks",
+        "type": 301
+      },
+      {
+        "source": "/pants.html",
+        "destination": "/category/pants",
+        "type": 301
+      },
+      {
+        "source": "/shorts.html",
+        "destination": "/category/shorts",
+        "type": 301
+      },
+      {
+        "source": "/belts.html",
+        "destination": "/category/belts",
+        "type": 301
+      },
+      {
+        "source": "/socks.html",
+        "destination": "/category/socks",
+        "type": 301
+      },
+      {
+        "source": "/shoes.html",
+        "destination": "/category/shoes",
+        "type": 301
+      },
+      {
+        "source": "/uw_shirts.html",
+        "destination": "/category/underwear-shirts",
+        "type": 301
+      },
+      {
+        "source": "/uw_boxers.html",
+        "destination": "/category/underwear-boxers",
+        "type": 301
+      },
+      {
+        "source": "/sportswear.html",
+        "destination": "/category/sportswear",
+        "type": 301
+      },
+      {
+        "source": "/track_your_wardrobe.html",
+        "destination": "/#track-your-own-wardrobe",
+        "type": 301
+      },
+      {
+        "source": "/data.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/development.html",
+        "destination": "/category/shoes",
+        "type": 301
+      },
+      {
+        "source": "/GA_script.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/REMOVED_navbar.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/footer.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/header_meta_tags.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/hero-image.html",
+        "destination": "/",
+        "type": 301
       }
     ]
   },

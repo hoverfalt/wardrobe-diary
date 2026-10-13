@@ -60,7 +60,7 @@ export function CategoryPage({
   }, [rows, sort]);
 
   const back = (
-    <a href="/" onClick={(e) => { e.preventDefault(); navigate({ page: "dashboard" }); }}>← Dashboard</a>
+    <a href="/dashboard" onClick={(e) => { e.preventDefault(); navigate({ page: "dashboard" }); }}>← Dashboard</a>
   );
   if (!category) return <section>{back}<p>Unknown category.</p></section>;
   if (!wardrobe) return <p>Loading…</p>;

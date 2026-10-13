@@ -7,22 +7,25 @@ export type Route =
   | { page: "category"; slug: string }
   | { page: "manage"; id?: string }
   | { page: "garment"; id: string }
-  | { page: "materials" };
+  | { page: "materials" }
+  | { page: "notFound" };
 
 export function parseRoute(path: string): Route {
   const parts = path.split("/").filter(Boolean);
+  // "/" is the static landing page (index.html); the app's Dashboard is /dashboard.
   if (parts[0] === "log") return { page: "log" };
   if (parts[0] === "category" && parts[1]) return { page: "category", slug: parts[1] };
   if (parts[0] === "garment" && parts[1]) return { page: "garment", id: decodeURIComponent(parts[1]) };
   if (parts[0] === "materials") return { page: "materials" };
   if (parts[0] === "manage") return parts[1] ? { page: "manage", id: decodeURIComponent(parts[1]) } : { page: "manage" };
-  return { page: "dashboard" };
+  if (parts[0] === "dashboard" || parts.length === 0) return { page: "dashboard" };
+  return { page: "notFound" };
 }
 
 export function routePath(route: Route): string {
   switch (route.page) {
     case "dashboard":
-      return "/";
+      return "/dashboard";
     case "log":
       return "/log";
     case "category":
@@ -33,6 +36,8 @@ export function routePath(route: Route): string {
       return `/garment/${encodeURIComponent(route.id)}`;
     case "materials":
       return "/materials";
+    case "notFound":
+      return location.pathname;
   }
 }
 

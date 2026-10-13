@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wardrobe Diary</title>
+    <!-- The app (every path except the landing page / is served this file; see firebase.json). -->
+    <script>
+      // Google Analytics (GA4, same property as the old site), only on the real domain. GA4's enhanced
+      // measurement records the app's page changes (history events) as page views.
+      if (location.hostname === "wardrobediary.io") {
+        var ga = document.createElement("script");
+        ga.async = true;
+        ga.src = "https://www.googletagmanager.com/gtag/js?id=G-HYJZNEMFV0";
+        document.head.appendChild(ga);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag("js", new Date());
+        gtag("config", "G-HYJZNEMFV0");
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
