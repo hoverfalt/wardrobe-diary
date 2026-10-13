@@ -23,8 +23,8 @@ How this file works:
 - **Waiting for Olof:** tag the Winter and Summer garments on Manage (bulk "Add tag"); try the Log Filters
   popup and `/manage/comparison` on the iPhone (not checked in a signed-in browser).
 - **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-33 location filter for the Dashboard and category pages (the logging half is done by R-38), R-18
-  housekeeping, R-17 multi-user (with R-32 user-defined tags).
+  R-33 location filter for the Dashboard and category pages (the logging half is done by R-38), R-17
+  multi-user (with R-32 user-defined tags).
 
 ## Inbox
 
@@ -53,9 +53,6 @@ _(nothing in progress; waiting for the next scope)_
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
-- **R-18 Housekeeping:** move `tools/.venv` to Python ≥ 3.10 (3.9 is end of life), together with the nightly
-  backup job in `hoverfalt/wardrobe-diary-backups`. (Storage rules: done 2026-10-09; code splitting: done
-  2026-10-13.)
 
 ## Decisions needed
 
@@ -133,6 +130,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-18b** 2026-10-13 Python 3.12 for `tools/` (3.9 is end of life): standalone CPython 3.12.15 installed
+  user-locally (`~/.local/share/python-3.12.15`, checksum verified), `tools/.venv` rebuilt (firebase-admin 7.7,
+  google-cloud-firestore 2.34). Verified: 16 tests, backup (identical to the nightly one apart from today's
+  wears), restore dry run (0 differences), Sheet sync and tag migration dry runs, emulator seeding. The nightly
+  job already ran 3.12, so nothing changed there. R-18 is complete.
 
 - **R-18a** 2026-10-13 Code splitting: the single 1.25 MB bundle (390 kB gzipped) is now lazy-loaded pages plus
   library chunks (react, firebase, plot; firebase-storage only for uploads). A first public visit needs ~306 kB

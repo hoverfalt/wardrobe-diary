@@ -32,7 +32,7 @@ read-only MCP server. The live site must not be touched until the domain switch 
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
 | Web config | `web/.env.local` (git-ignored), from the registered web app "Wardrobe Diary" |
-| Toolchain | Node 24 (≥ 20.19 required); `firebase-tools` is a devDependency of `web/` (use `npx firebase`, not the stale global one); Python venv in `tools/.venv` |
+| Toolchain | Node 24 (≥ 20.19 required); `firebase-tools` is a devDependency of `web/` (use `npx firebase`, not the stale global one); Python 3.12 venv in `tools/.venv`, built from the user-local standalone Python in `~/.local/share/python-3.12.*` (the system's 3.9 is end of life; recreate with `~/.local/share/python-3.12.15/bin/python3 -m venv tools/.venv && tools/.venv/bin/pip install -r tools/requirements.txt`); the nightly backup job also runs 3.12 |
 
 ## Architecture (decided)
 
