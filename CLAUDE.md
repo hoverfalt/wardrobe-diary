@@ -23,8 +23,8 @@ read-only MCP server. The live site must not be touched until the domain switch 
 
 | Thing | Value |
 |---|---|
-| Firebase project | `threddit-297417` ("Threddit"), also hosts the live site |
-| Live site (do not deploy to) | Hosting site `threddit-297417` → wardrobediary.io |
+| Firebase project | `threddit-297417` ("Threddit") |
+| Live site wardrobediary.io (do not touch until R-16) | **GitHub Pages**, public repo `hoverfalt/hoverfalt.github.io` (R Markdown output; `CNAME` = wardrobediary.io; hoverfalt.github.io 301s to it). DNS at Bluehost (A 185.199.108.153; www has no working HTTPS). Its chart images are served by the Firebase Hosting site `threddit-297417` (`threddit-297417.web.app/Category-*.png`, 89 PNG/GIF, last deployed 2021) and its photos from Storage; do not deploy to that site either |
 | New app | Hosting site `wardrobediary` → https://wardrobediary.web.app (deploy target `app`) |
 | Firestore | `(default)` database, Native mode (switched from empty Datastore mode), location `eur3` |
 | Storage buckets | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (228 × 228 PNG; always use these originals, not the `thumbs/` copies) and category images, shared with the live site. `threddit-plots`: the live site's chart images. Rules are versioned here (`storage.rules`, `storage-plots.rules`, deploy targets `photos` / `plots`): everything publicly readable; only the owner may upload, and only `<Photo id>.png` or `Comparison-<Name>.png`; no deletes. Deploy deliberately with `cd web && npx firebase deploy --only storage` and re-check that the live site's images still load |

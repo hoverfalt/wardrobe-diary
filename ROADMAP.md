@@ -50,8 +50,19 @@ _(nothing in progress; waiting for the next scope)_
   garments, and since R-38 the Log page's tag toggles can hide or show them, which covers the logging half;
   what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.
-- **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
-  text, press links, images) and `track_your_wardrobe.html` first.
+- **R-16 Domain switch:** point wardrobediary.io at the new app, keeping every old link working.
+  Findings (2026-10-13): wardrobediary.io is GitHub Pages (repo `hoverfalt/hoverfalt.github.io`, DNS at
+  Bluehost), not Firebase; hoverfalt.github.io 301s to it. 16 real pages: `index.html` (project, media
+  coverage, contacts; og/Twitter preview tags; GA4 G-HYJZNEMFV0), `portfolio.html`, 13 category pages
+  (`jackets`, `blazers`, `knits`, `shirts`, `t-shirts`, `pants`, `shorts`, `belts`, `socks`, `shoes`, `uw_shirts`,
+  `uw_boxers`, `sportswear`.html), `track_your_wardrobe.html`, `data.html`, `development.html` (an old Shoes
+  draft); no robots.txt or sitemap. Chart images live on `threddit-297417.web.app` (may be embedded by
+  articles: keep that site as is). Plan: (1) landing page as pre-rendered static HTML at `/` (crawlable, with
+  preview tags), app Dashboard moved to `/dashboard`, `track_your_wardrobe` ported; (2) 301 redirects in
+  `firebase.json` for every old `.html` path (incl. `index.html`, fragments → `/`), tested by a script;
+  (3) add wardrobediary.io (+ www) as a custom domain of Hosting site `wardrobediary`, switch the Bluehost
+  A records (lower the TTL a day before); (4) keep the GitHub Pages repo and its CNAME so hoverfalt.github.io
+  keeps redirecting; (5) Search Console: verify, submit a sitemap, watch for 404s.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 
 ## Decisions needed
