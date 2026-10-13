@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, GoogleAuthProvider, getAuth, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { connectFirestoreEmulator, initializeFirestore, memoryLocalCache, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
-import { connectStorageEmulator, getStorage, ref, uploadBytes } from "firebase/storage";
 
 /** Local testing against the Firebase emulators (`npm run dev:emulator`, see tools/emulator.sh): auth, Firestore
  *  and Storage are local copies seeded from a backup, so nothing touches production. Never set in production. */
@@ -31,7 +30,18 @@ export const db = initializeFirestore(app, {
 if (EMULATORS) {
   connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
   connectFirestoreEmulator(db, "127.0.0.1", 8080);
-  connectStorageEmulator(getStorage(app), "127.0.0.1", 9199);
+}
+
+/** The Storage SDK is only needed for uploads (owner), so it is loaded on first use, not for every visitor. */
+let storageEmulatorConnected = false;
+async function uploadPng(path: string, file: Blob): Promise<void> {
+  const { connectStorageEmulator, getStorage, ref, uploadBytes } = await import("firebase/storage");
+  const storage = getStorage(app);
+  if (EMULATORS && !storageEmulatorConnected) {
+    connectStorageEmulator(storage, "127.0.0.1", 9199);
+    storageEmulatorConnected = true;
+  }
+  await uploadBytes(ref(storage, path), file, { contentType: "image/png" });
 }
 
 // In emulator mode "Sign in" signs in as the seeded stand-in owner directly (no Google popup).
@@ -66,10 +76,10 @@ function storageUrl(path: string): string | null {
 /** Uploads a garment photo as <photo>.png at the bucket root, next to the existing ones. storage.rules
  *  allow this only for the owner, PNG, under 5 MB, and Photo ids like Jackets_and_hoodies-035. */
 export async function uploadGarmentPhoto(photo: string, file: Blob): Promise<void> {
-  await uploadBytes(ref(getStorage(app), `${photo}.png`), file, { contentType: "image/png" });
+  await uploadPng(`${photo}.png`, file);
 }
 
 /** Uploads a comparison photo as Comparison-<Name>.png (storage.rules allow that name pattern too). */
 export async function uploadComparisonPhoto(photo: string, file: Blob): Promise<void> {
-  await uploadBytes(ref(getStorage(app), `${photo}.png`), file, { contentType: "image/png" });
+  await uploadPng(`${photo}.png`, file);
 }

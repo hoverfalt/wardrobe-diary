@@ -1,6 +1,10 @@
 // Smoke check of the signed-in pages against the emulators: Log (Filters popup, logging a wear), Manage,
-// Comparison. Screenshots go to e2e/out/. Run: npm run ui-check (needs tools/emulator.sh + npm run dev:emulator).
-import { clickText, go, openApp, shot, waitForText } from "./browser.mjs";
+// Comparison (including a photo upload to the Storage emulator). Screenshots go to e2e/out/. Run: npm run ui-check (needs tools/emulator.sh + npm run dev:emulator).
+import { writeFileSync } from "node:fs";
+import { clickText, go, openApp, OUT, shot, waitForText } from "./browser.mjs";
+
+// Any real 228 × 228 PNG will do; read from the public bucket (read-only).
+const PUBLIC_PHOTO = "https://firebasestorage.googleapis.com/v0/b/threddit-297417.appspot.com/o/Comparison-HSL.png?alt=media";
 
 const { browser, page } = await openApp({ dark: true });
 const results = [];
@@ -31,6 +35,18 @@ try {
   await waitForText(page, "Monthly cost");
   await shot(page, "comparison");
   check("comparison lists items", (await page.$$("tbody tr")).length > 0);
+
+  // Photo upload (the Storage SDK loads on demand): replace the first item's photo in the Storage emulator.
+  const png = `${OUT}upload-test.png`;
+  writeFileSync(png, Buffer.from(await (await fetch(PUBLIC_PHOTO)).arrayBuffer()));
+  await clickText(page, "button", "Edit");
+  const input = await page.$('.comparison-form input[type="file"]');
+  await input.uploadFile(png);
+  await new Promise((r) => setTimeout(r, 800));
+  await clickText(page, ".comparison-form button", "Save");
+  const saved = await page.waitForFunction(() => !document.querySelector(".comparison-form"), { timeout: 20000 }).then(() => true, () => false);
+  const error = saved ? "" : await page.$eval(".comparison-form .error", (e) => e.textContent).catch(() => "form still open");
+  check("uploading a photo saves (Storage emulator)", saved, error);
 } catch (e) {
   check("run", false, e.message);
   await shot(page, "error").catch(() => {});

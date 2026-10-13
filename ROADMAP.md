@@ -53,8 +53,9 @@ _(nothing in progress; waiting for the next scope)_
 - **R-16 Domain switch:** point wardrobediary.io at the new app; port the static front page (`index.html`:
   text, press links, images) and `track_your_wardrobe.html` first.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
-- **R-18 Housekeeping:** code-split the web bundle (> 500 kB warning); move `tools/.venv` to
-  Python ≥ 3.10 (3.9 is end of life). (Storage rules: done 2026-10-09.)
+- **R-18 Housekeeping:** move `tools/.venv` to Python ≥ 3.10 (3.9 is end of life), together with the nightly
+  backup job in `hoverfalt/wardrobe-diary-backups`. (Storage rules: done 2026-10-09; code splitting: done
+  2026-10-13.)
 
 ## Decisions needed
 
@@ -132,6 +133,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-18a** 2026-10-13 Code splitting: the single 1.25 MB bundle (390 kB gzipped) is now lazy-loaded pages plus
+  library chunks (react, firebase, plot; firebase-storage only for uploads). A first public visit needs ~306 kB
+  of JavaScript; the owner-only pages and upload code no longer go to visitors; after a deploy, returning
+  visitors re-download only the changed app code (assets cached a year, pages always revalidated). A stale
+  chunk after a deploy reloads the page once. Verified: live public pages (`web/e2e/public-check.mjs`) and the
+  signed-in pages on the split build in the emulators, including a photo upload.
 
 - **R-39** 2026-10-13 Local testing of the signed-in UI: Firebase emulators (auth, Firestore, Storage) seeded from
   a backup (`tools/emulator.sh`, `seed_emulator.py`, local hosts only), the app in emulator mode

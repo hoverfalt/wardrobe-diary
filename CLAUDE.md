@@ -186,7 +186,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 
 | Path | What |
 |---|---|
-| `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`) |
+| `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`); every page is lazy-loaded (`page(...)`, R-18) |
 | `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/GarmentPage.tsx` | `/garment/<id>` (public): photo, all fields, composition bar, stats, wears per month; Edit for the owner |
@@ -226,7 +226,8 @@ EMULATOR" banner, in-memory cache, and "Sign in" signs in as the stand-in owner 
 owner uid) without Google. `npm run ui-check` (`web/e2e/ui-check.mjs`) signs in, logs a wear, uses the Filters
 popup and opens Manage and Comparison, with screenshots in `web/e2e/out/`; `web/e2e/browser.mjs` has helpers
 (`openApp`, `go`, `clickText`, `shot`) for new checks and refuses pages without the banner. Every start is a
-fresh copy, so tests may write freely. Java: the Firestore emulator needs it; a Temurin 21 JDK is in
+fresh copy, so tests may write freely. To test the split production build instead of the dev server:
+`npx vite build --mode emulator --outDir dist-emulator && npx vite preview --outDir dist-emulator --port 5174`. Java: the Firestore emulator needs it; a Temurin 21 JDK is in
 `~/.local/share/jdk-21*` (no system install), and `emulator.sh` uses it. Photos still load from the
 production bucket (read-only); photos uploaded in emulator mode go to the Storage emulator and won't show.
 
@@ -245,6 +246,7 @@ tools/migrate_colour_tags.sh               # one-off: Sheet row colours → Hank
 tools/emulator.sh                          # local emulators seeded from the newest backup (see Local testing)
 cd web && npm run dev:emulator             # app on http://localhost:5174 against the emulators
 cd web && npm run ui-check                 # signed-in UI smoke check + screenshots (emulators + dev:emulator running)
+cd web && node e2e/public-check.mjs        # live public pages: load without errors, JS per first visit (read-only)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
@@ -288,6 +290,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),
   never alphabetically: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants,
   Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear.
+- Bundle (R-18): pages are lazy-loaded in `App.tsx` (add new pages with `page(...)`), libraries are split into
+  `react` / `firebase` / `firebase-storage` (uploads only, imported on demand in `firebase.ts`) / `plot` chunks in
+  `vite.config.ts`, and `firebase.json` caches `/assets/**` for a year (hashed names) and revalidates every page.
 - Never commit `.env.local` or service-account JSON.
 - Git: run `git add`, `git commit` and `git push` as separate commands (not chained with `&&`); the local
   permission rules in `.claude/settings.local.json` allow commit, push and `tools/sync.sh` only individually.
