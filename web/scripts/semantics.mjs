@@ -528,6 +528,34 @@ const readJson = (file) => {
 };
 const fmtExpected = (e) =>
   e.type === "number" ? `${Math.round(e.value * 1000) / 1000} ${e.unit === "count" ? "" : e.unit} (± ${e.tolerance})`.replace("  ", " ") : e.type === "name" ? e.oneOf.join(" / ") : e.value.join("; ");
+/** Minimal Markdown (## headings, - bullets, **bold**, `code`, paragraphs) for the evaluation findings. */
+const markdown = (md) => {
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/`(.+?)`/g, "<code>$1</code>");
+  const out = [];
+  let list = false;
+  for (const line of md.split("\n")) {
+    if (line.startsWith("- ")) {
+      if (!list) out.push("<ul>");
+      list = true;
+      out.push(`<li>${inline(line.slice(2))}</li>`);
+      continue;
+    }
+    if (list) out.push("</ul>");
+    list = false;
+    if (line.startsWith("## ")) out.push(`<h3>${inline(line.slice(3))}</h3>`);
+    else if (line.trim()) out.push(`<p>${inline(line)}</p>`);
+  }
+  if (list) out.push("</ul>");
+  return out.map((l) => `      ${l}`).join("\n");
+};
+const readText = (file) => {
+  try {
+    return readFileSync(resolve(ROOT, file), "utf8");
+  } catch {
+    return "";
+  }
+};
+
 const CONDITION_LABEL = { raw: "Raw data in the prompt", tools: "MCP tools", semantic: "MCP tools + semantic layer" };
 
 export function evalsHtml(s) {
@@ -575,6 +603,7 @@ ${expected.questions.map((q) => `          <tr id="q-${esc(q.id)}"><td>${esc(q.q
 
       <h2 id="results">Results</h2>
 ${resultsTable}
+${markdown(readText("mcp/evals/findings.md"))}
 
       <h2 id="questions">Questions and correct answers</h2>
 ${questions}

@@ -44,8 +44,10 @@ _(empty)_
   (public copy = source verified with a backup: 3,833 records match); AI evaluation set of 30 questions with
   computed answers and a runner. GitHub Actions (added by Olof 2026-10-16, as the stored token lacks the
   `workflow` scope): `Tests` on every push (first runs green) and `Data quality` nightly at 03:30 UTC.
-  **Waiting for Olof:** an Anthropic API key to run the evaluation (`cd mcp && ANTHROPIC_API_KEY=… npm run evals -- run`, a few dollars),
-  then publish the results. Phase 5 (public remote MCP server) = R-29 phase 2, after R-16.
+  **First evaluation run (2026-10-16, Claude Sonnet 5.5, $7.51, Olof's account):** raw data 7/30, MCP tools
+  29/30, tools + semantic layer 30/30, published on `/evals` with findings and caveats (single run; the one
+  tools-vs-semantic difference is the D-2 lifetime cost-per-wear trap; raw data mostly hit the 4,096-token answer
+  limit). Possible next: `--repeat 3`, a higher answer limit for raw, more interpretation-heavy questions.
 
 - **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,

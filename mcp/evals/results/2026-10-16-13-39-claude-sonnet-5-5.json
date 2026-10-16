@@ -1,0 +1,3366 @@
+{
+ "model": "claude-sonnet-5-5",
+ "ranAt": "2026-10-16T13:39:27.056Z",
+ "snapshot": {
+  "takenAt": "2026-10-16",
+  "lastLoggedDay": "2026-10-16"
+ },
+ "semanticLayer": "0.2.1",
+ "runs": [
+  {
+   "question": "price-vest",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "50",
+   "correct": true,
+   "parsed": 50,
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 31,
+    "output": 69,
+    "cacheRead": 0,
+    "cacheWrite": 173649
+   },
+   "turns": 1,
+   "text": "The garment list contains an entry named \"North Bend black vest\" (Jackets and hoodies, id Jackets_and_hoodies-006), and its recorded price is 50 euros.\n\nANSWER: 50"
+  },
+  {
+   "question": "purchased-barbour",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "2025",
+   "correct": true,
+   "parsed": 2025,
+   "expected": {
+    "type": "number",
+    "value": 2025,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 36,
+    "output": 93,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The garment list gives \"Barbour Classic Tartan navy\" (Jackets_and_hoodies-030) a purchase date of 2025-11-20. It is tagged second-hand, and its details say it was bought at Relove Helsinki Airport.\n\nANSWER: 2025"
+  },
+  {
+   "question": "worn-2025-06-15",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15",
+   "correct": true,
+   "parsed": [
+    "ballin amsterdam",
+    "contra regular boxer khaki green 03",
+    "jack jones jacsummer mid blue",
+    "marmot crossover shorts blue",
+    "nike air zoom vomero 15",
+    "nike m tanjun black 2",
+    "pier one black 01 43 46",
+    "soc tech black melange s 02",
+    "tesma coolmax 03",
+    "under armour vanish woven shorts m",
+    "zalando essentials black 27"
+   ],
+   "expected": {
+    "type": "names",
+    "value": [
+     "Marmot crossover shorts blue",
+     "Ballin Amsterdam",
+     "Pier One black 01 (43-46)",
+     "Nike M Tanjun black 2",
+     "Zalando Essentials black 27",
+     "Jack & Jones Jacsummer Mid blue",
+     "SOC Tech black melange S 02",
+     "Under Armour Vanish woven shorts M",
+     "Contra regular boxer Khaki green 03",
+     "Tesma Coolmax 03",
+     "Nike Air Zoom Vomero 15"
+    ]
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 34,
+    "output": 2944,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The entry for 2025-06-15 lists these garment positions: 145, 154, 275, 328, 416, 535, 554, 585, 589, 600 and 620. I looked each one up by counting through the garments list, category by category. I did not check the numbering against a printed index, so the lookup rests on that count.\n\n- 145: Marmot crossover shorts blue\n- 154: Ballin Amsterdam\n- 275: Pier One black 01 (43-46)\n- 328: Nike M Tanjun black 2\n- 416: Zalando Essentials black 27\n- 535: Jack & Jones Jacsummer Mid blue\n- 554: SOC Tech black melange S 02\n- 585: Under Armour Vanish woven shorts M\n- 589: Contra regular boxer Khaki green 03\n- 600: Tesma Coolmax 03\n- 620: Nike Air Zoom Vomero 15\n\nANSWER: Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15"
+  },
+  {
+   "question": "wears-march-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "407",
+   "correct": false,
+   "parsed": 407,
+   "expected": {
+    "type": "number",
+    "value": 408,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 34,
+    "output": 2361,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "There were **407** wears logged in March 2025.\n\nI went through each of the 31 days in March 2025 and counted the garments listed for that day. All 31 dates have an entry.\n\n| Day | Wears | Day | Wears | Day | Wears | Day | Wears |\n|---|---|---|---|---|---|---|---|\n| 1 | 9 | 9 | 13 | 17 | 13 | 25 | 13 |\n| 2 | 10 | 10 | 13 | 18 | 18 | 26 | 14 |\n| 3 | 14 | 11 | 13 | 19 | 12 | 27 | 19 |\n| 4 | 13 | 12 | 15 | 20 | 12 | 28 | 16 |\n| 5 | 15 | 13 | 16 | 21 | 15 | 29 | 18 |\n| 6 | 13 | 14 | 12 | 22 | 12 | 30 | 11 |\n| 7 | 13 | 15 | 9 | 23 | 9 | 31 | 14 |\n| 8 | 8 | 16 | 11 | 24 | 14 | | |\n\nSumming the daily counts gives 407.\n\nANSWER: 407"
+  },
+  {
+   "question": "distinct-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 250,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 22,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "divested-2024",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "2",
+   "correct": true,
+   "parsed": 2,
+   "expected": {
+    "type": "number",
+    "value": 2,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 25,
+    "output": 986,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "Two garments have a divest date in 2024. I scanned every garment's \"divested\" field for dates in 2024.\n\n- Socks-021, Happy Socks white orange balls, divested 2024-10-02.\n- Socks-079, Happy Socks navy with colorful dots, divested 2024-10-20.\n\nNo other category has a 2024 divest date. Their divest dates fall in 2018–2023 or 2025–2026.\n\nANSWER: 2"
+  },
+  {
+   "question": "active-2026-10-01",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "317",
+   "correct": false,
+   "parsed": 317,
+   "expected": {
+    "type": "number",
+    "value": 316,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 25,
+    "output": 4006,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "There were **317** garments owned on 1 October 2026.\n\nI counted every garment bought on or before 1 October 2026 and not yet divested on that date. No garment in the list was bought after that date. One garment, the Jack & Jones Jacsummer Yellow boxer, was divested on 3 October 2026, so it still counts as owned.\n\n| Category | Active |\n|---|---|\n| Jackets and hoodies | 24 |\n| Blazers and vests | 4 |\n| Knits | 1 |\n| Shirts | 19 |\n| T-shirts and tanks | 16 |\n| Pants | 11 |\n| Shorts | 15 |\n| Belts | 8 |\n| Socks | 60 |\n| Shoes | 18 |\n| Underwear shirts | 52 |\n| Underwear boxers | 26 |\n| Sportswear | 63 |\n\nThe total is 24 + 4 + 1 + 19 + 16 + 11 + 15 + 8 + 60 + 18 + 52 + 26 + 63 = 317.\n\nANSWER: 317"
+  },
+  {
+   "question": "value-2025-12-31",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 15589.199999999999,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 41,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "value-jackets-2020",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "1426",
+   "correct": true,
+   "parsed": 1426,
+   "expected": {
+    "type": "number",
+    "value": 1426,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 38,
+    "output": 1102,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The inventory value on 1 January 2020 is **€1,426**, taking it as the sum of the purchase prices of Jackets and hoodies items owned that day. An item counts if it was purchased on or before 1 Jan 2020 and was either never divested or divested after that date.\n\nItems owned on 1 Jan 2020:\n\n| Item | Price (€) |\n|---|---|\n| Tierra soft shell | 150 |\n| North Bend black vest | 50 |\n| Rocky black vest (divested 2020-07-08) | 30 |\n| Suit Supply gray body warmer | 149 |\n| Jack & Jones Core black hoodie (divested 2022) | 60 |\n| Jack & Jones Premium black hoodie (divested 2022) | 40 |\n| Elvine Thermore black jacket | 324 |\n| Makia black jacket long | 274 |\n| Tiger of Sweden body warmer (purchased 2019-09-25) | 349 |\n\nThe total is 150 + 50 + 30 + 149 + 60 + 40 + 324 + 274 + 349 = 1,426.\n\nThe four early items, the Diesel and Quicksilver hoodies and the Red Label hoodie were divested before 2020 and are excluded. Everything purchased from the Helly Hansen Ervik jacket (July 2020) onward is also excluded, because it was bought after the date.\n\nANSWER: 1426"
+  },
+  {
+   "question": "most-worn-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Diesel black matte 02"
+    ]
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 26,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "times-vest-2023",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 82,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 27,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "days-used-shoes-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 89.04109589041096,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 45,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "hanko-active",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "49",
+   "correct": true,
+   "parsed": 49,
+   "expected": {
+    "type": "number",
+    "value": 49,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 28,
+    "output": 2084,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "**49** garments tagged Hanko were active on 1 October 2026. I counted every garment with the \"hanko\" tag that had been purchased by that date and was either never divested or divested after it.\n\n| Category | Active Hanko items |\n|---|---|\n| Jackets and hoodies | 3 |\n| T-shirts and tanks | 4 |\n| Shorts | 5 |\n| Socks | 8 |\n| Shoes | 2 |\n| Underwear shirts | 9 |\n| Underwear boxers | 10 |\n| Sportswear | 8 |\n\n**Total: 49**\n\nThe Hanko-tagged garments that were no longer active on that date are:\n- Fred Perry black/black piqué, divested 22 July 2026.\n- Musto gray sailing shorts, divested 5 August 2026.\n- The five Workwear shaftless black socks, divested 26 July 2026.\n- The three North Bend black shaftless socks, divested 2025.\n- Several older divested T-shirts, underwear shirts and boxers.\n\nANSWER: 49"
+  },
+  {
+   "question": "second-hand-share-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 5.993690851735016,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 37,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "outfit-weight-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 3.9284986301369953,
+    "tolerance": 0.02,
+    "unit": "kg"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 45,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "wool-owned",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "1.77",
+   "correct": true,
+   "parsed": 1.77,
+   "expected": {
+    "type": "number",
+    "value": 1.8624800000000001,
+    "tolerance": 0.1,
+    "unit": "kg"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 47,
+    "output": 2055,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The wardrobe held about 1.77 kg of wool on 30 September 2026. I counted only garments bought on or before that date and not yet divested, and multiplied each one's weight by the wool share of its material composition.\n\n| Garment | Weight (g) | Wool share | Wool (g) |\n|---|---|---|---|\n| Suit Supply Havana Patch navy blazer | 549 | 100% | 549.00 |\n| Tiger of Sweden Jile blazer | 569 | 55% (shell) | 312.95 |\n| Sand Angelico light blue blazer | 518 | 56% | 290.08 |\n| Bugatti knit jacket | 641 | 50% | 320.50 |\n| Tiger of Sweden body warmer | 455 | 30% (collar) | 136.50 |\n| Bridgedale Everyday Merino socks, 3 pairs at 39 g | 117 | 45% | 52.65 |\n| Bridgedale Hike Merino socks, 3 pairs at 61 g | 183 | 60% (51% merino + 9% new wool) | 109.80 |\n\nThe total is 1771.48 g, or about 1.77 kg.\n\n- **Body warmer:** its material text is garbled (\"Shell: 100% woll, 100% polyamide… Collar: 70% akryl, 30% wool\"). I counted only the 30% collar figure, because \"woll\" looks like a typo rather than a wool listing. Counting the shell as 100% wool would change the total.\n- **Jile blazer:** I applied the 55% shell figure to the whole garment weight, since the lining (100% viscose) has no separate weight.\n\nOther wool items were already divested by that date, for example the Diesel knit on 2026-07-06 and the older blazers.\n\nANSWER: 1.77"
+  },
+  {
+   "question": "synthetic-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 33.20148964649001,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 54,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "cpw-vest-2024",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 0.05030181086519115,
+    "tolerance": 0.002,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 34,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "cpw-shirts-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 1.2957848605577693,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 30,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "cpw-socks-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 0.1385922122379119,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 29,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "cpw-belts-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 29,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "cpw-blazers-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "142.32",
+   "correct": false,
+   "parsed": 142.32,
+   "expected": {
+    "type": "number",
+    "value": 13.177777777777779,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 33,
+    "output": 2162,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The cost per wear of the Blazers and vests category in 2025 was about €142.32. This takes the combined price of the category items owned that year divided by the category's wears in 2025. The question could be read in other ways, so this is my assumption: an alternative reading, counting only the items actually worn, gives about €66.52.\n\n**Items owned during 2025.** The category is garments 34–44 in the list. Those owned throughout 2025 were:\n- Suit Supply Havana Patch navy blazer: €229\n- G Star Raw black vest: €150\n- Tiger of Sweden Jile night blue: €332.60\n\nThe other items were either divested before 2025 or bought only in 2026 (the Sand Angelico light blue blazer, bought 2026-04-26). Their combined price is €711.60.\n\n**Wears in 2025.** Only the Tiger of Sweden Jile was worn, on 5 days: 2025-01-14, 2025-10-06, 2025-10-07, 2025-10-29 and 2025-11-05. The other two owned items do not appear on any 2025 day. I read the 2025 entries by eye rather than with a script, so the count of 5 carries some risk of a miss.\n\n**Cost per wear.** €711.60 / 5 = €142.32\n\nANSWER: 142.32"
+  },
+  {
+   "question": "yearly-pants-2024",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "69",
+   "correct": false,
+   "parsed": 69,
+   "expected": {
+    "type": "number",
+    "value": 170.95909982063154,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 29,
+    "output": 413,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "Interpreting \"yearly cost\" as the total price of garments bought in that year, the Pants category cost €69 in 2024.\n\nI checked the purchase date of every Pants garment. Only one was bought in 2024:\n\n- Arket dark blue slim cotton chinos 46, bought 2024-03-16 for €69.\n\nThe nearest others were bought outside 2024: Mr Marvis Colderdays Blackjacks on 2023-10-08, and the second-hand Tiger of Sweden black jeans on 2025-05-10.\n\nANSWER: 69"
+  },
+  {
+   "question": "monthly-shoes-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "9.875",
+   "correct": false,
+   "parsed": 9.875,
+   "expected": {
+    "type": "number",
+    "value": 22.730283794981062,
+    "tolerance": 0.1,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 30,
+    "output": 755,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "The monthly cost of the Shoes category in 2025 was about €9.88, which I took to mean the shoes bought that year spread evenly over 12 months. The question could also mean cost amortised over each pair's lifetime, but I used the simpler reading.\n\nFour shoes were purchased in 2025:\n\n| Shoe | Purchased | Price (€) |\n|---|---|---|\n| Puma Speedcat OG | 2025-04-12 | 40.00 |\n| Delta Cordura Black Tactical Boots | 2025-05-10 | 10.50 |\n| Lager 157 white sneakers | 2025-06-27 | 40.00 |\n| Sumarine Blue suede shoes | 2025-11-16 | 28.00 |\n\nThe total is €118.50, and 118.50 / 12 = 9.875.\n\nANSWER: 9.875"
+  },
+  {
+   "question": "turnover-boxers",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "370.7",
+   "correct": false,
+   "parsed": 370.7,
+   "expected": {
+    "type": "number",
+    "value": 49.58385027222119,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 57,
+    "output": 2175,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "**Inventory turnover ≈ 370.7%**\n\nThe data doesn't define \"inventory turnover\", so I used the standard count-based definition: garments divested during the period divided by average inventory, where average inventory is the mean of the opening and closing counts.\n\n- **Opening inventory (1 Jan 2018):** 15 boxers were already owned and not yet divested (Diesel black 01–04, special gray, gray 01–04, pink 01–02, red 01, dark blue 01, light blue 01, and similar).\n- **Closing inventory (30 Sep 2026):** 26 boxers were still owned. That is 25 with no divestment date, plus Jacsummer Yellow, which was divested on 3 Oct 2026, after the period ends.\n- **Divested during the period:** the category has 102 garments in total. Removing the 26 still owned at the end leaves 76 divested between 1 Jan 2018 and 30 Sep 2026.\n- **Average inventory:** (15 + 26) / 2 = 20.5.\n\nTurnover = 76 / 20.5 ≈ 3.707, which is 370.7%.\n\nANSWER: 370.7"
+  },
+  {
+   "question": "highest-yearly",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": "Sportswear",
+   "correct": false,
+   "parsed": "Sportswear",
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Shirts"
+    ]
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 47,
+    "output": 3940,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": "**Sportswear** had the highest cost over the period, on the assumption that \"yearly cost\" means purchase spending, since the question does not define it.\n\nI took \"cost\" as the purchase price of garments bought between 1 January 2018 and 30 September 2026, and dropped items bought before 2018. I added the prices category by category by hand, so the totals are approximate.\n\n| Category | Approx. total spent (€) |\n|---|---|\n| Sportswear | 3,330 |\n| Jackets and hoodies | 2,330 |\n| Pants | 1,770 |\n| Shoes | 1,750 |\n| Shirts | 1,750 |\n\nThe other categories (underwear shirts, underwear boxers, socks, shorts and so on) came out far lower, from rough estimates rather than full sums.\n\nIf pre-2018 purchases were counted too, Shirts would lead (about €4,130, ahead of Jackets and hoodies at about €3,880), so the answer depends on that choice.\n\nANSWER: Sportswear"
+  },
+  {
+   "question": "days-used-socks-all",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 80.71987480438185,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 50,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "daily-cost-sep-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 5.269836059303483,
+    "tolerance": 0.05,
+    "unit": "EUR"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 54,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "wears-per-month-vest",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 8.890944066291802,
+    "tolerance": 0.05,
+    "unit": "wears per month"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 46,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "synthetic-share-sep-2025",
+   "condition": "raw",
+   "model": "claude-sonnet-5-5",
+   "answer": null,
+   "correct": false,
+   "parsed": null,
+   "expected": {
+    "type": "number",
+    "value": 35.75546315993038,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [],
+   "usage": {
+    "input": 38,
+    "output": 4096,
+    "cacheRead": 173649,
+    "cacheWrite": 0
+   },
+   "turns": 1,
+   "text": ""
+  },
+  {
+   "question": "price-vest",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "50",
+   "correct": true,
+   "parsed": 50,
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6102,
+    "output": 123,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The \"North Bend black vest\" (ID Jackets_and_hoodies-006) has a purchase price of 50 euros. The diary lists it as bought on 2017-07-01.\n\nANSWER: 50"
+  },
+  {
+   "question": "purchased-barbour",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "2025",
+   "correct": true,
+   "parsed": 2025,
+   "expected": {
+    "type": "number",
+    "value": 2025,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Barbour Classic Tartan navy"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6029,
+    "output": 129,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The diary lists the \"Barbour Classic Tartan navy\" as purchased on 2025-11-20. It's a second-hand jacket, and its first logged wear is that same day.\n\nANSWER: 2025"
+  },
+  {
+   "question": "worn-2025-06-15",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15",
+   "correct": true,
+   "parsed": [
+    "ballin amsterdam",
+    "contra regular boxer khaki green 03",
+    "jack jones jacsummer mid blue",
+    "marmot crossover shorts blue",
+    "nike air zoom vomero 15",
+    "nike m tanjun black 2",
+    "pier one black 01 43 46",
+    "soc tech black melange s 02",
+    "tesma coolmax 03",
+    "under armour vanish woven shorts m",
+    "zalando essentials black 27"
+   ],
+   "expected": {
+    "type": "names",
+    "value": [
+     "Marmot crossover shorts blue",
+     "Ballin Amsterdam",
+     "Pier One black 01 (43-46)",
+     "Nike M Tanjun black 2",
+     "Zalando Essentials black 27",
+     "Jack & Jones Jacsummer Mid blue",
+     "SOC Tech black melange S 02",
+     "Under Armour Vanish woven shorts M",
+     "Contra regular boxer Khaki green 03",
+     "Tesma Coolmax 03",
+     "Nike Air Zoom Vomero 15"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-06-15",
+      "to": "2025-06-15"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6080,
+    "output": 414,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The log for 15 June 2025 lists 11 garments:\n\nMarmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15\n\nANSWER: Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15"
+  },
+  {
+   "question": "wears-march-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "408",
+   "correct": true,
+   "parsed": 408,
+   "expected": {
+    "type": "number",
+    "value": 408,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-03-01",
+      "to": "2025-03-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 28348,
+    "output": 1974,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "March 2025 has 408 logged wears. I got this by counting every garment listed on each of the 31 days, sportswear included.\n\nDaily counts, from 1 to 31 March:\n\n| Days | Wears per day |\n|---|---|\n| 1–7 | 9, 10, 14, 13, 15, 13, 14 |\n| 8–14 | 8, 13, 13, 13, 15, 16, 12 |\n| 15–21 | 9, 11, 13, 18, 12, 12, 15 |\n| 22–28 | 12, 9, 14, 13, 14, 19, 16 |\n| 29–31 | 18, 11, 14 |\n\nThe tally was done by hand, so a miscount of one or two is possible.\n\nANSWER: 408"
+  },
+  {
+   "question": "distinct-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "250",
+   "correct": true,
+   "parsed": 250,
+   "expected": {
+    "type": "number",
+    "value": 250,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Belts"
+     }
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Jackets and hoodies",
+      "sort": "times_worn"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Blazers and vests"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Knits"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shirts"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "T-shirts and tanks"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Pants"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shorts"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shoes"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear boxers"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Socks",
+      "limit": 100
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear shirts",
+      "limit": 100,
+      "maxWeightG": 125
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear shirts",
+      "limit": 100,
+      "minWeightG": 126,
+      "maxWeightG": 132
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear shirts",
+      "limit": 100,
+      "minWeightG": 132.5
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Sportswear",
+      "limit": 100,
+      "maxWeightG": 100
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Sportswear",
+      "limit": 100,
+      "minWeightG": 100.5
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Sportswear",
+      "limit": 100,
+      "sort": "weight",
+      "tag": "winter"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Sportswear",
+      "limit": 100,
+      "sort": "cost_per_wear",
+      "minWeightG": 0,
+      "maxWeightG": 0
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-001"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-003"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-007"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-080"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-011"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-012"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-014"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-015"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-016"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-017"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-035"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-041"
+     }
+    },
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Sportswear-056"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1108571,
+    "output": 9737,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 14,
+   "text": "**250** different garments were worn at least once in 2025.\n\nI listed every garment tracked in 2025 (341, including ones divested during the year) with its wear count for the year, then removed those with zero wears. By category, the garments worn at least once:\n\n| Category | Worn in 2025 |\n|---|---|\n| Belts | 5 |\n| Jackets and hoodies | 14 |\n| Blazers and vests | 1 |\n| Knits | 1 |\n| Shirts | 16 |\n| T-shirts and tanks | 8 |\n| Pants | 11 |\n| Shorts | 15 |\n| Shoes | 12 |\n| Underwear boxers | 29 |\n| Socks | 53 |\n| Underwear shirts | 35 |\n| Sportswear | 50 |\n\nSportswear includes one item that the weight-filtered lists missed (goggles with no weight recorded, worn twice in 2025). The remaining 91 of the 341 had no wears in 2025.\n\nANSWER: 250"
+  },
+  {
+   "question": "divested-2024",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "2",
+   "correct": true,
+   "parsed": 2,
+   "expected": {
+    "type": "number",
+    "value": 2,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "limit": 700,
+      "sort": "purchased"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "sort": "purchased",
+      "category": "Jackets and hoodies"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "sort": "purchased"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-10-03",
+      "to": "2024-10-03"
+     }
+    },
+    {
+     "name": "get_inventory_over_time",
+     "input": {
+      "measure": "items",
+      "from": "2023-11-01",
+      "to": "2025-01-31"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Socks",
+      "limit": 700,
+      "sort": "purchased",
+      "from": "2022-01-01"
+     }
+    }
+   ],
+   "usage": {
+    "input": 190714,
+    "output": 3001,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 6,
+   "text": "Two garments were divested in 2024. Both are socks:\n\n- Happy Socks white orange balls, divested 2024-10-02.\n- Happy Socks navy with colorful dots, divested 2024-10-20.\n\nI got this by listing divested garments for 2024. That list covers any garment active at some point in the year and divested by 31 December. It returned only these two. The sock count matches: 69 active at the end of September 2024 and 67 at the end of October.\n\nThe month-end counts for the other categories only moved upward, so they show no divestments. A purchase and a divestment in the same category in the same month could in principle hide each other in those counts. The divested-garment list is the main evidence.\n\nANSWER: 2"
+  },
+  {
+   "question": "active-2026-10-01",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "316",
+   "correct": true,
+   "parsed": 316,
+   "expected": {
+    "type": "number",
+    "value": 316,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "get_inventory_over_time",
+     "input": {
+      "measure": "items",
+      "from": "2026-08-01",
+      "to": "2026-10-16"
+     }
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2026-10-01",
+      "to": "2026-10-01"
+     }
+    }
+   ],
+   "usage": {
+    "input": 11702,
+    "output": 305,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 3,
+   "text": "On 1 October 2026 there were 316 active garments.\n\nThe category listing for that exact date gives a total of 316. The month-end samples agree with it. On 30 September the categories add up to 316, and by 16 October one boxer had left, bringing the total to 315.\n\nANSWER: 316"
+  },
+  {
+   "question": "value-2025-12-31",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "15589.2",
+   "correct": true,
+   "parsed": 15589.2,
+   "expected": {
+    "type": "number",
+    "value": 15589.199999999999,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "to": "2025-12-31",
+      "from": "2025-01-01"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7851,
+    "output": 381,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Total inventory value on 31 December 2025 was **€15,589.20**, across 317 active garments.\n\nI took this from the Total row of the category listing for 2025-01-01 to 2025-12-31. I added up the 13 category values and got the same figure, so the Total row includes Sportswear (€3,074.50).\n\nANSWER: 15589.2"
+  },
+  {
+   "question": "value-jackets-2020",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "1426",
+   "correct": true,
+   "parsed": 1426,
+   "expected": {
+    "type": "number",
+    "value": 1426,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_inventory_over_time",
+     "input": {
+      "measure": "value",
+      "category": "Jackets and hoodies",
+      "from": "2019-11-01",
+      "to": "2020-02-29"
+     }
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2020-01-01"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7630,
+    "output": 336,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Jackets and hoodies category had an inventory value of €1,426 on 1 January 2020. The category listing for 2018-01-01 to 2020-01-01 shows 9 active items worth that amount. The month-end values for 30 November 2019 through 29 February 2020 are all €1,426, so nothing was bought or divested around that date.\n\nANSWER: 1426"
+  },
+  {
+   "question": "most-worn-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "Diesel black matte 02",
+   "correct": true,
+   "parsed": "Diesel black matte 02",
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Diesel black matte 02"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "limit": 5
+     }
+    }
+   ],
+   "usage": {
+    "input": 6861,
+    "output": 199,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The garment worn most often in 2025 was the belt \"Diesel black matte 02\". It was worn 204 times, ahead of the North Bend black vest at 181 and the Helly Hansen Lifa Loft Hybrid insulator at 172.\n\nANSWER: Diesel black matte 02"
+  },
+  {
+   "question": "times-vest-2023",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "82",
+   "correct": true,
+   "parsed": 82,
+   "expected": {
+    "type": "number",
+    "value": 82,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "search": "North Bend",
+      "from": "2023-01-01",
+      "to": "2023-12-31",
+      "status": "all"
+     }
+    }
+   ],
+   "usage": {
+    "input": 8293,
+    "output": 195,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The \"North Bend black vest\" was worn 82 times in 2023. That comes from the garment list filtered to 1 January to 31 December 2023. I didn't check it against the daily logs.\n\nANSWER: 82"
+  },
+  {
+   "question": "days-used-shoes-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "89.0",
+   "correct": true,
+   "parsed": 89,
+   "expected": {
+    "type": "number",
+    "value": 89.04109589041096,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 7859,
+    "output": 527,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Shoes were worn on about 89% of days in 2025. That is the \"share of days used\" figure for the Shoes category over 1 January to 31 December 2025, which the category listing gives as 0.89.\n\nI didn't check the day-by-day log. The listing rounds to three decimals, so 89.0 is a rounded figure. If some days in 2025 were not logged, the exact value could be slightly different.\n\nANSWER: 89.0"
+  },
+  {
+   "question": "hanko-active",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "49",
+   "correct": true,
+   "parsed": 49,
+   "expected": {
+    "type": "number",
+    "value": 49,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "tag": "hanko",
+      "status": "all",
+      "limit": 700,
+      "sort": "purchased"
+     }
+    }
+   ],
+   "usage": {
+    "input": 31585,
+    "output": 1049,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 3,
+   "text": "On 1 October 2026, 49 garments tagged Hanko were active.\n\nThe garment list, including divested items, has 86 Hanko-tagged garments. I counted 37 of them as divested before 1 October 2026. That includes three divested in summer 2026: the Musto grey shorts on 5 August, the Workwear socks on 26 July, and the Fred Perry black piqué on 22 July. The other 49 had no divestment date. None of those 49 were bought after 1 October 2026. Counting the active ones one by one also gave 49.\n\nANSWER: 49"
+  },
+  {
+   "question": "second-hand-share-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "5.99",
+   "correct": true,
+   "parsed": 5.99,
+   "expected": {
+    "type": "number",
+    "value": 5.993690851735016,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 7843,
+    "output": 707,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Second-hand items made up about 6.0% of the garments active at the end of 2025. I took the per-category figures from the dashboard listing for 2025.\n\nThere were 317 active garments at the end of 2025. The category counts add up to 317. I converted each category's second-hand share back into a whole number of items:\n\n| Category | Active items | Second-hand share | Second-hand items |\n|---|---|---|---|\n| Jackets and hoodies | 22 | 0.227 | 5 |\n| Shirts | 18 | 0.111 | 2 |\n| T-shirts and tanks | 16 | 0.063 | 1 |\n| Pants | 13 | 0.154 | 2 |\n| Shorts | 16 | 0.188 | 3 |\n| Shoes | 18 | 0.278 | 5 |\n| Sportswear | 57 | 0.018 | 1 |\n\nThe other categories (blazers and vests, knits, belts, socks, both underwear categories) have no second-hand items. That gives 19 second-hand garments out of 317, and 19 / 317 = 5.99%. This agrees with the dashboard's overall figure of 0.06.\n\nANSWER: 5.99"
+  },
+  {
+   "question": "outfit-weight-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "3.93",
+   "correct": true,
+   "parsed": 3.93,
+   "expected": {
+    "type": "number",
+    "value": 3.9284986301369953,
+    "tolerance": 0.02,
+    "unit": "kg"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6514,
+    "output": 661,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "2025 的平均每套穿搭重量约为 3.93 千克。这个数值来自按穿着统计的材料汇总工具,该工具直接给出了平均穿搭重量。\n\n2025 年共有 4269 次穿着记录,其中只有 2 次因缺少重量而未计入。\n\n我没有自己重新计算这个数字。\n\nANSWER: 3.93"
+  },
+  {
+   "question": "wool-owned",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "1.86",
+   "correct": true,
+   "parsed": 1.86,
+   "expected": {
+    "type": "number",
+    "value": 1.8624800000000001,
+    "tolerance": 0.1,
+    "unit": "kg"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "owned",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7261,
+    "output": 277,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The wardrobe held about 1.86 kg of wool on 30 September 2026. That is the wool total from the material breakdown for garments active on that date, which multiplies each garment's weight by its wool share.\n\nThe figure covers only 266 of the 316 active garments. Eight have no recorded weight and 45 have no readable materials, so the true wool total could be higher. Sixteen of the included garments have estimated fibre shares, because their materials gave no percentages or the percentages didn't sum to 100.\n\nANSWER: 1.86"
+  },
+  {
+   "question": "synthetic-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "33.2",
+   "correct": true,
+   "parsed": 33.2,
+   "expected": {
+    "type": "number",
+    "value": 33.20148964649001,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6532,
+    "output": 669,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025, synthetic fibre made up about 33.2% of the mass of clothes worn. This comes from the material breakdown of everything worn in 2025, where each wear counts the garment's full weight. The total was 1,156.52 kg.\n\nI counted these fibres as synthetic:\n\n| Fibre | Mass (kg) |\n|---|---|\n| Polyamide | 218.44 |\n| Polyester | 138.18 |\n| Elastane | 21.84 |\n| \"Synthetic textile\" | 5.20 |\n| Acrylic | 0.32 |\n| **Total** | **383.98** |\n\n383.98 / 1,156.52 ≈ 33.2%.\n\n- **Rubber:** I left out the 122.52 kg of rubber because it isn't a fibre. Counting it as synthetic would raise the share to about 43.8%.\n- **Generic \"textile\":** I also left out the 66.25 kg listed only as \"textile\", since its fibre type is unknown.\n- **Coverage:** The breakdown covers 3,689 of 4,269 wears. The other 580 wears had no readable materials. A further 444 of the included wears used estimated fibre shares, so the figure is approximate.\n\nANSWER: 33.2"
+  },
+  {
+   "question": "cpw-vest-2024",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.26",
+   "correct": false,
+   "parsed": 0.26,
+   "expected": {
+    "type": "number",
+    "value": 0.05030181086519115,
+    "tolerance": 0.002,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "search": "North Bend black vest",
+      "from": "2024-01-01",
+      "to": "2024-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 10075,
+    "output": 490,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 3,
+   "text": "The vest cost €50 and was worn 195 times in 2024. That gives 50 / 195 ≈ €0.26 per wear for the year.\n\nThe garment record also shows €0.05, but that figure is spread over all 994 lifetime wears, so I didn't use it. I assumed \"cost per wear in 2024\" means the full price divided by 2024 wears.\n\nANSWER: 0.26"
+  },
+  {
+   "question": "cpw-shirts-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "1.30",
+   "correct": true,
+   "parsed": 1.3,
+   "expected": {
+    "type": "number",
+    "value": 1.2957848605577693,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7225,
+    "output": 142,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Shirts category's cost per wear in 2025 was about €1.30. This is the figure in the category listing for 1 January to 31 December 2025.\n\nANSWER: 1.30"
+  },
+  {
+   "question": "cpw-socks-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.14",
+   "correct": true,
+   "parsed": 0.14,
+   "expected": {
+    "type": "number",
+    "value": 0.1385922122379119,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7223,
+    "output": 183,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025, the Socks category cost €0.14 per wear. This is the Socks row of the category listing for 1 January to 31 December 2025, which gives the figure rounded to the nearest cent. The same row shows 60 active socks items and a yearly cost of €46.29.\n\nANSWER: 0.14"
+  },
+  {
+   "question": "cpw-belts-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.26",
+   "correct": true,
+   "parsed": 0.26,
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7223,
+    "output": 137,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025, the Belts category had a cost per wear of €0.26, according to the category listing for 1 January to 31 December 2025.\n\nANSWER: 0.26"
+  },
+  {
+   "question": "cpw-blazers-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "13.18",
+   "correct": true,
+   "parsed": 13.18,
+   "expected": {
+    "type": "number",
+    "value": 13.177777777777779,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7231,
+    "output": 141,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025, the Blazers and vests category had a cost per wear of €13.18, according to the category listing for 1 January to 31 December 2025.\n\nANSWER: 13.18"
+  },
+  {
+   "question": "yearly-pants-2024",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "170.96",
+   "correct": true,
+   "parsed": 170.96,
+   "expected": {
+    "type": "number",
+    "value": 170.95909982063154,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2024-01-01",
+      "to": "2024-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7211,
+    "output": 154,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Pants category's yearly cost in 2024 was €170.96. This is the \"yearlyCostEur\" figure for Pants in the category listing for 1 January to 31 December 2024.\n\nANSWER: 170.96"
+  },
+  {
+   "question": "monthly-shoes-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "22.73",
+   "correct": true,
+   "parsed": 22.73,
+   "expected": {
+    "type": "number",
+    "value": 22.730283794981062,
+    "tolerance": 0.1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7829,
+    "output": 221,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Shoes had a yearly cost of €272.76 in 2025, according to the category listing. Dividing by 12 gives 272.76 / 12 = €22.73 per month.\n\nANSWER: 22.73"
+  },
+  {
+   "question": "turnover-boxers",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "49.6",
+   "correct": true,
+   "parsed": 49.6,
+   "expected": {
+    "type": "number",
+    "value": 49.58385027222119,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7281,
+    "output": 157,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Underwear boxers have an inventory turnover of 0.496, which is 49.6% over 1 January 2018 to 30 September 2026. I took this figure straight from the category listing for that date range.\n\nANSWER: 49.6"
+  },
+  {
+   "question": "highest-yearly",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "Shirts",
+   "correct": true,
+   "parsed": "Shirts",
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Shirts"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7261,
+    "output": 157,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Shirts had the highest yearly cost over 1 January 2018 to 30 September 2026, at €367.33 a year. Shoes came second at €274.31, and Pants third at €243.96.\n\nANSWER: Shirts"
+  },
+  {
+   "question": "days-used-socks-all",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "80.7",
+   "correct": true,
+   "parsed": 80.7,
+   "expected": {
+    "type": "number",
+    "value": 80.71987480438185,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_overview",
+     "input": {}
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7871,
+    "output": 420,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Socks were worn on about 80.7% of days between 1 January 2018 and 30 September 2026. This is the \"share of days used\" figure for the Socks category, taken from the dashboard listing for that exact date range.\n\nThe diary has 3,201 logged days against about 3,212 calendar days up to 16 October 2026. Nearly every day is logged, so it makes little difference whether the share is counted over logged days or calendar days. I didn't check which of the two the dashboard uses.\n\nANSWER: 80.7"
+  },
+  {
+   "question": "daily-cost-sep-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "5.27",
+   "correct": true,
+   "parsed": 5.27,
+   "expected": {
+    "type": "number",
+    "value": 5.269836059303483,
+    "tolerance": 0.05,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_daily_cost",
+     "input": {
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 7648,
+    "output": 158,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In September 2025, the average daily cost over the 30 days with wears was €5.27. That figure excludes Sportswear.\n\nANSWER: 5.27"
+  },
+  {
+   "question": "wears-per-month-vest",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "8.87",
+   "correct": true,
+   "parsed": 8.87,
+   "expected": {
+    "type": "number",
+    "value": 8.890944066291802,
+    "tolerance": 0.05,
+    "unit": "wears per month"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 6734,
+    "output": 728,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Up to 30 September 2026, the North Bend black vest averages about 8.87 wears per month. I counted wears from the purchase date, including the 2 worn before tracking began.\n\n- **Lifetime wears:** The tool reports 994 wears up to the last logged day, 16 October 2026. That figure includes 2 wears from before tracking.\n- **Wears after 30 September:** The recent-wear list shows 9 in October (3, 5, 7, 8, 10, 12, 14, 15 and 16 October). That leaves 994 − 9 = 985 wears up to 30 September 2026.\n- **Months owned:** The vest was bought on 1 July 2017. From then to 30 September 2026 is 9 years and 3 months, or 111 months.\n- **Average:** 985 ÷ 111 ≈ 8.87 wears per month.\n\nANSWER: 8.87"
+  },
+  {
+   "question": "synthetic-share-sep-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "35.8",
+   "correct": true,
+   "parsed": 35.8,
+   "expected": {
+    "type": "number",
+    "value": 35.75546315993038,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6317,
+    "output": 545,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In September 2025, synthetic fibres made up about 35.8% of the worn fibre mass.\n\nThe worn-mass breakdown for that month has a total of 72.39 kg. I counted these fibres as synthetic:\n\n| Fibre | Mass (kg) |\n|---|---|\n| Polyamide | 12.03 |\n| Polyester | 11.51 |\n| Elastane | 1.57 |\n| Synthetic textile | 0.78 |\n| **Total** | **25.89** |\n\n25.89 / 72.39 ≈ 35.8%.\n\n- **Rubber:** I left it out (6.18 kg), because the data doesn't say whether it is natural or synthetic. Counting it as synthetic would raise the share to about 44.3%.\n- **Coverage:** Only 313 of the 388 wears that month had readable materials, so the figure covers those wears only.\n\nANSWER: 35.8"
+  },
+  {
+   "question": "price-vest",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "50",
+   "correct": true,
+   "parsed": 50,
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1319,
+    "output": 107,
+    "cacheRead": 8469,
+    "cacheWrite": 8469
+   },
+   "turns": 2,
+   "text": "The garment \"North Bend black vest\" (ID Jackets_and_hoodies-006) has a purchase price of 50 euros.\n\nANSWER: 50"
+  },
+  {
+   "question": "purchased-barbour",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "2025",
+   "correct": true,
+   "parsed": 2025,
+   "expected": {
+    "type": "number",
+    "value": 2025,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "Barbour Classic Tartan navy"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1246,
+    "output": 184,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The \"Barbour Classic Tartan navy\" has a purchase date of 2025-11-20 in the diary, so it was bought in 2025. The details field mentions \"KDH AW16\". That looks like a season code for the jacket's model, not the purchase date. It's tagged second hand, and the details say it was bought at Relove Helsinki Airport.\n\nANSWER: 2025"
+  },
+  {
+   "question": "worn-2025-06-15",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15",
+   "correct": true,
+   "parsed": [
+    "ballin amsterdam",
+    "contra regular boxer khaki green 03",
+    "jack jones jacsummer mid blue",
+    "marmot crossover shorts blue",
+    "nike air zoom vomero 15",
+    "nike m tanjun black 2",
+    "pier one black 01 43 46",
+    "soc tech black melange s 02",
+    "tesma coolmax 03",
+    "under armour vanish woven shorts m",
+    "zalando essentials black 27"
+   ],
+   "expected": {
+    "type": "names",
+    "value": [
+     "Marmot crossover shorts blue",
+     "Ballin Amsterdam",
+     "Pier One black 01 (43-46)",
+     "Nike M Tanjun black 2",
+     "Zalando Essentials black 27",
+     "Jack & Jones Jacsummer Mid blue",
+     "SOC Tech black melange S 02",
+     "Under Armour Vanish woven shorts M",
+     "Contra regular boxer Khaki green 03",
+     "Tesma Coolmax 03",
+     "Nike Air Zoom Vomero 15"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-06-15",
+      "to": "2025-06-15"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1091,
+    "output": 276,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Eleven garments were logged as worn on 15 June 2025. Five of them are in the Sportswear category.\n\nANSWER: Marmot crossover shorts blue; Ballin Amsterdam; Pier One black 01 (43-46); Nike M Tanjun black 2; Zalando Essentials black 27; Jack & Jones Jacsummer Mid blue; SOC Tech black melange S 02; Under Armour Vanish woven shorts M; Contra regular boxer Khaki green 03; Tesma Coolmax 03; Nike Air Zoom Vomero 15"
+  },
+  {
+   "question": "wears-march-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "408",
+   "correct": true,
+   "parsed": 408,
+   "expected": {
+    "type": "number",
+    "value": 408,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-03-01",
+      "to": "2025-03-31"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 24170,
+    "output": 1934,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "March 2025 has 408 wears in total, counting every garment on every day, Sportswear included. I got this by counting the items on each day's log from 1 to 31 March and adding the daily counts. I did not cross-check it against a tool-computed total.\n\nDaily counts, in order from 1 to 31 March:\n9, 10, 14, 13, 15, 13, 14, 8, 13, 13, 13, 15, 16, 12, 9, 11, 13, 18, 12, 12, 15, 12, 9, 14, 13, 14, 19, 16, 18, 11, 14\n\nANSWER: 408"
+  },
+  {
+   "question": "distinct-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "250",
+   "correct": true,
+   "parsed": 250,
+   "expected": {
+    "type": "number",
+    "value": 250,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Socks",
+      "limit": 700
+     }
+    },
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Jackets and hoodies",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Blazers and vests",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Knits",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shirts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "T-shirts and tanks",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Pants",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shorts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Belts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Shoes",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear shirts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Underwear boxers",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all",
+      "category": "Sportswear",
+      "limit": 700
+     }
+    }
+   ],
+   "usage": {
+    "input": 371670,
+    "output": 4215,
+    "cacheRead": 50814,
+    "cacheWrite": 0
+   },
+   "turns": 6,
+   "text": "In 2025, 250 different garments were worn at least once. That counts all 13 categories, Sportswear included.\n\nI listed every garment owned at any point in 2025 (341 in total) and counted those with at least one logged wear in the year. The other 91 were owned but never worn in 2025.\n\n| Category | Worn in 2025 |\n|---|---|\n| Jackets and hoodies | 14 |\n| Blazers and vests | 1 |\n| Knits | 1 |\n| Shirts | 16 |\n| T-shirts and tanks | 8 |\n| Pants | 11 |\n| Shorts | 15 |\n| Belts | 5 |\n| Socks | 53 |\n| Shoes | 12 |\n| Underwear shirts | 35 |\n| Underwear boxers | 29 |\n| Sportswear | 50 |\n| **Total** | **250** |\n\nTwo things to know about how this was counted:\n- Garments divested during 2025 still count if they were worn before they were divested.\n- Pre-tracking wears are not counted, so only wears logged in 2025 matter.\n\nANSWER: 250"
+  },
+  {
+   "question": "divested-2024",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "2",
+   "correct": true,
+   "parsed": 2,
+   "expected": {
+    "type": "number",
+    "value": 2,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "limit": 700,
+      "sort": "purchased"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Jackets and hoodies",
+      "limit": 700,
+      "from": "2024-01-01",
+      "to": "2024-12-31"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Blazers and vests",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Knits",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Shirts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Pants",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "category": "Shorts",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "category": "T-shirts and tanks"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "category": "Belts"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "category": "Shoes"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700,
+      "category": "Sportswear"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2024-01-01",
+      "to": "2024-12-31",
+      "limit": 700
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "status": "divested",
+      "from": "2023-01-01",
+      "to": "2023-12-31",
+      "limit": 700,
+      "category": "Shirts"
+     }
+    }
+   ],
+   "usage": {
+    "input": 223425,
+    "output": 3406,
+    "cacheRead": 50814,
+    "cacheWrite": 0
+   },
+   "turns": 6,
+   "text": "Two garments were divested in 2024. Both are socks:\n\n- **Happy Socks white orange balls** (Socks-021), divested 2024-10-02.\n- **Happy Socks navy with colorful dots** (Socks-079), divested 2024-10-20.\n\nI listed divested garments owned during 2024. This filter appears to return only garments whose divest date falls inside the range. I checked that on 2023, where it returned the two shirts with a divest date of 2023-08-01. I also checked the other categories one by one. No jackets, blazers, knits, shirts, pants, shorts, belts, T-shirts, shoes or sportswear were divested in 2024.\n\nThe underwear shirts and underwear boxers had no per-category check. They are covered only by the unfiltered 2024 query. The full divested listing was cut off before reaching their later entries, so I couldn't check them by hand.\n\nANSWER: 2"
+  },
+  {
+   "question": "active-2026-10-01",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "316",
+   "correct": true,
+   "parsed": 316,
+   "expected": {
+    "type": "number",
+    "value": 316,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2026-10-01",
+      "to": "2026-10-01"
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 3421,
+    "output": 169,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "On 1 October 2026, 316 garments were active (owned). That is the Total row of the category listing for a range ending that day. It includes the 63 Sportswear items.\n\nANSWER: 316"
+  },
+  {
+   "question": "value-2025-12-31",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "15589.2",
+   "correct": true,
+   "parsed": 15589.2,
+   "expected": {
+    "type": "number",
+    "value": 15589.199999999999,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2684,
+    "output": 402,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The total inventory value on 31 December 2025 was €15,589.20, across 317 active garments.\n\nI took this from the Dashboard category listing for 2025-01-01 to 2025-12-31. Its Total row includes Sportswear. I added up the 13 category values myself and got the same figure.\n\nANSWER: 15589.2"
+  },
+  {
+   "question": "value-jackets-2020",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "1426",
+   "correct": true,
+   "parsed": 1426,
+   "expected": {
+    "type": "number",
+    "value": 1426,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2020-01-01"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2657,
+    "output": 176,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Jackets and hoodies category had an inventory value of €1,426 on 1 January 2020. That is the sum of the purchase prices of its 9 garments that were active on that date, taken from the category listing for 2018-01-01 to 2020-01-01.\n\nANSWER: 1426"
+  },
+  {
+   "question": "most-worn-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "Diesel black matte 02",
+   "correct": true,
+   "parsed": "Diesel black matte 02",
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Diesel black matte 02"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "limit": 5
+     }
+    }
+   ],
+   "usage": {
+    "input": 2135,
+    "output": 181,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The garment worn the most times in 2025 was the Diesel black matte 02 belt. I logged 204 wears for it in 2025, ahead of the North Bend black vest in second place with 181.\n\nANSWER: Diesel black matte 02"
+  },
+  {
+   "question": "times-vest-2023",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "82",
+   "correct": true,
+   "parsed": 82,
+   "expected": {
+    "type": "number",
+    "value": 82,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "search": "North Bend",
+      "from": "2023-01-01",
+      "to": "2023-12-31",
+      "status": "all"
+     }
+    }
+   ],
+   "usage": {
+    "input": 3567,
+    "output": 189,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The \"North Bend black vest\" was worn 82 times in 2023. The range didn't start on 1 January 2018, so pre-tracking wears aren't included in that count.\n\nANSWER: 82"
+  },
+  {
+   "question": "days-used-shoes-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "89.04",
+   "correct": true,
+   "parsed": 89.04,
+   "expected": {
+    "type": "number",
+    "value": 89.04109589041096,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-03-31"
+     }
+    },
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-04-01",
+      "to": "2025-06-30"
+     }
+    },
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-07-01",
+      "to": "2025-09-30"
+     }
+    },
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-10-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "category": "Shoes",
+      "from": "2025-01-01",
+      "to": "2025-12-31",
+      "status": "all"
+     }
+    }
+   ],
+   "usage": {
+    "input": 236575,
+    "output": 1687,
+    "cacheRead": 33876,
+    "cacheWrite": 0
+   },
+   "turns": 4,
+   "text": "Shoes were worn on 89.04% of the days in 2025 (325 of 365 days).\n\nI didn't count the days directly, because the daily wear logs came back truncated. I worked back from the 2025 Shoes row of the category table, which gives yearly cost and days used. Yearly cost is cost per wear × 365 × days used (per the semantic layer).\n\n- **Yearly cost (Shoes, 2025):** €272.76, from the category table.\n- **Cost per wear (Shoes):** The 19 pairs owned at some point in 2025 cost €2,363.39 in total and were worn 2,816 times over their lifetimes. That gives €0.8393 per wear.\n- **Days used:** 272.76 ÷ (0.8393 × 365) = 0.8903. This agrees with the 0.89 shown in the category table.\n\n0.8903 × 365 is 324.96, so I took it as 325 days. 325 ÷ 365 = 89.04%.\n\nANSWER: 89.04"
+  },
+  {
+   "question": "hanko-active",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "49",
+   "correct": true,
+   "parsed": 49,
+   "expected": {
+    "type": "number",
+    "value": 49,
+    "tolerance": 0,
+    "unit": "count"
+   },
+   "toolCalls": [
+    {
+     "name": "list_garments",
+     "input": {
+      "tag": "hanko",
+      "status": "all",
+      "limit": 700
+     }
+    },
+    {
+     "name": "get_overview",
+     "input": {}
+    }
+   ],
+   "usage": {
+    "input": 23803,
+    "output": 1273,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "49 garments tagged Hanko were active on 1 October 2026.\n\nI took the 86 garments with the Hanko tag, including divested ones, and kept those whose ownership period covers 1 October 2026. A garment is active from its purchase date through its divest date, inclusive.\n\n- **Divested before the date:** 37 of the 86 have divest dates between 2018 and 5 August 2026, so they were no longer owned on 1 October 2026.\n- **Bought after the date:** none. The latest Hanko purchase was in June 2025.\n- **Still active:** the other 49 have no divest date, so they were all active on that day.\n\nANSWER: 49"
+  },
+  {
+   "question": "second-hand-share-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "5.99",
+   "correct": true,
+   "parsed": 5.99,
+   "expected": {
+    "type": "number",
+    "value": 5.993690851735016,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2676,
+    "output": 522,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Of the 317 garments active at the end of 2025, 19 were bought second hand, which is 5.99%.\n\nI read each category's second-hand share and active-item count from the 2025 category listing. I multiplied them to get the second-hand counts below. The total includes Sportswear.\n\n| Category | Active items | Second hand |\n|---|---|---|\n| Jackets and hoodies | 22 | 5 |\n| Shirts | 18 | 2 |\n| T-shirts and tanks | 16 | 1 |\n| Pants | 13 | 2 |\n| Shorts | 16 | 3 |\n| Shoes | 18 | 5 |\n| Sportswear | 57 | 1 |\n| Other categories | 157 | 0 |\n| **Total** | **317** | **19** |\n\n19 / 317 = 5.99%. This matches the listing's own total of 0.06, which is rounded.\n\nANSWER: 5.99"
+  },
+  {
+   "question": "outfit-weight-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "3.93",
+   "correct": true,
+   "parsed": 3.93,
+   "expected": {
+    "type": "number",
+    "value": 3.9284986301369953,
+    "tolerance": 0.02,
+    "unit": "kg"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "explain",
+     "input": {
+      "query": "average-outfit-weight"
+     }
+    },
+    {
+     "name": "get_wears",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-03-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 32289,
+    "output": 861,
+    "cacheRead": 25407,
+    "cacheWrite": 0
+   },
+   "turns": 3,
+   "text": "The average outfit weight in 2025 was about 3.93 kg per logged day. This is the `averageOutfitKg` figure from the worn-basis material breakdown for 2025-01-01 to 2025-12-31.\n\nI didn't recompute it from the daily wear log. The breakdown's fibre total (1,156.52 kg) covers only wears that also have readable materials. That total divided by the logged days would come out lower than 3.93, so I take the average outfit weight to be calculated from all wears with a known weight. Only 2 of the 4,269 wears in 2025 had no weight, and I didn't check this further.\n\nANSWER: 3.93"
+  },
+  {
+   "question": "wool-owned",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "1.86",
+   "correct": true,
+   "parsed": 1.86,
+   "expected": {
+    "type": "number",
+    "value": 1.8624800000000001,
+    "tolerance": 0.1,
+    "unit": "kg"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "owned",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1800,
+    "output": 213,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The wardrobe held about 1.86 kg of wool on 30 September 2026. That is the wool figure from the owned-basis material breakdown, which counts garments active on that date (weight × main-part composition).\n\nOnly 266 of the 316 active garments had both a weight and readable materials, so this is a lower bound. Eight garments had no weight and 45 had no readable materials.\n\nANSWER: 1.86"
+  },
+  {
+   "question": "synthetic-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "33.2",
+   "correct": true,
+   "parsed": 33.2,
+   "expected": {
+    "type": "number",
+    "value": 33.20148964649001,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    },
+    {
+     "name": "explain",
+     "input": {
+      "query": "synthetic-share"
+     }
+    },
+    {
+     "name": "explain",
+     "input": {
+      "query": "fibre class"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6637,
+    "output": 954,
+    "cacheRead": 33876,
+    "cacheWrite": 0
+   },
+   "turns": 4,
+   "text": "In 2025, about 33.2% of the mass of clothes worn was synthetic fibre.\n\nThe worn-basis fibre breakdown for 2025 gives a total fibre mass of 1156.52 kg. The synthetic fibres in it are:\n\n| Fibre | kg |\n|---|---|\n| Polyamide | 218.44 |\n| Polyester | 138.18 |\n| Elastane | 21.84 |\n| Synthetic textile | 5.20 |\n| Acrylic | 0.32 |\n| **Total** | **383.98** |\n\n383.98 / 1156.52 = 33.2%.\n\n- **\"Synthetic textile\":** I counted it as synthetic because of its name. The definitions don't classify it explicitly. Leaving it out gives 378.78 kg, or 32.75%.\n- **Rubber and \"textile\":** I left both out. Rubber isn't a synthetic fibre in the definitions' list, and plain \"textile\" has no stated fibre.\n- **Coverage:** Only wears where the garment has both a weight and readable materials are included. That is 3,689 of 4,269 wears in 2025, so the share describes the covered wears only.\n\nANSWER: 33.2"
+  },
+  {
+   "question": "cpw-vest-2024",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.05",
+   "correct": true,
+   "parsed": 0.05,
+   "expected": {
+    "type": "number",
+    "value": 0.05030181086519115,
+    "tolerance": 0.002,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1325,
+    "output": 285,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The \"North Bend black vest\" cost €0.05 per wear in 2024, or €0.0503 before rounding.\n\nCost per wear is always a lifetime figure, so the date range doesn't change it. It is the price divided by all wears over the whole ownership period, and that includes wears after 2024. The vest cost €50. Its lifetime wears are 994, which is 992 logged wears plus 2 from before tracking began.\n\n€50 / 994 ≈ €0.0503\n\nANSWER: 0.05"
+  },
+  {
+   "question": "cpw-shirts-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "1.30",
+   "correct": true,
+   "parsed": 1.3,
+   "expected": {
+    "type": "number",
+    "value": 1.2957848605577693,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2662,
+    "output": 183,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The cost per wear of the Shirts category in 2025 was €1.30. This is the category's pooled figure: the summed prices of its garments owned at any point in 2025, divided by their summed lifetime wears. It comes from the category listing for 1 January to 31 December 2025.\n\nANSWER: 1.30"
+  },
+  {
+   "question": "cpw-socks-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.14",
+   "correct": true,
+   "parsed": 0.14,
+   "expected": {
+    "type": "number",
+    "value": 0.1385922122379119,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2660,
+    "output": 270,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025, the Socks category had a cost per wear of about €0.14. I took this from the category listing for 2025-01-01 to 2025-12-31, where it is rounded to two decimals. The listing's other Socks figures agree with it: a yearly cost of €46.29 and 91.5% of days used give 46.29 / (365 × 0.915) ≈ €0.139.\n\nANSWER: 0.14"
+  },
+  {
+   "question": "cpw-belts-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.26",
+   "correct": true,
+   "parsed": 0.26,
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2660,
+    "output": 262,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The cost per wear of the Belts category in 2025 was **€0.26**. This is the Belts figure from the category listing for 1 January to 31 December 2025.\n\nThe category figure is the total purchase price of the belts owned at any point in 2025, divided by their lifetime wears. Lifetime wears include any wears after 2025.\n\nANSWER: 0.26"
+  },
+  {
+   "question": "cpw-blazers-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "13.18",
+   "correct": true,
+   "parsed": 13.18,
+   "expected": {
+    "type": "number",
+    "value": 13.177777777777779,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2668,
+    "output": 250,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The cost per wear of the Blazers and vests category in 2025 was **€13.18**.\n\nThis is the category figure from the Dashboard table for 1 January to 31 December 2025. It is the summed prices of the category's garments owned at any point in 2025, divided by their lifetime wears. The category had 3 active items worth €711.60 at the end of 2025.\n\nANSWER: 13.18"
+  },
+  {
+   "question": "yearly-pants-2024",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "170.96",
+   "correct": true,
+   "parsed": 170.96,
+   "expected": {
+    "type": "number",
+    "value": 170.95909982063154,
+    "tolerance": 1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2024-01-01",
+      "to": "2024-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2648,
+    "output": 143,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Pants category had a yearly cost of 170.96 euros in 2024. That figure comes from the category listing for 1 January to 31 December 2024.\n\nANSWER: 170.96"
+  },
+  {
+   "question": "monthly-shoes-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "22.73",
+   "correct": true,
+   "parsed": 22.73,
+   "expected": {
+    "type": "number",
+    "value": 22.730283794981062,
+    "tolerance": 0.1,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2662,
+    "output": 251,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Shoes category's yearly cost in 2025 was €272.76. That is its cost per wear multiplied by 365 and by its share of days used. Monthly cost is yearly cost divided by 12, so €272.76 / 12 = €22.73.\n\nANSWER: 22.73"
+  },
+  {
+   "question": "turnover-boxers",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "49.6",
+   "correct": true,
+   "parsed": 49.6,
+   "expected": {
+    "type": "number",
+    "value": 49.58385027222119,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2718,
+    "output": 280,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Over 1 January 2018 to 30 September 2026, the Underwear boxers category has an inventory turnover of about 49.6%.\n\nThe category listing gives a yearly cost of €119.59 and an inventory value of €241.19 for that range. Turnover is yearly cost divided by inventory value, so 119.59 / 241.19 ≈ 0.4958. The listing shows the same figure rounded to 0.496.\n\nANSWER: 49.6"
+  },
+  {
+   "question": "highest-yearly",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "Shirts",
+   "correct": true,
+   "parsed": "Shirts",
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Shirts"
+    ]
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2698,
+    "output": 153,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The category with the highest yearly cost from 1 January 2018 to 30 September 2026 is Shirts, at €367.33 per year. The next highest is Shoes at €274.31.\n\nANSWER: Shirts"
+  },
+  {
+   "question": "days-used-socks-all",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "80.7",
+   "correct": true,
+   "parsed": 80.7,
+   "expected": {
+    "type": "number",
+    "value": 80.71987480438185,
+    "tolerance": 0.5,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2018-01-01",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2704,
+    "output": 255,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "Socks were worn on about 80.7% of days between 1 January 2018 and 30 September 2026. This is the \"days used\" figure for the Socks category from the category listing. It counts the days on which at least one pair of socks was worn. The listing gives it rounded to three decimals, so 80.7% is as precise as I could get it.\n\nANSWER: 80.7"
+  },
+  {
+   "question": "daily-cost-sep-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "5.27",
+   "correct": true,
+   "parsed": 5.27,
+   "expected": {
+    "type": "number",
+    "value": 5.269836059303483,
+    "tolerance": 0.05,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_daily_cost",
+     "input": {
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2117,
+    "output": 170,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The average daily cost over the 30 days with wears in September 2025 (Sportswear excluded) is 5.27 euros. That is the figure the daily cost tool reports for the month. The mean of the 30 daily values gives the same result.\n\nANSWER: 5.27"
+  },
+  {
+   "question": "wears-per-month-vest",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "8.89",
+   "correct": true,
+   "parsed": 8.89,
+   "expected": {
+    "type": "number",
+    "value": 8.890944066291802,
+    "tolerance": 0.05,
+    "unit": "wears per month"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    },
+    {
+     "name": "list_garments",
+     "input": {
+      "search": "North Bend black vest",
+      "to": "2026-09-30"
+     }
+    }
+   ],
+   "usage": {
+    "input": 3466,
+    "output": 641,
+    "cacheRead": 25407,
+    "cacheWrite": 0
+   },
+   "turns": 3,
+   "text": "Over its whole ownership up to 30 September 2026, the North Bend black vest has been worn about 8.89 times per month.\n\n- **Ownership period:** It was bought on 2017-07-01 and has not been divested. Counting from the purchase date to 2026-09-30, both days included, that is 3,379 days, or about 110.8 months of 30.5 days.\n- **Wears:** The range starts at the start of tracking, so it includes the 2 pre-tracking wears. That gives 985 wears in the range.\n- **Result:** 985 ÷ (3,379 ÷ 30.5) ≈ 8.89 wears per month. This matches the figure from the garment listing for that range.\n\nANSWER: 8.89"
+  },
+  {
+   "question": "synthetic-share-sep-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "35.8",
+   "correct": true,
+   "parsed": 35.8,
+   "expected": {
+    "type": "number",
+    "value": 35.75546315993038,
+    "tolerance": 1,
+    "unit": "percent"
+   },
+   "toolCalls": [
+    {
+     "name": "get_material_breakdown",
+     "input": {
+      "basis": "worn",
+      "from": "2025-09-01",
+      "to": "2025-09-30"
+     }
+    },
+    {
+     "name": "explain",
+     "input": {
+      "query": "synthetic-share"
+     }
+    },
+    {
+     "name": "explain",
+     "input": {
+      "query": "Fibre class"
+     }
+    }
+   ],
+   "usage": {
+    "input": 5986,
+    "output": 942,
+    "cacheRead": 33876,
+    "cacheWrite": 0
+   },
+   "turns": 4,
+   "text": "In September 2025, about 35.8% of the worn fibre mass was synthetic. That counts \"synthetic textile\" as synthetic, which is my assumption. The definitions don't say how that label is classified.\n\nThe worn-basis breakdown for 1–30 September 2025 totals 72.39 kg. It only covers wears with a readable materials label: 313 of 388 wears, because 75 had no readable materials.\n\nSynthetic fibres in that month:\n\n| Fibre | kg |\n|---|---|\n| Polyamide | 12.03 |\n| Polyester | 11.51 |\n| Elastane | 1.57 |\n| Synthetic textile | 0.78 |\n| **Total** | **25.89** |\n\n25.89 / 72.39 = 35.8%.\n\nIf \"synthetic textile\" were left out, the share would be 25.11 / 72.39 = 34.7%.\n\nI did not count rubber (6.18 kg) or the generic \"textile\" (3.84 kg) as synthetic. The glossary lists rubber under neither natural, regenerated cellulose nor synthetic, so I treated it as \"other\". Counting either of them would raise the share.\n\nANSWER: 35.8"
+  }
+ ]
+}

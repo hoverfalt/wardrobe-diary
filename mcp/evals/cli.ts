@@ -210,7 +210,16 @@ function report() {
   const dir = resolve(EVALS, "results");
   if (!existsSync(dir)) return console.log("No results yet.");
   const files = readdirSync(dir).filter((f) => f.endsWith(".json") && f !== "summary.json");
-  const runs: Run[] = files.flatMap((f) => JSON.parse(readFileSync(resolve(dir, f), "utf8")).runs);
+  // Only complete runs count: a condition's answers from a file are included only if they cover every question
+  // (so trial runs with --only don't skew the totals).
+  const all = new Set(QUESTIONS.map((q) => q.id));
+  const runs: Run[] = files.flatMap((f) => {
+    const rs: Run[] = JSON.parse(readFileSync(resolve(dir, f), "utf8")).runs;
+    return [...new Set(rs.map((r) => r.condition))].flatMap((c) => {
+      const group = rs.filter((r) => r.condition === c);
+      return [...all].every((id) => group.some((r) => r.question === id)) ? group : [];
+    });
+  });
   const kinds = Object.fromEntries(QUESTIONS.map((q) => [q.id, q.kind]));
   const groups: Record<string, { correct: number; total: number; tokens: number; toolCalls: number }> = {};
   for (const r of runs) {

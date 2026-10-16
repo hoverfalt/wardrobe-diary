@@ -1,0 +1,133 @@
+{
+ "model": "claude-sonnet-5-5",
+ "ranAt": "2026-10-16T13:17:42.046Z",
+ "snapshot": {
+  "takenAt": "2026-10-16",
+  "lastLoggedDay": "2026-10-16"
+ },
+ "semanticLayer": "0.2.1",
+ "runs": [
+  {
+   "question": "price-vest",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "50",
+   "correct": true,
+   "parsed": 50,
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    }
+   ],
+   "usage": {
+    "input": 6102,
+    "output": 120,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The garment \"North Bend black vest\" (ID Jackets_and_hoodies-006) has a purchase price of 50 euros. It was bought on 2017-07-01.\n\nANSWER: 50"
+  },
+  {
+   "question": "cpw-belts-2025",
+   "condition": "tools",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.26",
+   "correct": true,
+   "parsed": 0.26,
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 7223,
+    "output": 141,
+    "cacheRead": 0,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "In 2025 the Belts category had a cost per wear of €0.26. This is the figure in the category listing for 1 January to 31 December 2025.\n\nANSWER: 0.26"
+  },
+  {
+   "question": "price-vest",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "50",
+   "correct": true,
+   "parsed": 50,
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_garment",
+     "input": {
+      "id": "North Bend black vest"
+     }
+    }
+   ],
+   "usage": {
+    "input": 1319,
+    "output": 88,
+    "cacheRead": 8469,
+    "cacheWrite": 8469
+   },
+   "turns": 2,
+   "text": "The purchase price of the \"North Bend black vest\" is 50 euros.\n\nANSWER: 50"
+  },
+  {
+   "question": "cpw-belts-2025",
+   "condition": "semantic",
+   "model": "claude-sonnet-5-5",
+   "answer": "0.26",
+   "correct": true,
+   "parsed": 0.26,
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   },
+   "toolCalls": [
+    {
+     "name": "get_category_listing",
+     "input": {
+      "from": "2025-01-01",
+      "to": "2025-12-31"
+     }
+    }
+   ],
+   "usage": {
+    "input": 2660,
+    "output": 246,
+    "cacheRead": 16938,
+    "cacheWrite": 0
+   },
+   "turns": 2,
+   "text": "The Belts category had a cost per wear of about €0.26 in 2025. That figure comes from the category listing for 1 January to 31 December 2025.\n\nANSWER: 0.26"
+  }
+ ]
+}

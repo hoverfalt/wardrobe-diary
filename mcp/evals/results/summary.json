@@ -1,0 +1,129 @@
+{
+ "updated": "2026-10-16T13:43:06.648Z",
+ "files": [
+  "2026-10-16-13-17-claude-sonnet-5-5.json",
+  "2026-10-16-13-39-claude-sonnet-5-5.json"
+ ],
+ "summary": [
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "raw",
+   "kind": "all",
+   "correct": 7,
+   "total": 30,
+   "accuracy": 0.23333333333333334,
+   "avgTokens": 176708,
+   "avgToolCalls": 0
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "raw",
+   "kind": "lookup",
+   "correct": 4,
+   "total": 6,
+   "accuracy": 0.6666666666666666,
+   "avgTokens": 175438,
+   "avgToolCalls": 0
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "raw",
+   "kind": "metric",
+   "correct": 3,
+   "total": 11,
+   "accuracy": 0.2727272727272727,
+   "avgTokens": 177134,
+   "avgToolCalls": 0
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "raw",
+   "kind": "definition",
+   "correct": 0,
+   "total": 13,
+   "accuracy": 0,
+   "avgTokens": 176935,
+   "avgToolCalls": 0
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "tools",
+   "kind": "all",
+   "correct": 29,
+   "total": 30,
+   "accuracy": 0.9666666666666667,
+   "avgTokens": 52574,
+   "avgToolCalls": 2.7333333333333334
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "tools",
+   "kind": "lookup",
+   "correct": 6,
+   "total": 6,
+   "accuracy": 1,
+   "avgTokens": 226870,
+   "avgToolCalls": 7.5
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "tools",
+   "kind": "metric",
+   "correct": 11,
+   "total": 11,
+   "accuracy": 1,
+   "avgTokens": 10476,
+   "avgToolCalls": 1.7272727272727273
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "tools",
+   "kind": "definition",
+   "correct": 12,
+   "total": 13,
+   "accuracy": 0.9230769230769231,
+   "avgTokens": 7751,
+   "avgToolCalls": 1.3846153846153846
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "semantic",
+   "kind": "all",
+   "correct": 30,
+   "total": 30,
+   "accuracy": 1,
+   "avgTokens": 54754,
+   "avgToolCalls": 2.3666666666666667
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "semantic",
+   "kind": "lookup",
+   "correct": 6,
+   "total": 6,
+   "accuracy": 1,
+   "avgTokens": 133737,
+   "avgToolCalls": 5.5
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "semantic",
+   "kind": "metric",
+   "correct": 11,
+   "total": 11,
+   "accuracy": 1,
+   "avgTokens": 50321,
+   "avgToolCalls": 2
+  },
+  {
+   "model": "claude-sonnet-5-5",
+   "condition": "semantic",
+   "kind": "definition",
+   "correct": 13,
+   "total": 13,
+   "accuracy": 1,
+   "avgTokens": 22051,
+   "avgToolCalls": 1.2307692307692308
+  }
+ ]
+}
