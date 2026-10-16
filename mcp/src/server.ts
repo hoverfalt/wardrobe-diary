@@ -3,11 +3,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { loadWardrobe } from "./publicData";
+import { loadPublic, loadWardrobe } from "./publicData";
+import semanticsJson from "../../web/src/generated/semantics.json";
+import { runQuality } from "../../web/src/lib/quality";
+import { CATALOG, DEFINITIONS, explain, GLOSSARY, provenance, SEMANTIC_MODEL, SEMANTIC_VERSION } from "./semantics";
 import { TAG_IDS, type Tag } from "../../web/src/lib/tags";
 import {
   categoryTable,
-  DEFINITIONS,
+  lastLoggedDay,
   getDailyCost,
   getGarment,
   getWears,
@@ -26,10 +29,14 @@ const to = z.string().optional().describe("End date YYYY-MM-DD (default: the las
 const category = z.string().optional().describe('Category name, e.g. "Shirts" (see get_overview)');
 const readOnly = { readOnlyHint: true, openWorldHint: false } as const;
 
-/** Runs a tool and returns its result as JSON text, or the error message as a tool error. */
-async function run(fn: () => Promise<unknown> | unknown) {
+/** Runs a tool and returns its result as JSON text (with provenance: which definitions, which data), or the
+ *  error message as a tool error. */
+async function run(tool: string, fn: () => Promise<unknown> | unknown) {
   try {
-    return { content: [{ type: "text" as const, text: JSON.stringify(await fn(), null, 1) }] };
+    const result = await fn();
+    const body = result && typeof result === "object" && !Array.isArray(result) ? result : { result };
+    const wardrobe = await loadWardrobe().catch(() => null); // provenance without data details if it can't be read
+    return { content: [{ type: "text" as const, text: JSON.stringify({ ...body, provenance: provenance(tool, wardrobe) }, null, 1) }] };
   } catch (e) {
     return { content: [{ type: "text" as const, text: e instanceof Error ? e.message : String(e) }], isError: true };
   }
@@ -42,7 +49,7 @@ server.registerTool(
     description: "Start here: what the data covers (tracking start, last logged day, counts) and the categories with their active item counts.",
     annotations: readOnly,
   },
-  () => run(async () => overview(await loadWardrobe())),
+  () => run("get_overview", async () => overview(await loadWardrobe())),
 );
 
 server.registerTool(
@@ -54,7 +61,7 @@ server.registerTool(
     inputSchema: { from, to },
     annotations: readOnly,
   },
-  ({ from, to }) => run(async () => { const w = await loadWardrobe(); return categoryTable(w, resolveRange(w, from, to)); }),
+  ({ from, to }) => run("get_category_listing", async () => { const w = await loadWardrobe(); return categoryTable(w, resolveRange(w, from, to)); }),
 );
 
 server.registerTool(
@@ -78,7 +85,7 @@ server.registerTool(
     },
     annotations: readOnly,
   },
-  ({ from, to, ...opts }) => run(async () => { const w = await loadWardrobe(); return listGarments(w, { range: resolveRange(w, from, to), ...opts }); }),
+  ({ from, to, ...opts }) => run("list_garments", async () => { const w = await loadWardrobe(); return listGarments(w, { range: resolveRange(w, from, to), ...opts }); }),
 );
 
 server.registerTool(
@@ -89,7 +96,7 @@ server.registerTool(
     inputSchema: { id: z.string().describe("Garment id or exact name") },
     annotations: readOnly,
   },
-  ({ id }) => run(async () => getGarment(await loadWardrobe(), id)),
+  ({ id }) => run("get_garment", async () => getGarment(await loadWardrobe(), id)),
 );
 
 server.registerTool(
@@ -100,7 +107,7 @@ server.registerTool(
     inputSchema: { from: z.string().describe("Start date YYYY-MM-DD"), to: z.string().describe("End date YYYY-MM-DD") },
     annotations: readOnly,
   },
-  ({ from, to }) => run(async () => { const w = await loadWardrobe(); return getWears(w, resolveRange(w, from, to)); }),
+  ({ from, to }) => run("get_wears", async () => { const w = await loadWardrobe(); return getWears(w, resolveRange(w, from, to)); }),
 );
 
 server.registerTool(
@@ -111,7 +118,7 @@ server.registerTool(
     inputSchema: { from, to, category },
     annotations: readOnly,
   },
-  ({ from, to, category }) => run(async () => { const w = await loadWardrobe(); return getDailyCost(w, resolveRange(w, from, to), category); }),
+  ({ from, to, category }) => run("get_daily_cost", async () => { const w = await loadWardrobe(); return getDailyCost(w, resolveRange(w, from, to), category); }),
 );
 
 server.registerTool(
@@ -122,7 +129,7 @@ server.registerTool(
     inputSchema: { from, to, measure: z.enum(["items", "value"]).describe("items = number of active garments; value = sum of their purchase prices"), category },
     annotations: readOnly,
   },
-  ({ from, to, measure, category }) => run(async () => { const w = await loadWardrobe(); return inventoryOverTime(w, resolveRange(w, from, to), measure, category); }),
+  ({ from, to, measure, category }) => run("get_inventory_over_time", async () => { const w = await loadWardrobe(); return inventoryOverTime(w, resolveRange(w, from, to), measure, category); }),
 );
 
 server.registerTool(
@@ -134,8 +141,45 @@ server.registerTool(
     inputSchema: { from, to, basis: z.enum(["owned", "worn"]).describe("owned = wardrobe at the end of the range; worn = what was worn in the range"), category },
     annotations: readOnly,
   },
-  ({ from, to, basis, category }) => run(async () => { const w = await loadWardrobe(); return materialTable(w, resolveRange(w, from, to), basis, category); }),
+  ({ from, to, basis, category }) => run("get_material_breakdown", async () => { const w = await loadWardrobe(); return materialTable(w, resolveRange(w, from, to), basis, category); }),
 );
+
+server.registerTool(
+  "explain",
+  {
+    title: "Explain a term, metric or field",
+    description:
+      "The full, authoritative definition of any term (e.g. \"cost per wear\", \"days used\"), metric id, field (e.g. \"garments.price\"), dataset or decision (e.g. \"D-2\") from the semantic layer: definition, formula, grain, unit, how the date range applies, inputs, decisions behind it, implementing code and tests. Use it before interpreting a number.",
+    inputSchema: { query: z.string().describe("A term, metric id, field (dataset.field), dataset id or decision id") },
+    annotations: readOnly,
+  },
+  ({ query }) => run("explain", () => explain(query)),
+);
+
+server.registerTool(
+  "get_data_quality",
+  {
+    title: "Data quality",
+    description: "Runs the semantic layer's data quality rules on the current public data (unique ids, valid dates and amounts, worn garments exist, wears within ownership, materials coverage) and reports the results.",
+    annotations: readOnly,
+  },
+  () =>
+    run("get_data_quality", async () => {
+      const { raw, wardrobe } = await loadPublic();
+      const ids = (semanticsJson as { qualityRules: { id: string }[] }).qualityRules.map((r) => r.id);
+      return { asOf: lastLoggedDay(wardrobe), results: runQuality(raw, ids, lastLoggedDay(wardrobe)) };
+    }),
+);
+
+for (const [name, uri, title, description, body] of [
+  ["glossary", "wardrobe://glossary", "Glossary", "Every term with its definition (SKOS-style JSON)", GLOSSARY],
+  ["semantic-model", "wardrobe://semantic-model", "Semantic model", "Every metric (formula, grain, unit, range rule, code, tests), decisions and the conceptual model", SEMANTIC_MODEL],
+  ["catalog", "wardrobe://catalog", "Data catalog", "Datasets, fields, access, lineage and quality rules", CATALOG],
+] as const) {
+  server.registerResource(name, uri, { title, description: `${description} (semantic layer ${SEMANTIC_VERSION})`, mimeType: "application/json" }, (u) => ({
+    contents: [{ uri: u.href, mimeType: "application/json", text: JSON.stringify(body, null, 1) }],
+  }));
+}
 
 server.registerResource(
   "definitions",

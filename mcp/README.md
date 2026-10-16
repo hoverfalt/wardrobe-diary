@@ -1,7 +1,7 @@
 # Wardrobe Diary MCP server
 
-Read-only [MCP](https://modelcontextprotocol.io) server for the public Wardrobe Diary data (ROADMAP R-29,
-phase 1). It reads the world-readable `public/data` document (the same one the public web pages read; no
+Read-only [MCP](https://modelcontextprotocol.io) server for the public Wardrobe Diary data (ROADMAP R-29 phase 1,
+R-40). It reads the world-readable `public/data` document (the same one the public web pages read; no
 key needed), caches it for 5 minutes, and computes everything with the web app's own `web/src/lib/metrics.ts`
 (bundled in), so answers match the Dashboard.
 
@@ -16,8 +16,15 @@ key needed), caches it for 5 minutes, and computes everything with the web app's
 | `get_wears` | What was worn each day (≤ 92 days) |
 | `get_daily_cost` | Daily cost per day (≤ 92 days) or as monthly averages |
 | `get_inventory_over_time` | Active items or inventory value per category, at month ends |
+| `get_material_breakdown` | Fibre mass owned or worn (weight × composition), with coverage |
+| `get_data_quality` | The semantic layer's quality rules run on the current data |
+| `explain` | The authoritative definition of any term, metric, field (`garments.price`), dataset or decision (`D-2`) |
 
-Resource `wardrobe://definitions`: how every metric is calculated.
+**Every answer carries `provenance`:** the semantic-layer version, the metric definitions the numbers come from
+(with links to [wardrobediary.io/model](https://wardrobediary.io/model)), and the data's last logged day.
+
+Resources, all generated from the [semantic layer](../semantics/): `wardrobe://definitions` (every term,
+metric and decision as text), `wardrobe://glossary`, `wardrobe://semantic-model`, `wardrobe://catalog` (JSON).
 
 ## Build and test
 
