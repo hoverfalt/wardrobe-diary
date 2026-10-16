@@ -159,13 +159,19 @@ async function main() {
     return;
   }
   if (cmd === "run") {
-    if (!process.env.ANTHROPIC_API_KEY) throw new Error("Set ANTHROPIC_API_KEY to run the evaluation.");
+    const key = process.env.ANTHROPIC_API_KEY ?? "";
+    if (!key) throw new Error("Set ANTHROPIC_API_KEY to run the evaluation.");
+    // A key pasted with a stray character (e.g. "…" or a smart quote) fails every request; catch it up front.
+    const bad = [...key].findIndex((c) => c.charCodeAt(0) > 126 || c.charCodeAt(0) < 33);
+    if (bad >= 0) throw new Error(`ANTHROPIC_API_KEY has an invalid character at position ${bad} (code ${key.charCodeAt(bad)}): paste the key exactly, without "…", quotes or spaces.`);
     const model = arg("--model") ?? "claude-sonnet-5-5";
     const conditions = (arg("--condition")?.split(",") ?? CONDITIONS) as Condition[];
     const only = arg("--only")?.split(",");
     const repeat = Number(arg("--repeat") ?? 1);
     const questions = QUESTIONS.filter((q) => !only || only.includes(q.id));
     const client = new Anthropic();
+    // Check the key and model with one tiny request before running anything.
+    await client.messages.create({ model, max_tokens: 1, messages: [{ role: "user", content: "ok" }] });
     const runs: Run[] = [];
     for (const condition of conditions) {
       const mcp = condition === "raw" ? null : await startServer(condition === "semantic");
@@ -180,10 +186,13 @@ async function main() {
           const r = await ask(client, model, condition, q, expected[q.id], mcp, extra);
           runs.push(r);
           console.log(`${condition.padEnd(9)} ${q.id.padEnd(26)} ${r.correct ? "✓" : "✕"} answer ${r.answer ?? "–"}${r.error ? ` (${r.error.slice(0, 80)})` : ""}`);
+          // Stop on repeated API errors (authentication, quota…) rather than recording a run of failures.
+          if (runs.slice(-3).length === 3 && runs.slice(-3).every((x) => x.error)) throw new Error(`Stopped: the last three requests failed (${r.error}). Nothing was saved.`);
         }
       }
       await mcp?.close();
     }
+    if (runs.every((r) => r.error)) throw new Error("Every request failed; nothing was saved.");
     const dir = resolve(EVALS, "results");
     mkdirSync(dir, { recursive: true });
     const file = resolve(dir, `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}-${model}.json`);
