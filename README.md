@@ -33,4 +33,4 @@ in [CLAUDE.md](CLAUDE.md).
 ## Licence
 
 Code: [MIT](LICENSE). Semantic layer, site content and data: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-(see [LICENSE](LICENSE)). © Olof Hoverfält. Contact: [linkedin.com/in/hoverfalt](https://www.linkedin.com/in/hoverfalt/).
+(see [LICENSE-CONTENT.md](LICENSE-CONTENT.md)). © Olof Hoverfält. Contact: [linkedin.com/in/hoverfalt](https://www.linkedin.com/in/hoverfalt/).

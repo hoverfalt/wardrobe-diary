@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This MIT licence covers the source code. The following are licensed separately under the Creative Commons
-Attribution 4.0 International licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/):
-the semantic layer (semantics/), the landing page text and images (web/index.html and the images it shows),
-and the Wardrobe Diary data (the public data document and photos). Attribution: "Olof Hoverfält, The Wardrobe
-Diary Project, wardrobediary.io".
