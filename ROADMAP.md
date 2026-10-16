@@ -31,7 +31,17 @@ _(empty)_
 
 ## Now
 
-- **R-16 Domain switch – paused 2026-10-13; next up.** Everything on the new site is done
+- **R-16 Domain switch – in progress (2026-10-16 evening).** Status: Firebase custom domain (site `wardrobediary`,
+  Advanced setup) stages 1 (ownership TXT `hosting-site=wardrobediary`) and 2 (certificate, `_acme-challenge` TXT)
+  **done**; certificate issued (Google Trust Services, valid to 2027-01-11) and verified by Claude via Firebase's IP:
+  all redirects and pages OK under wardrobediary.io. Stage 3: Olof changed the Bluehost `@` A record to
+  `199.36.158.100` (TTL 15 min) at ~19:15 UTC; **Bluehost had not published it an hour later** (its servers are
+  slow to publish `@` changes: the TXT edit took over an hour). When `dig wardrobediary.io` shows 199.36.158.100:
+  run the step-5 checks below, then add `www.wardrobediary.io` in Firebase (redirect to the apex) and submit the
+  sitemap. If it still isn't published by the next session, confirm the Bluehost page shows the new value, then
+  ask Bluehost support. Keep the `_acme-challenge` and `hosting-site` TXT records.
+
+  Original plan (2026-10-13): Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
   23 redirects, sitemap; `node web/e2e/redirect-check.mjs` all OK). wardrobediary.io still shows the old
   GitHub Pages site, so nothing is broken meanwhile. Olof had trouble with Bluehost's DNS settings.
