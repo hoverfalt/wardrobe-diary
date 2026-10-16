@@ -647,7 +647,11 @@ export function outputs(s) {
   const json = (v) => JSON.stringify(v, null, 1) + "\n";
   const out = {
     "web/src/generated/semantics.json": json(combined(s)),
-    "web/src/generated/labels.json": json({ version: s.model.version, term: Object.fromEntries(s.terms.map((t) => [t.id, t.label])), metric: Object.fromEntries(s.metrics.map((m) => [m.id, m.label])) }),
+    "web/src/generated/labels.json": json({
+      version: s.model.version,
+      term: Object.fromEntries(s.terms.map((t) => [t.id, { label: t.label, definition: t.definition.trim() }])),
+      metric: Object.fromEntries(s.metrics.map((m) => [m.id, { label: m.label, definition: m.definition.trim(), formula: m.formula }])),
+    }),
     "web/public/llms.txt": llmsTxt(s),
     "web/public/def/ontology.jsonld": json(ontologyLd(s)),
     "web/public/def/glossary.jsonld": json(glossaryLd(s)),

@@ -99,6 +99,15 @@ export function App() {
             signInPrompt
           ))}
       </Suspense>
+      <footer className="app-footer">
+        <span>The data and how it's defined:</span>
+        <a href="/glossary">Glossary</a>
+        <a href="/model">Model</a>
+        <a href="/data">Data catalog</a>
+        <a href="/evals">AI evaluation</a>
+        <a href="https://github.com/hoverfalt/wardrobe-diary">Source</a>
+        <a href="/">About the project</a>
+      </footer>
     </main>
   );
 }

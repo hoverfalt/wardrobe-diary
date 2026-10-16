@@ -1,71 +1,285 @@
 {
  "version": "0.2.1",
  "term": {
-  "garment": "Garment",
-  "category": "Category",
-  "tracking-start": "Start of tracking",
-  "wear": "Wear",
-  "pre-tracking-wears": "Pre-tracking wears",
-  "price": "Price",
-  "ownership-period": "Ownership period",
-  "active": "Active",
-  "divested": "Divested",
-  "date-range": "Date range",
-  "as-of": "As of",
-  "times-worn": "Times worn",
-  "lifetime-wears": "Lifetime wears",
-  "cost-per-wear": "Cost per wear",
-  "use-weighted-average": "Use-weighted average",
-  "wears-per-month": "Wears per month",
-  "days-used": "Days used",
-  "yearly-cost": "Yearly cost",
-  "monthly-cost": "Monthly cost",
-  "inventory-value": "Inventory value",
-  "active-items": "Active items",
-  "turnover": "Inventory turnover",
-  "second-hand-share": "Second hand share",
-  "daily-cost": "Daily cost",
-  "final-daily-cost": "Final (daily cost)",
-  "tag": "Tag",
-  "second-hand": "Second hand (tag)",
-  "hanko": "Hanko (tag)",
-  "bicycle-gear": "Bicycle gear (tag)",
-  "motorcycle-gear": "Motorcycle gear (tag)",
-  "season-tags": "Winter / Summer (tags)",
-  "materials": "Materials",
-  "main-part": "Main part",
-  "fibre": "Fibre",
-  "fibre-class": "Fibre class",
-  "estimated-composition": "Estimated composition",
-  "fibre-mass": "Fibre mass",
-  "outfit-weight": "Average outfit weight",
-  "coverage": "Coverage",
-  "comparison-item": "Comparison item",
-  "use-frequency": "Use frequency",
-  "cost-per-use": "Cost per use (comparison)"
+  "garment": {
+   "label": "Garment",
+   "definition": "One physical piece of clothing, footwear or accessory in the wardrobe, owned at some point since tracking began."
+  },
+  "category": {
+   "label": "Category",
+   "definition": "A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear."
+  },
+  "tracking-start": {
+   "label": "Start of tracking",
+   "definition": "1 January 2018, the first day of the daily log."
+  },
+  "wear": {
+   "label": "Wear",
+   "definition": "One garment worn on one day, as logged. Wearing a garment more than once on the same day is still one wear."
+  },
+  "pre-tracking-wears": {
+   "label": "Pre-tracking wears",
+   "definition": "The number of times a garment was worn before tracking began, entered once as an estimate."
+  },
+  "price": {
+   "label": "Price",
+   "definition": "What was paid for the garment, in euros, rounded to whole cents."
+  },
+  "ownership-period": {
+   "label": "Ownership period",
+   "definition": "The days a garment counts as owned: from its purchase date, but no earlier than the start of tracking, to its divest date, both inclusive."
+  },
+  "active": {
+   "label": "Active",
+   "definition": "A garment is active on a day if that day is within its ownership period."
+  },
+  "divested": {
+   "label": "Divested",
+   "definition": "No longer owned after the divest date, because it was sold, given away, recycled or discarded."
+  },
+  "date-range": {
+   "label": "Date range",
+   "definition": "The period a figure is computed for, from a start date to an end date, both inclusive. Every metric takes a date range; the default is from the start of tracking to the last logged day."
+  },
+  "as-of": {
+   "label": "As of",
+   "definition": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts."
+  },
+  "times-worn": {
+   "label": "Times worn",
+   "definition": "The number of wears of a garment within the date range, plus its pre-tracking wears when the range starts on the start of tracking."
+  },
+  "lifetime-wears": {
+   "label": "Lifetime wears",
+   "definition": "All wears of a garment over its whole ownership period, including pre-tracking wears."
+  },
+  "cost-per-wear": {
+   "label": "Cost per wear",
+   "definition": "For a garment: its price divided by its lifetime wears, regardless of the date range chosen. A garment never worn costs its full price. For a category: the sum of the prices of its garments owned in the range divided by the sum of their lifetime wears, so unworn garments count with their full price (divided by 1 if none has ever been worn)."
+  },
+  "use-weighted-average": {
+   "label": "Use-weighted average",
+   "definition": "An average in which each garment counts as many times as it was worn in the range."
+  },
+  "wears-per-month": {
+   "label": "Wears per month",
+   "definition": "Times worn divided by the months owned in the range, where a month is 30.5 days."
+  },
+  "days-used": {
+   "label": "Days used",
+   "definition": "For a category: the share of days on which at least one of its garments was worn, counted from the later of the range start and the day the category's first garment was owned, to the range end."
+  },
+  "yearly-cost": {
+   "label": "Yearly cost",
+   "definition": "What a year of using a category costs at the current rate - its cost per wear × 365 × days used."
+  },
+  "monthly-cost": {
+   "label": "Monthly cost",
+   "definition": "Yearly cost divided by 12. Used to compare clothing categories with other monthly spending."
+  },
+  "inventory-value": {
+   "label": "Inventory value",
+   "definition": "The sum of the prices of the garments active on the range's end date."
+  },
+  "active-items": {
+   "label": "Active items",
+   "definition": "The number of garments active on the range's end date."
+  },
+  "turnover": {
+   "label": "Inventory turnover",
+   "definition": "Yearly cost divided by inventory value - the share of the wardrobe's purchase value \"used up\" per year."
+  },
+  "second-hand-share": {
+   "label": "Second hand share",
+   "definition": "The share of the garments active on the range's end date that were bought second hand (a count, not a value share)."
+  },
+  "daily-cost": {
+   "label": "Daily cost",
+   "definition": "For a day, the sum of the cost per wear of the garments worn that day (and owned then)."
+  },
+  "final-daily-cost": {
+   "label": "Final (daily cost)",
+   "definition": "A day's cost is final when every garment worn that day has been divested, so it can no longer fall."
+  },
+  "tag": {
+   "label": "Tag",
+   "definition": "A descriptive label from a fixed vocabulary. Tags only describe garments; they never change any calculation."
+  },
+  "second-hand": {
+   "label": "Second hand (tag)",
+   "definition": "Bought second hand, i.e. used before. The price is what was paid and wears count from the purchase, without estimating earlier use."
+  },
+  "hanko": {
+   "label": "Hanko (tag)",
+   "definition": "Kept at the summer home in Hanko, so worn only during stays there."
+  },
+  "bicycle-gear": {
+   "label": "Bicycle gear (tag)",
+   "definition": "Cycling gear."
+  },
+  "motorcycle-gear": {
+   "label": "Motorcycle gear (tag)",
+   "definition": "Motorcycle gear."
+  },
+  "season-tags": {
+   "label": "Winter / Summer (tags)",
+   "definition": "Worn mainly in winter or in summer; used to narrow the logging list by season."
+  },
+  "materials": {
+   "label": "Materials",
+   "definition": "The garment's materials label as written, in free text (e.g. \"Shell 100% polyamide, lining 100% polyester\")."
+  },
+  "main-part": {
+   "label": "Main part",
+   "definition": "For a garment whose label lists several parts (shell, lining, padding…), the part that counts in material figures: the one whose label begins with shell, main, outer, body, fabric or belt, otherwise the first one listed."
+  },
+  "fibre": {
+   "label": "Fibre",
+   "definition": "A material a garment is made of, under one normalised name (e.g. lycra and spandex are both elastane, nylon is polyamide)."
+  },
+  "fibre-class": {
+   "label": "Fibre class",
+   "definition": "Natural (cotton, wool, linen, leather, down, feather), regenerated cellulose (viscose, modal, lyocell), synthetic (polyester, polyamide, elastane, acrylic…) or other."
+  },
+  "estimated-composition": {
+   "label": "Estimated composition",
+   "definition": "A composition whose shares are not given on the label (or don't add up to 100 %), so the fibres are split equally or normalised."
+  },
+  "fibre-mass": {
+   "label": "Fibre mass",
+   "definition": "Weight × composition, summed per fibre. Owned basis: garments active on the range's end date. Worn basis: every wear in the range counts the garment's full weight."
+  },
+  "outfit-weight": {
+   "label": "Average outfit weight",
+   "definition": "The average total weight of the garments worn per logged day (garments with a known weight)."
+  },
+  "coverage": {
+   "label": "Coverage",
+   "definition": "How much of the data a material figure could use - garments or wears with both a weight and readable materials, out of all."
+  },
+  "comparison-item": {
+   "label": "Comparison item",
+   "definition": "An item of other everyday spending, such as a transport ticket or a streaming service, with a monthly cost and a use frequency."
+  },
+  "use-frequency": {
+   "label": "Use frequency",
+   "definition": "For a comparison item, the share of days on which it is used (entered by the owner)."
+  },
+  "cost-per-use": {
+   "label": "Cost per use (comparison)",
+   "definition": "For a comparison item, its monthly cost divided by (30.5 × use frequency)."
+  }
  },
  "metric": {
-  "times-worn": "Times worn",
-  "lifetime-wears": "Lifetime wears",
-  "garment-cost-per-wear": "Cost per wear (garment)",
-  "days-owned": "Days owned",
-  "wears-per-month": "Wears per month",
-  "active-items": "Active items",
-  "inventory-value": "Inventory value",
-  "category-cost-per-wear": "Cost per wear (category)",
-  "days-used": "Days used",
-  "yearly-cost": "Yearly cost",
-  "monthly-cost": "Monthly cost",
-  "turnover": "Inventory turnover",
-  "second-hand-share": "Second hand share",
-  "divested-averages": "Divested items' averages",
-  "active-items-over-time": "Active items over time",
-  "inventory-value-over-time": "Inventory value over time",
-  "daily-cost": "Daily cost",
-  "fibre-mass": "Fibre mass",
-  "average-outfit-weight": "Average outfit weight",
-  "synthetic-share": "Synthetic share (worn)",
-  "comparison-yearly-cost": "Yearly cost (comparison item)",
-  "comparison-cost-per-use": "Cost per use (comparison item)"
+  "times-worn": {
+   "label": "Times worn",
+   "definition": "Wears of the garment within the range (and within its ownership period), plus pre-tracking wears when the range starts on the start of tracking.",
+   "formula": "|{wear days d : range.from ≤ d ≤ range.to, d in ownership}| + (range.from ≤ 2018-01-01 ? timesUsedInit : 0)"
+  },
+  "lifetime-wears": {
+   "label": "Lifetime wears",
+   "definition": "All wears over the garment's whole ownership period, including pre-tracking wears.",
+   "formula": "times-worn over {from: 2018-01-01, to: open}"
+  },
+  "garment-cost-per-wear": {
+   "label": "Cost per wear (garment)",
+   "definition": "Price divided by lifetime wears, independent of any chosen range; a garment never worn costs its full price.",
+   "formula": "lifetime-wears = 0 ? price : price / lifetime-wears"
+  },
+  "days-owned": {
+   "label": "Days owned",
+   "definition": "Days owned within the range up to its end, frozen at the divest date. When the range starts on the start of tracking, counted from the purchase date even before tracking (since pre-tracking wears are included too).",
+   "formula": "max(0, days(start .. min(range.to, divested))) with start = range.from ≤ 2018-01-01 ? purchased : max(range.from, ownedFrom)"
+  },
+  "wears-per-month": {
+   "label": "Wears per month",
+   "definition": "Times worn divided by months owned in the range (30.5 days per month); 0 if not owned in the range.",
+   "formula": "days-owned > 0 ? times-worn / (days-owned / 30.5) : 0"
+  },
+  "active-items": {
+   "label": "Active items",
+   "definition": "Number of the category's garments active on the range's end date. Total row - the sum over categories.",
+   "formula": "|{garments g in category : active(g, range.to)}|"
+  },
+  "inventory-value": {
+   "label": "Inventory value",
+   "definition": "Sum of the prices of the category's garments active on the range's end date (unknown prices count as 0). Total row - the sum.",
+   "formula": "Σ price over active garments on range.to"
+  },
+  "category-cost-per-wear": {
+   "label": "Cost per wear (category)",
+   "definition": "The sum of the prices of the category's garments owned at any point in the range, divided by the sum of their lifetime wears. Unworn garments count with their full price and no wears; if none of them has ever been worn, the sum of prices is divided by 1 (as an unworn garment costs its full price). Garments without a price are left out. No Total row value.",
+   "formula": "Σ price / max(1, Σ lifetime-wears), over the category's garments owned during the range with a price"
+  },
+  "days-used": {
+   "label": "Days used",
+   "definition": "Share of days with at least one wear of a category garment, from the later of the range start and the day the category's first garment was owned, to the range end. No Total row value.",
+   "formula": "|{days d in span : some category garment worn on d}| / |span|, span = max(range.from, min ownedFrom) .. range.to"
+  },
+  "yearly-cost": {
+   "label": "Yearly cost",
+   "definition": "Category cost per wear × 365 × days used. Total row - the sum over categories.",
+   "formula": "category-cost-per-wear × 365 × days-used"
+  },
+  "monthly-cost": {
+   "label": "Monthly cost",
+   "definition": "Yearly cost divided by 12, as in the original R comparison chart.",
+   "formula": "yearly-cost / 12"
+  },
+  "turnover": {
+   "label": "Inventory turnover",
+   "definition": "Yearly cost divided by inventory value. Total row - Σ yearly cost / Σ inventory value.",
+   "formula": "yearly-cost / inventory-value"
+  },
+  "second-hand-share": {
+   "label": "Second hand share",
+   "definition": "Share of the category's garments active on the range's end date that carry the second-hand tag (by count). Total row - over all active garments.",
+   "formula": "|{active garments tagged second-hand}| / |{active garments}|"
+  },
+  "divested-averages": {
+   "label": "Divested items' averages",
+   "definition": "Over divested garments owned at least 30 days: wears per month (Σ times worn / Σ days owned × 30.5) and the use-weighted cost per wear. Reference lines on category pages.",
+   "formula": "(Σ times-worn / Σ days-owned) × 30.5; Σ (cost per wear × times-worn) / Σ times-worn"
+  },
+  "active-items-over-time": {
+   "label": "Active items over time",
+   "definition": "Active items per category on every day of the range, as step series (Sportswear left out on the Dashboard).",
+   "formula": "active-items(category, d) for each day d in range"
+  },
+  "inventory-value-over-time": {
+   "label": "Inventory value over time",
+   "definition": "Inventory value per category (and in total) on every day of the range, as step series.",
+   "formula": "inventory-value(category, d) for each day d in range"
+  },
+  "daily-cost": {
+   "label": "Daily cost",
+   "definition": "For each logged day in the range with wears: the sum of the lifetime cost per wear of the garments worn and owned that day (unknown prices count 0); \"final\" when all of them are divested. Average - the mean of 30 consecutive logged days centred on the day (days i−14 … i+15), so days without wears are skipped.",
+   "formula": "Σ garment-cost-per-wear over garments worn on d; average(i) = mean(cost[i−14 .. i+15])"
+  },
+  "fibre-mass": {
+   "label": "Fibre mass",
+   "definition": "Weight × main-part composition, summed per fibre, with recycled and organic kg. Owned basis - garments active on the range's end date. Worn basis - each wear in the range counts the garment's full weight. Only garments with a weight and readable materials are included; coverage says how many.",
+   "formula": "Σ weightG / 1000 × fibreShare"
+  },
+  "average-outfit-weight": {
+   "label": "Average outfit weight",
+   "definition": "Mean total weight of the garments worn per logged day (garments with a known weight).",
+   "formula": "Σ weight of garments worn / number of logged days"
+  },
+  "synthetic-share": {
+   "label": "Synthetic share (worn)",
+   "definition": "Share of the worn fibre mass in a month that is synthetic.",
+   "formula": "synthetic kg / total kg (worn basis)"
+  },
+  "comparison-yearly-cost": {
+   "label": "Yearly cost (comparison item)",
+   "definition": "Monthly cost × 12.",
+   "formula": "monthlyCost × 12"
+  },
+  "comparison-cost-per-use": {
+   "label": "Cost per use (comparison item)",
+   "definition": "Monthly cost divided by (30.5 × use frequency); none if never used.",
+   "formula": "useFrequency > 0 ? monthlyCost / (30.5 × useFrequency) : null"
+  }
  }
 }

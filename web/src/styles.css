@@ -228,3 +228,13 @@ th.num .sort-header { justify-content: flex-end; }
 /* Links to the semantic layer's definitions under charts and tables (R-40). */
 .how-calculated { font-size: 13px; color: var(--muted); margin: 4px 0 12px; }
 .how-calculated a { color: inherit; }
+.definition-link { text-decoration-style: dotted; text-underline-offset: 2px; cursor: help; }
+.definition-pop { position: fixed; z-index: 20; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--fg); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); font-size: 13px; line-height: 1.45;
+  display: flex; flex-direction: column; gap: 6px; }
+.definition-pop code { font-size: 12px; white-space: pre-wrap; color: var(--muted); }
+.definition-pop a { color: var(--accent); font-weight: 600; }
+/* Footer on every app page: where the definitions, catalog and source are (R-43). */
+.app-footer { margin: 40px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.app-footer a { color: inherit; }
