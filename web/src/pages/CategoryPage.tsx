@@ -1,4 +1,5 @@
 // One page per category (live site: jackets.html etc.): item listing and charts per item.
+import { DefinitionLinks, HowCalculated } from "../components/Definitions";
 import { useMemo, useState, type ReactNode } from "react";
 import { SortHeader } from "../components/SortHeader";
 import { nextSort, sortRows, type SortDir } from "../lib/sorting";
@@ -117,6 +118,7 @@ export function CategoryPage({
           </tbody>
         </table>
       </div>
+      <DefinitionLinks items={[["Times worn", "term:times-worn"], ["Cost per wear", "term:cost-per-wear"], ["Wears per month", "term:wears-per-month"], ["Status", "term:active"]]} />
       <p className="muted">
         Times worn and wears per month count the chosen time span; cost per wear is always over the item's
         whole ownership.
@@ -129,6 +131,7 @@ export function CategoryPage({
         details.
       </p>
       <TimesWornChart rows={rows} />
+      <HowCalculated refs={["metric:times-worn", "metric:divested-averages"]} />
       {rangeControl}
 
       <h3>Cost per wear and times worn</h3>
@@ -137,6 +140,7 @@ export function CategoryPage({
         shows how its cost per wear fell with every wear; the blue guides show the same for set prices.
       </p>
       <CostVsWearsChart rows={rows} />
+      <HowCalculated refs={["metric:garment-cost-per-wear", "metric:lifetime-wears"]} />
       {rangeControl}
 
       <h3>Cost per wear and frequency of use</h3>
@@ -145,11 +149,13 @@ export function CategoryPage({
         items' averages (items owned at least 30 days).
       </p>
       <CostVsFrequencyChart rows={rows} />
+      <HowCalculated refs={["metric:garment-cost-per-wear", "metric:wears-per-month", "metric:divested-averages"]} />
       {rangeControl}
 
       <h3>Times worn – animated by date</h3>
       <p className="muted">Times worn as of the chosen date. Press play to watch the items being worn.</p>
       <TimesWornAnimation garments={garments} days={wardrobe.days} range={range} />
+      <HowCalculated refs={["metric:times-worn"]} />
       {rangeControl}
 
       <h3>Cost per wear and frequency of use – animated by date</h3>
@@ -157,6 +163,7 @@ export function CategoryPage({
         Cost per wear and frequency of use as of the chosen date, counting only the wears logged by then.
       </p>
       <CostVsFrequencyAnimation garments={garments} days={wardrobe.days} range={range} />
+      <HowCalculated refs={["metric:garment-cost-per-wear", "metric:wears-per-month"]} />
       {rangeControl}
 
       <h3>Daily cost</h3>
@@ -165,6 +172,7 @@ export function CategoryPage({
         “All divested” means the daily cost is final and no longer decreases with future use.
       </p>
       <DailyCostChart garments={garments} days={wardrobe.days} range={range} yMax="auto" />
+      <HowCalculated refs={["metric:daily-cost"]} />
       {rangeControl}
     </section>
   );

@@ -16,6 +16,7 @@ import {
   type ScatterPoint,
 } from "../components/CategoryCharts";
 import { CategoryLink } from "../components/CategoryLink";
+import { DefinitionLinks, HowCalculated } from "../components/Definitions";
 import { comparisonPhotoUrl } from "../firebase";
 import { costPerUse } from "../lib/comparison";
 import { Link } from "../components/Link";
@@ -184,12 +185,14 @@ export function Dashboard({
           </tbody>
         </table>
       </div>
+      <DefinitionLinks items={[["Items", "term:active-items"], ["Value", "term:inventory-value"], ["Cost per wear", "term:cost-per-wear"], ["Days used", "term:days-used"], ["Yearly cost", "term:yearly-cost"], ["Turnover", "term:turnover"], ["Second hand", "term:second-hand-share"]]} />
 
       {charts && (
         <>
           <h2>Active items by category</h2>
           <p className="muted">Number of active items in each category; the number is the count at the end date.</p>
           <CategorySmallMultiples series={charts.activeItems} range={range} format={formatCount} />
+          <HowCalculated refs={["metric:active-items-over-time"]} />
           {rangeControl}
 
           <h2>Inventory value by category</h2>
@@ -197,11 +200,13 @@ export function Dashboard({
             Sum of the value of active items in each category. The value of an item is its purchase price.
           </p>
           <CategorySmallMultiples series={charts.inventoryValue} range={range} format={formatEur} />
+          <HowCalculated refs={["metric:inventory-value-over-time"]} />
           {rangeControl}
 
           <h2>Total inventory value</h2>
           <p className="muted">Total value of active items. The value of an item is its purchase price.</p>
           <TotalChart points={charts.totalValue} range={range} format={formatEur} />
+          <HowCalculated refs={["metric:inventory-value-over-time"]} />
           {rangeControl}
 
           <p className="muted">
@@ -221,6 +226,7 @@ export function Dashboard({
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}
           />
+          <HowCalculated refs={["metric:category-cost-per-wear", "metric:days-used"]} />
           {rangeControl}
 
           <h2>Average yearly cost and category frequency of use</h2>
@@ -235,6 +241,7 @@ export function Dashboard({
             yFormat={formatEur}
             tipLabels={YEARLY_VS_USE_TIP}
           />
+          <HowCalculated refs={["metric:yearly-cost", "metric:days-used"]} />
           {rangeControl}
 
           <h2>Daily cost</h2>
@@ -243,6 +250,7 @@ export function Dashboard({
             means the daily cost is final and no longer decreases with future use. Sportswear not included.
           </p>
           <DailyCostChart garments={charts.notSportswear} days={days!} range={range} />
+          <HowCalculated refs={["metric:daily-cost"]} />
           {rangeControl}
 
           <h2>Daily cost – animated by date</h2>
@@ -251,6 +259,7 @@ export function Dashboard({
             to watch the cost of past days fall as the garments worn on them get more use.
           </p>
           <DailyCostAnimation garments={charts.notSportswear} days={days!} range={range} />
+          <HowCalculated refs={["metric:daily-cost"]} />
           {rangeControl}
 
           <h2>Monthly cost compared with other spending</h2>
@@ -268,6 +277,7 @@ export function Dashboard({
             yTickFormat={formatEur}
             tipLabels={MONTHLY_VS_USE_TIP}
           />
+          <HowCalculated refs={["metric:monthly-cost", "metric:comparison-cost-per-use"]} />
           {rangeControl}
         </>
       )}

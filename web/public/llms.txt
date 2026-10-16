@@ -1,0 +1,19 @@
+# The Wardrobe Diary Project
+
+> One person's daily log, since 1 January 2018, of every garment worn, with what each garment cost, and the
+> real cost and use of a wardrobe derived from it. All data is open (CC BY 4.0) and every figure is defined in a
+> machine-readable semantic layer (version 0.2.1). Use these definitions when interpreting the data.
+
+## Definitions and metadata
+- [Glossary](https://wardrobediary.io/glossary): every term (cost per wear, days used, ownership, wears…); SKOS JSON-LD: https://wardrobediary.io/def/glossary.jsonld
+- [Model](https://wardrobediary.io/model): conceptual model and every metric's formula, grain, unit and date-range rule; JSON-LD: https://wardrobediary.io/def/metrics.jsonld, https://wardrobediary.io/def/ontology.jsonld
+- [Data catalog](https://wardrobediary.io/data): datasets, fields, access, lineage, live quality checks; DCAT JSON-LD: https://wardrobediary.io/def/catalog.jsonld
+- [Data contracts](https://wardrobediary.io/def/contracts/public-data.odcs.yaml): Open Data Contract Standard v3, one per dataset
+- [AI evaluation](https://wardrobediary.io/evals): how reliably an AI answers questions about this data, with and without the semantic layer
+
+## Data
+- Public data document (JSON via Firestore REST): https://firestore.googleapis.com/v1/projects/threddit-297417/databases/(default)/documents/users/0q0I90W7W3RAcgFN1c1JX6pZupG3/public/data
+- Interactive: [Dashboard](https://wardrobediary.io/dashboard)
+
+## Source
+- [GitHub](https://github.com/hoverfalt/wardrobe-diary): the app, the semantic layer (semantics/*.yaml), the MCP server and the tests

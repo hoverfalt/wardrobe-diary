@@ -9,6 +9,7 @@
     <title>The Wardrobe Diary Project</title>
     <meta name="description" content="By tracking even a part of your wardrobe, you gain insights into your real use of clothes, item cost performance, your favorites, and the items you should probably consider putting forward." />
     <link rel="canonical" href="https://wardrobediary.io/" />
+    <link rel="alternate" type="application/ld+json" href="/def/catalog.jsonld" title="Data catalog (DCAT)" />
     <meta property="og:title" content="The Wardrobe Diary Project - Find out the real cost of clothes." />
     <meta property="og:url" content="https://wardrobediary.io/" />
     <meta property="og:type" content="website" />
@@ -42,6 +43,7 @@
     <main class="landing">
       <nav class="landing-nav">
         <a href="/dashboard">My wardrobe data</a>
+        <a href="#open-data">Data &amp; definitions</a>
         <a href="#contacts">Contact</a>
       </nav>
 
@@ -125,6 +127,31 @@
           alternatives and choices across types of spending and across business models.
         </p>
         <a href="/dashboard"><img class="wide" src="https://firebasestorage.googleapis.com/v0/b/threddit-297417.appspot.com/o/Expanding_comparability_to_all_spending.jpg?alt=media" alt="" loading="lazy" /></a>
+      </section>
+
+      <section id="open-data">
+        <h2>Open data, explained</h2>
+        <p>
+          All the data on this site is open, and its meaning is written down. A machine-readable semantic layer defines
+          every term and every figure: a <a href="/glossary">glossary</a>, a <a href="/model">model</a> of how each
+          figure is calculated, traceable down to the code and the tests that check it, and a
+          <a href="/data">data catalog</a> with lineage, access rights and quality checks that run every night. The same
+          definitions are served to AI assistants through an MCP server, so they can explain where each number comes
+          from.
+        </p>
+        <p>
+          Does that make AI answers more reliable? In a <a href="/evals">first experiment</a>, an AI model answered 7 of
+          30 questions correctly from the raw data, 29 with the governed tools, and all 30 with the tools and the
+          definitions. It was a single run, so read it as an illustration; the method and caveats are on the
+          <a href="/evals">evaluation page</a>.
+        </p>
+        <ul class="link-list">
+          <li><a href="/glossary">Glossary</a>: what every term means</li>
+          <li><a href="/model">Model</a>: the conceptual model and every metric's formula</li>
+          <li><a href="/data">Data catalog</a>: datasets, lineage, data contracts and live quality checks</li>
+          <li><a href="/evals">AI evaluation</a>: raw data vs governed tools vs tools with the semantic layer</li>
+          <li><a href="https://github.com/hoverfalt/wardrobe-diary">Source on GitHub</a>: the app, the semantic layer and the tests (open source)</li>
+        </ul>
       </section>
 
       <section id="contacts">

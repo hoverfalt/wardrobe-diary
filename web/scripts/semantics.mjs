@@ -618,11 +618,37 @@ ${questions}
   });
 }
 
+// ---------- llms.txt (a pointer file for AI assistants and crawlers) ----------
+export function llmsTxt(s) {
+  return `# The Wardrobe Diary Project
+
+> One person's daily log, since 1 January 2018, of every garment worn, with what each garment cost, and the
+> real cost and use of a wardrobe derived from it. All data is open (CC BY 4.0) and every figure is defined in a
+> machine-readable semantic layer (version ${s.model.version}). Use these definitions when interpreting the data.
+
+## Definitions and metadata
+- [Glossary](${SITE}/glossary): every term (cost per wear, days used, ownership, wears…); SKOS JSON-LD: ${SITE}/def/glossary.jsonld
+- [Model](${SITE}/model): conceptual model and every metric's formula, grain, unit and date-range rule; JSON-LD: ${SITE}/def/metrics.jsonld, ${SITE}/def/ontology.jsonld
+- [Data catalog](${SITE}/data): datasets, fields, access, lineage, live quality checks; DCAT JSON-LD: ${SITE}/def/catalog.jsonld
+- [Data contracts](${SITE}/def/contracts/public-data.odcs.yaml): Open Data Contract Standard v3, one per dataset
+- [AI evaluation](${SITE}/evals): how reliably an AI answers questions about this data, with and without the semantic layer
+
+## Data
+- Public data document (JSON via Firestore REST): ${s.datasets.find((d) => d.id === "public-data")?.distribution?.[0]?.url ?? ""}
+- Interactive: [Dashboard](${SITE}/dashboard)
+
+## Source
+- [GitHub](https://github.com/hoverfalt/wardrobe-diary): the app, the semantic layer (semantics/*.yaml), the MCP server and the tests
+`;
+}
+
 // ---------- write ----------
 export function outputs(s) {
   const json = (v) => JSON.stringify(v, null, 1) + "\n";
   const out = {
     "web/src/generated/semantics.json": json(combined(s)),
+    "web/src/generated/labels.json": json({ version: s.model.version, term: Object.fromEntries(s.terms.map((t) => [t.id, t.label])), metric: Object.fromEntries(s.metrics.map((m) => [m.id, m.label])) }),
+    "web/public/llms.txt": llmsTxt(s),
     "web/public/def/ontology.jsonld": json(ontologyLd(s)),
     "web/public/def/glossary.jsonld": json(glossaryLd(s)),
     "web/public/def/metrics.jsonld": json(metricsLd(s)),

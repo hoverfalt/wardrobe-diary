@@ -186,6 +186,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-43** 2026-10-16 The semantic layer made findable: an "Open data, explained" section on the landing page
+  (with the evaluation result as a first experiment, linked to its caveats) and a "Data & definitions" menu item;
+  "How it's calculated" / "Definitions" links under every chart and table on the Dashboard, category, garment and
+  materials pages (checked by a test); `/llms.txt` for AI assistants and crawlers (generated); the DCAT catalog
+  linked from every page head. Goes live on wardrobediary.io with the domain switch.
+
 - **R-40** 2026-10-16 Semantic layer and data governance showcase, phases 1–4 (decisions by Olof: in this repo,
   made public, and on the website; English only; public MCP server after the domain switch). `semantics/` 0.2.1
   (reviewed by Olof): ontology, glossary (42 terms), semantic model (22 metrics, each linked to code and tests),

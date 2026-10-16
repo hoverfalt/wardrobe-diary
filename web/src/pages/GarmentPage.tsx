@@ -1,4 +1,5 @@
 // Public page for one garment (R-30): photo, all its details, composition, lifetime stats and wears over time.
+import { DefinitionLinks } from "../components/Definitions";
 import * as Plot from "@observablehq/plot";
 import { useCallback, useMemo } from "react";
 import { formatEur2 } from "../components/CategoryCharts";
@@ -119,6 +120,8 @@ export function GarmentPage({ id, wardrobe, canEdit }: { id: string; wardrobe: W
         <div><strong>{row ? row.wearsPerMonth.toFixed(1).replace(".", ",") : "–"}</strong><span>wears per month</span></div>
         <div><strong>{dates.length ? formatFi(dates[dates.length - 1]) : "–"}</strong><span>last worn{dates.length ? ` (first ${formatFi(dates[0])})` : ""}</span></div>
       </div>
+
+      <DefinitionLinks items={[["Times worn", "term:lifetime-wears"], ["Cost per wear", "term:cost-per-wear"], ["Wears per month", "term:wears-per-month"]]} />
 
       {dates.length > 0 && (
         <>

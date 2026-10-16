@@ -31,3 +31,6 @@
 
 .landing footer { margin: 48px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .landing footer img { display: inline; vertical-align: middle; margin-right: 6px; }
+.link-list { padding-left: 20px; }
+.link-list li { margin: 4px 0; }
+.link-list a { color: var(--accent); font-weight: 600; }

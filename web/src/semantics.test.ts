@@ -137,6 +137,13 @@ describe("semantic layer", () => {
     expect(stray).toEqual([]);
   });
 
+  it("links the app only to definitions that exist (HowCalculated / DefinitionLinks)", () => {
+    const pages = ["Dashboard", "CategoryPage", "GarmentPage", "MaterialsPage"].map((n) => read(`web/src/pages/${n}.tsx`)).join("\n");
+    const used = [...pages.matchAll(/"(metric|term):([a-z0-9-]+)"/g)];
+    expect(used.length).toBeGreaterThan(10);
+    expect(used.filter(([, kind, id]) => !known[kind].has(id)).map((m) => m[0])).toEqual([]);
+  });
+
   it("has a check in lib/quality.ts for every catalogued quality rule, and no others", () => {
     const rules = catalog.quality_rules.map((r: Item) => r.id).sort();
     expect(Object.keys(CHECKS).sort()).toEqual(rules);

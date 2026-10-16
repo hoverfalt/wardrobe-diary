@@ -1,5 +1,6 @@
 // Materials page (R-30): fibre mass owned and worn, the fibre mix per category, and monthly trends, all from
 // weight × the composition read from the Materials field. Follows the app-wide date range.
+import { HowCalculated } from "../components/Definitions";
 import { useMemo, type ReactNode } from "react";
 import { Link } from "../components/Link";
 import { CategoryFibreMultiples, FibreBars, FibreLegend, MonthLine } from "../components/MaterialsCharts";
@@ -66,6 +67,7 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
       <p className="muted">Garments active at the end of the period.</p>
       <FibreLegend />
       <figure className="chart"><FibreBars fibres={owned.fibres} /></figure>
+      <HowCalculated refs={["metric:fibre-mass"]} />
 
       <h3>Fibres worn</h3>
       <p className="muted">Every wear in the period counts the garment's full weight; hover a bar for recycled and organic.</p>
@@ -79,8 +81,10 @@ export function MaterialsPage({ wardrobe, range, rangeControl }: { wardrobe: War
 
       <h3>Average outfit weight per month</h3>
       <MonthLine data={data.months.map((m) => ({ month: m.month, value: m.averageOutfitKg }))} format={kg} color="var(--accent)" />
+      <HowCalculated refs={["metric:average-outfit-weight"]} />
       <h3>Synthetic share of the worn mass per month</h3>
       <MonthLine data={data.months.map((m) => ({ month: m.month, value: m.syntheticShare }))} format={pct} color="var(--fibre-synthetic)" />
+      <HowCalculated refs={["metric:synthetic-share"]} />
       {rangeControl}
 
       <p className="muted">

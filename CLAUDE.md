@@ -317,6 +317,9 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   The public data and the date range are loaded/held once in `App.tsx` and shared by all pages.
 - One app-wide date range (kept when moving between pages). Its control (slider + date boxes) is rendered in
   several places (`{rangeControl}`), all bound to the same state; put a copy under each new chart section.
+- **Every chart and table links to its definitions** (R-40): `<HowCalculated refs={["metric:…"]} />` under a chart,
+  `<DefinitionLinks items={[["Column", "term:…"]]} />` under a table (`components/Definitions.tsx`, labels from the
+  generated `labels.json`); semantics.test.ts checks every id exists. Add them for new charts and columns.
 - Animated charts use `useAsOf(range)` (play/pause + slider) and keep their scales fixed while playing.
 - **Sortable tables** (`lib/sorting.ts`, `components/SortHeader.tsx`): numbers largest first, then smallest;
   texts A–Z first; empty values last. A "default order" header (Category on the Dashboard, Status on category
