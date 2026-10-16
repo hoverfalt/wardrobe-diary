@@ -1,0 +1,169 @@
+# Data catalog (R-40), published as DCAT. Every dataset: where it lives, who may read it, where it comes from
+# (lineage, PROV-O), its fields and the quality rules it must meet (validated automatically from phase 3).
+#
+# classification:
+#   public       readable by anyone (the owner has chosen to publish it)
+#   owner-only   readable and writable only by the signed-in owner (Firestore and Storage rules enforce this)
+#   private      not exposed by the app at all (e.g. backups in a private repository)
+# All data describes one identifiable person, Olof Hoverfält, who publishes the public parts by choice.
+
+catalog:
+  title: Wardrobe Diary data catalog
+  publisher: Olof Hoverfält
+  license: https://creativecommons.org/licenses/by/4.0/
+  homepage: https://wardrobediary.io/
+  temporal_coverage: {from: 2018-01-01, to: ongoing}
+  update_frequency: daily (logged in the app)
+
+datasets:
+  - id: garments
+    title: Garments
+    description: Every garment owned at some point since tracking began, with its details. The source of truth for garment details (decision D-4).
+    location: "Firestore users/{uid}/garments/{garmentId}"
+    classification: owner-only
+    published_via: [dataset:public-data]
+    represents: class:Garment
+    key: id
+    lineage:
+      - {from: dataset:legacy-sheet, activity: "Sheet → Firestore migration and sync", until: 2026-10-09, decision: decision:D-4}
+      - {from: owner, activity: edited in the app (/manage), since: 2026-10-09}
+    fields:
+      - {name: id, type: text, required: true, definition: "Garment id, from the original Sheet's Photo id (e.g. Jackets_and_hoodies-006); also the photo file name.", constraints: "pattern <Category_words>-NNN; unique"}
+      - {name: category, type: text, required: true, definition: The garment's category., constraints: one of the 13 standard categories, term: term:category}
+      - {name: item, type: text, required: true, definition: "Name (brand, model, colour; numbered when identical items exist)."}
+      - {name: details, type: text, required: false, definition: Free-text details such as size or model code.}
+      - {name: photo, type: text, required: true, definition: Photo file name without .png in public storage.}
+      - {name: photoVersion, type: text, required: false, definition: Set when the photo is replaced; part of the photo URL so caches show the new one.}
+      - {name: price, type: money-eur, required: false, definition: "What was paid, rounded to whole cents.", constraints: "≥ 0", term: term:price}
+      - {name: purchased, type: date, required: false, definition: Purchase date., constraints: "≤ divested"}
+      - {name: divested, type: date, required: false, definition: Last day owned; empty while active., term: term:divested}
+      - {name: timesUsedInit, type: integer, required: true, definition: Wears before tracking began (estimate)., constraints: "≥ 0", term: term:pre-tracking-wears}
+      - {name: materials, type: text, required: false, definition: The materials label as written., term: term:materials}
+      - {name: weightG, type: mass-g, required: false, definition: Weight in grams., constraints: "> 0"}
+      - {name: tags, type: "list of text", required: false, definition: Descriptive tags., constraints: "each one of: second-hand, hanko, bicycle, motorcycle, winter, summer", term: term:tag}
+      - {name: detailsUnavailable, type: boolean, required: false, definition: "Divested only: missing materials or weight can no longer be filled in (left off the review list)."}
+
+  - id: garment-history
+    title: Garment history
+    description: Every saved version of every garment (an audit trail), including the version before each change.
+    location: "Firestore users/{uid}/garments/{garmentId}/history/{autoId}"
+    classification: owner-only
+    lineage:
+      - {from: dataset:garments, activity: written in the same transaction as each garment save}
+    fields:
+      - {name: savedAt, type: timestamp, required: true, definition: When the version was saved.}
+      - {name: before, type: garment, required: false, definition: The previous version; empty when the garment was created in the app.}
+      - {name: after, type: garment, required: true, definition: The saved version.}
+      - {name: note, type: text, required: false, definition: "What happened, e.g. \"Photo replaced\"."}
+
+  - id: deleted-garments
+    title: Deleted garments
+    description: Garments deleted in the app (only never-worn ones can be), kept as a record.
+    location: "Firestore users/{uid}/deletedGarments/{garmentId}"
+    classification: owner-only
+    fields:
+      - {name: deletedAt, type: timestamp, required: true, definition: When it was deleted.}
+      - {name: garment, type: garment, required: true, definition: The garment as it was.}
+
+  - id: days
+    title: Wear log
+    description: One record per day with wears - the garments worn that day. Days with nothing worn have no record.
+    location: "Firestore users/{uid}/days/{YYYY-MM-DD}"
+    classification: owner-only
+    published_via: [dataset:public-data]
+    represents: class:WearDay
+    key: date
+    lineage:
+      - {from: dataset:legacy-sheet, activity: "daily checkbox columns, migrated", until: 2026-10-09}
+      - {from: owner, activity: logged in the app (/log), since: 2026-10-10, decision: decision:R-15}
+    fields:
+      - {name: date, type: date, required: true, definition: The day (document id)., constraints: "≥ 2018-01-01; not in the future"}
+      - {name: worn, type: "list of garment ids", required: true, definition: The garments worn that day., constraints: "each an existing garment id; no duplicates"}
+
+  - id: settings
+    title: Settings
+    description: "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced."
+    location: "Firestore users/{uid}/settings/app"
+    classification: owner-only
+    fields:
+      - {name: sheetRetired, type: date, required: false, definition: Cut-over date (2026-10-09).}
+
+  - id: comparison
+    title: Comparison items
+    description: Other everyday spending shown next to the clothing categories in the monthly cost chart.
+    location: "Firestore users/{uid}/settings/comparison (items)"
+    classification: owner-only
+    published_via: [dataset:public-data]
+    represents: class:ComparisonItem
+    key: id
+    lineage:
+      - {from: dataset:legacy-sheet, activity: "one-off import of the Comparison tab (values only)", until: 2026-10-12}
+      - {from: owner, activity: edited in the app (/manage/comparison), since: 2026-10-12}
+    fields:
+      - {name: id, type: text, required: true, definition: Item id (from its name).}
+      - {name: type, type: text, required: false, definition: "Kind of spending, e.g. Content, Physical service."}
+      - {name: item, type: text, required: true, definition: Name.}
+      - {name: details, type: text, required: false, definition: Free-text details.}
+      - {name: photo, type: text, required: false, definition: "Photo file name (Comparison-<Name>) without .png; empty when none."}
+      - {name: photoVersion, type: text, required: false, definition: Set when a photo is uploaded.}
+      - {name: monthlyCost, type: money-eur, required: true, definition: Monthly cost (entered)., constraints: "≥ 0"}
+      - {name: useFrequency, type: share, required: true, definition: Share of days used (entered)., constraints: "0–1", term: term:use-frequency}
+
+  - id: public-data
+    title: Public wardrobe data
+    description: >-
+      The world-readable copy for public pages and the MCP server: all garments, the full day-by-day log (as indexes
+      into the garment list) and the comparison items, in one document, so any metric can be computed for any range
+      with one read (decision D-1).
+    location: "Firestore users/{uid}/public/data"
+    classification: public
+    distribution:
+      - {format: Firestore REST (JSON), url: "https://firestore.googleapis.com/v1/projects/threddit-297417/databases/(default)/documents/users/0q0I90W7W3RAcgFN1c1JX6pZupG3/public/data"}
+      - {format: web app, url: "https://wardrobediary.io/dashboard"}
+      - {format: MCP server, url: "mcp/ (local; public server planned, R-29 phase 2)"}
+    lineage:
+      - {from: [dataset:garments, dataset:days, dataset:comparison], activity: "updated in the same write as every change in the app (transactions / batches)", decision: decision:D-1}
+    fields:
+      - {name: version, type: integer, required: true, definition: Format version (1).}
+      - {name: garments, type: "list of garment", required: true, definition: All garments with all their fields (same as dataset garments).}
+      - {name: days, type: "map date → list of integer", required: true, definition: The wear log as positions in the garments list.}
+      - {name: comparison, type: "list of comparison item", required: false, definition: The comparison items.}
+
+  - id: photos
+    title: Photos
+    description: Garment photos (228 × 228 PNG), category images and comparison photos.
+    location: Firebase Storage bucket threddit-297417.appspot.com
+    classification: public
+    fields: []
+
+  - id: backups
+    title: Nightly backups
+    description: A full JSON export of garments (with history), days, deleted garments and settings, every night, with git history keeping every day.
+    location: "private GitHub repository hoverfalt/wardrobe-diary-backups (wardrobe.json); local backups/ folder"
+    classification: private
+    update_frequency: daily at 02:17 UTC
+    lineage:
+      - {from: [dataset:garments, dataset:garment-history, dataset:days, dataset:deleted-garments, dataset:settings], activity: "tools/backup.py with a read-only service account", decision: decision:R-28}
+    fields: []
+
+  - id: legacy-sheet
+    title: Google Sheet (retired)
+    description: >-
+      The original data entry, 2018-01-01 to 2026-10-09 - one row per garment, one checkbox column per day. Retired at
+      the cut-over; kept read-only for reference.
+    location: Google Sheet 1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM, tab Threddit (and Comparison)
+    classification: private
+    status: retired
+    fields: []
+
+quality_rules:
+  # Checked against the data from phase 3 (nightly, in the backup job); listed here so they are explicit now.
+  - {id: unique-ids, dataset: dataset:garments, rule: Every garment id is unique.}
+  - {id: known-category, dataset: dataset:garments, rule: Every category is one of the 13 standard categories.}
+  - {id: dates-ordered, dataset: dataset:garments, rule: "purchased ≤ divested when both are set."}
+  - {id: non-negative, dataset: dataset:garments, rule: "price ≥ 0, timesUsedInit ≥ 0, weightG > 0 when set."}
+  - {id: known-tags, dataset: dataset:garments, rule: Every tag is in the vocabulary.}
+  - {id: worn-exists, dataset: dataset:days, rule: Every worn id is an existing garment.}
+  - {id: wears-in-ownership, dataset: dataset:days, rule: "Wears fall within the garment's ownership period.", severity: warning, note: "Known exceptions are ignored by the metrics (Q-9)."}
+  - {id: public-matches-source, dataset: dataset:public-data, rule: The public copy equals garments + days + comparison.}
+  - {id: materials-coverage, dataset: dataset:garments, rule: "Share of active garments with a weight and readable materials (reported, no threshold).", severity: info}

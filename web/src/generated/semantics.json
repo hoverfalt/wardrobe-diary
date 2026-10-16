@@ -1,0 +1,1543 @@
+{
+ "version": "0.2.1",
+ "modified": "2026-10-16",
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "base": "https://wardrobediary.io",
+ "terms": [
+  {
+   "id": "garment",
+   "label": "Garment",
+   "definition": "One physical piece of clothing, footwear or accessory in the wardrobe, owned at some point since tracking began.",
+   "note": "Identical items bought together are separate garments, each with its own wears.",
+   "related": [
+    "term:category",
+    "term:ownership-period"
+   ]
+  },
+  {
+   "id": "category",
+   "label": "Category",
+   "definition": "A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear.",
+   "note": "Categories are always listed in this order, never alphabetically."
+  },
+  {
+   "id": "tracking-start",
+   "label": "Start of tracking",
+   "definition": "1 January 2018, the first day of the daily log.",
+   "note": "Garments bought earlier count as owned from this date; their earlier wears are pre-tracking wears."
+  },
+  {
+   "id": "wear",
+   "label": "Wear",
+   "alt_labels": [
+    "use"
+   ],
+   "definition": "One garment worn on one day, as logged. Wearing a garment more than once on the same day is still one wear.",
+   "note": "Wears logged outside the garment's ownership period are ignored by every metric."
+  },
+  {
+   "id": "pre-tracking-wears",
+   "label": "Pre-tracking wears",
+   "alt_labels": [
+    "times used init"
+   ],
+   "definition": "The number of times a garment was worn before tracking began, entered once as an estimate.",
+   "note": "They count only in figures whose range starts on the start of tracking, and always in lifetime wears."
+  },
+  {
+   "id": "price",
+   "label": "Price",
+   "definition": "What was paid for the garment, in euros, rounded to whole cents.",
+   "note": "Second-hand garments have the price actually paid. Multipacks are split evenly per item."
+  },
+  {
+   "id": "ownership-period",
+   "label": "Ownership period",
+   "definition": "The days a garment counts as owned: from its purchase date, but no earlier than the start of tracking, to its divest date, both inclusive.",
+   "related": [
+    "term:active",
+    "term:divested"
+   ]
+  },
+  {
+   "id": "active",
+   "label": "Active",
+   "definition": "A garment is active on a day if that day is within its ownership period.",
+   "note": "The divest day itself still counts as owned (as in the original R pipeline)."
+  },
+  {
+   "id": "divested",
+   "label": "Divested",
+   "definition": "No longer owned after the divest date, because it was sold, given away, recycled or discarded."
+  },
+  {
+   "id": "date-range",
+   "label": "Date range",
+   "definition": "The period a figure is computed for, from a start date to an end date, both inclusive. Every metric takes a date range; the default is from the start of tracking to the last logged day.",
+   "decision": "decision:2026-10-08-ranges"
+  },
+  {
+   "id": "as-of",
+   "label": "As of",
+   "definition": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts.",
+   "note": "The one deliberate exception to the lifetime rule of cost per wear (decision D-2)."
+  },
+  {
+   "id": "times-worn",
+   "label": "Times worn",
+   "definition": "The number of wears of a garment within the date range, plus its pre-tracking wears when the range starts on the start of tracking.",
+   "metric": "metric:times-worn"
+  },
+  {
+   "id": "lifetime-wears",
+   "label": "Lifetime wears",
+   "definition": "All wears of a garment over its whole ownership period, including pre-tracking wears.",
+   "metric": "metric:lifetime-wears"
+  },
+  {
+   "id": "cost-per-wear",
+   "label": "Cost per wear",
+   "alt_labels": [
+    "CPW",
+    "cost per use"
+   ],
+   "definition": "For a garment: its price divided by its lifetime wears, regardless of the date range chosen. A garment never worn costs its full price. For a category: the sum of the prices of its garments owned in the range divided by the sum of their lifetime wears, so unworn garments count with their full price (divided by 1 if none has ever been worn).",
+   "note": "Using lifetime wears, even wears after the range ends, keeps the concept consistent: a garment has one cost per wear, which falls as it gets more use, and a category's cost per wear is what its garments cost over all the use they get. The date range decides only which garments count.",
+   "decision": "decision:D-2",
+   "metric": "metric:garment-cost-per-wear"
+  },
+  {
+   "id": "use-weighted-average",
+   "label": "Use-weighted average",
+   "definition": "An average in which each garment counts as many times as it was worn in the range."
+  },
+  {
+   "id": "wears-per-month",
+   "label": "Wears per month",
+   "definition": "Times worn divided by the months owned in the range, where a month is 30.5 days.",
+   "metric": "metric:wears-per-month"
+  },
+  {
+   "id": "days-used",
+   "label": "Days used",
+   "alt_labels": [
+    "frequency of use",
+    "category frequency of use"
+   ],
+   "definition": "For a category: the share of days on which at least one of its garments was worn, counted from the later of the range start and the day the category's first garment was owned, to the range end.",
+   "metric": "metric:days-used"
+  },
+  {
+   "id": "yearly-cost",
+   "label": "Yearly cost",
+   "definition": "What a year of using a category costs at the current rate - its cost per wear × 365 × days used.",
+   "metric": "metric:yearly-cost"
+  },
+  {
+   "id": "monthly-cost",
+   "label": "Monthly cost",
+   "definition": "Yearly cost divided by 12. Used to compare clothing categories with other monthly spending.",
+   "metric": "metric:monthly-cost"
+  },
+  {
+   "id": "inventory-value",
+   "label": "Inventory value",
+   "definition": "The sum of the prices of the garments active on the range's end date.",
+   "metric": "metric:inventory-value"
+  },
+  {
+   "id": "active-items",
+   "label": "Active items",
+   "alt_labels": [
+    "items"
+   ],
+   "definition": "The number of garments active on the range's end date.",
+   "metric": "metric:active-items"
+  },
+  {
+   "id": "turnover",
+   "label": "Inventory turnover",
+   "alt_labels": [
+    "turnover"
+   ],
+   "definition": "Yearly cost divided by inventory value - the share of the wardrobe's purchase value \"used up\" per year.",
+   "metric": "metric:turnover"
+  },
+  {
+   "id": "second-hand-share",
+   "label": "Second hand share",
+   "definition": "The share of the garments active on the range's end date that were bought second hand (a count, not a value share).",
+   "metric": "metric:second-hand-share"
+  },
+  {
+   "id": "daily-cost",
+   "label": "Daily cost",
+   "definition": "For a day, the sum of the cost per wear of the garments worn that day (and owned then).",
+   "note": "The Dashboard leaves Sportswear out of its daily cost charts.",
+   "metric": "metric:daily-cost",
+   "decision": "decision:Q-1"
+  },
+  {
+   "id": "final-daily-cost",
+   "label": "Final (daily cost)",
+   "alt_labels": [
+    "all divested"
+   ],
+   "definition": "A day's cost is final when every garment worn that day has been divested, so it can no longer fall."
+  },
+  {
+   "id": "tag",
+   "label": "Tag",
+   "definition": "A descriptive label from a fixed vocabulary. Tags only describe garments; they never change any calculation."
+  },
+  {
+   "id": "second-hand",
+   "label": "Second hand (tag)",
+   "definition": "Bought second hand, i.e. used before. The price is what was paid and wears count from the purchase, without estimating earlier use.",
+   "related": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "hanko",
+   "label": "Hanko (tag)",
+   "definition": "Kept at the summer home in Hanko, so worn only during stays there.",
+   "related": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "bicycle-gear",
+   "label": "Bicycle gear (tag)",
+   "definition": "Cycling gear.",
+   "related": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "motorcycle-gear",
+   "label": "Motorcycle gear (tag)",
+   "definition": "Motorcycle gear.",
+   "related": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "season-tags",
+   "label": "Winter / Summer (tags)",
+   "definition": "Worn mainly in winter or in summer; used to narrow the logging list by season.",
+   "related": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "materials",
+   "label": "Materials",
+   "definition": "The garment's materials label as written, in free text (e.g. \"Shell 100% polyamide, lining 100% polyester\").",
+   "note": "The text is never changed; it is interpreted on read into a material composition."
+  },
+  {
+   "id": "main-part",
+   "label": "Main part",
+   "definition": "For a garment whose label lists several parts (shell, lining, padding…), the part that counts in material figures: the one whose label begins with shell, main, outer, body, fabric or belt, otherwise the first one listed."
+  },
+  {
+   "id": "fibre",
+   "label": "Fibre",
+   "definition": "A material a garment is made of, under one normalised name (e.g. lycra and spandex are both elastane, nylon is polyamide)."
+  },
+  {
+   "id": "fibre-class",
+   "label": "Fibre class",
+   "definition": "Natural (cotton, wool, linen, leather, down, feather), regenerated cellulose (viscose, modal, lyocell), synthetic (polyester, polyamide, elastane, acrylic…) or other."
+  },
+  {
+   "id": "estimated-composition",
+   "label": "Estimated composition",
+   "definition": "A composition whose shares are not given on the label (or don't add up to 100 %), so the fibres are split equally or normalised."
+  },
+  {
+   "id": "fibre-mass",
+   "label": "Fibre mass",
+   "definition": "Weight × composition, summed per fibre. Owned basis: garments active on the range's end date. Worn basis: every wear in the range counts the garment's full weight.",
+   "metric": "metric:fibre-mass"
+  },
+  {
+   "id": "outfit-weight",
+   "label": "Average outfit weight",
+   "definition": "The average total weight of the garments worn per logged day (garments with a known weight).",
+   "metric": "metric:average-outfit-weight"
+  },
+  {
+   "id": "coverage",
+   "label": "Coverage",
+   "definition": "How much of the data a material figure could use - garments or wears with both a weight and readable materials, out of all."
+  },
+  {
+   "id": "comparison-item",
+   "label": "Comparison item",
+   "definition": "An item of other everyday spending, such as a transport ticket or a streaming service, with a monthly cost and a use frequency."
+  },
+  {
+   "id": "use-frequency",
+   "label": "Use frequency",
+   "definition": "For a comparison item, the share of days on which it is used (entered by the owner)."
+  },
+  {
+   "id": "cost-per-use",
+   "label": "Cost per use (comparison)",
+   "definition": "For a comparison item, its monthly cost divided by (30.5 × use frequency).",
+   "metric": "metric:comparison-cost-per-use"
+  }
+ ],
+ "metrics": [
+  {
+   "id": "times-worn",
+   "label": "Times worn",
+   "term": "term:times-worn",
+   "grain": "garment",
+   "unit": "count",
+   "definition": "Wears of the garment within the range (and within its ownership period), plus pre-tracking wears when the range starts on the start of tracking.",
+   "formula": "|{wear days d : range.from ≤ d ≤ range.to, d in ownership}| + (range.from ≤ 2018-01-01 ? timesUsedInit : 0)",
+   "range_rule": "range",
+   "inputs": [
+    "field:days.worn",
+    "field:days.date",
+    "field:garments.timesUsedInit",
+    "field:garments.purchased",
+    "field:garments.divested"
+   ],
+   "implementation": "web/src/lib/metrics.ts#timesWorn",
+   "tests": [
+    "web/src/lib/metrics.test.ts › counts times worn including pre-tracking wears, ignoring wears outside ownership",
+    "web/src/lib/metrics.test.ts › counts pre-tracking wears only when the range starts at the start of tracking"
+   ]
+  },
+  {
+   "id": "lifetime-wears",
+   "label": "Lifetime wears",
+   "term": "term:lifetime-wears",
+   "grain": "garment",
+   "unit": "count",
+   "definition": "All wears over the garment's whole ownership period, including pre-tracking wears.",
+   "formula": "times-worn over {from: 2018-01-01, to: open}",
+   "range_rule": "lifetime",
+   "depends_on": [
+    "metric:times-worn"
+   ],
+   "implementation": "web/src/lib/metrics.ts#lifetimeWears"
+  },
+  {
+   "id": "garment-cost-per-wear",
+   "label": "Cost per wear (garment)",
+   "term": "term:cost-per-wear",
+   "grain": "garment",
+   "unit": "EUR per wear",
+   "definition": "Price divided by lifetime wears, independent of any chosen range; a garment never worn costs its full price.",
+   "formula": "lifetime-wears = 0 ? price : price / lifetime-wears",
+   "range_rule": "lifetime",
+   "null_when": "the price is unknown",
+   "inputs": [
+    "field:garments.price"
+   ],
+   "depends_on": [
+    "metric:lifetime-wears"
+   ],
+   "decisions": [
+    "decision:D-2"
+   ],
+   "implementation": "web/src/lib/metrics.ts#costPerWear",
+   "tests": [
+    "web/src/lib/metrics.test.ts › computes cost per wear over the whole ownership; unworn garments cost their full price",
+    "web/src/lib/metrics.test.ts › computes cost per wear independently of any range, including wears after it (D-2)"
+   ]
+  },
+  {
+   "id": "days-owned",
+   "label": "Days owned",
+   "grain": "garment",
+   "unit": "days",
+   "definition": "Days owned within the range up to its end, frozen at the divest date. When the range starts on the start of tracking, counted from the purchase date even before tracking (since pre-tracking wears are included too).",
+   "formula": "max(0, days(start .. min(range.to, divested))) with start = range.from ≤ 2018-01-01 ? purchased : max(range.from, ownedFrom)",
+   "range_rule": "range",
+   "inputs": [
+    "field:garments.purchased",
+    "field:garments.divested"
+   ],
+   "implementation": "web/src/lib/metrics.ts#daysOwned",
+   "tests": [
+    "web/src/lib/metrics.test.ts › counts days owned from purchase, frozen at the divest date"
+   ]
+  },
+  {
+   "id": "wears-per-month",
+   "label": "Wears per month",
+   "term": "term:wears-per-month",
+   "grain": "garment",
+   "unit": "wears per month",
+   "definition": "Times worn divided by months owned in the range (30.5 days per month); 0 if not owned in the range.",
+   "formula": "days-owned > 0 ? times-worn / (days-owned / 30.5) : 0",
+   "range_rule": "range",
+   "depends_on": [
+    "metric:times-worn",
+    "metric:days-owned"
+   ],
+   "implementation": "web/src/lib/metrics.ts#itemListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › lists items with wears per month"
+   ]
+  },
+  {
+   "id": "active-items",
+   "label": "Active items",
+   "term": "term:active-items",
+   "grain": "category",
+   "unit": "count",
+   "definition": "Number of the category's garments active on the range's end date. Total row - the sum over categories.",
+   "formula": "|{garments g in category : active(g, range.to)}|",
+   "range_rule": "end-date",
+   "inputs": [
+    "field:garments.category",
+    "field:garments.purchased",
+    "field:garments.divested"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › summarises a category"
+   ]
+  },
+  {
+   "id": "inventory-value",
+   "label": "Inventory value",
+   "term": "term:inventory-value",
+   "grain": "category",
+   "unit": "EUR",
+   "definition": "Sum of the prices of the category's garments active on the range's end date (unknown prices count as 0). Total row - the sum.",
+   "formula": "Σ price over active garments on range.to",
+   "range_rule": "end-date",
+   "inputs": [
+    "field:garments.price"
+   ],
+   "depends_on": [
+    "metric:active-items"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › summarises a category"
+   ]
+  },
+  {
+   "id": "category-cost-per-wear",
+   "label": "Cost per wear (category)",
+   "term": "term:cost-per-wear",
+   "grain": "category",
+   "unit": "EUR per wear",
+   "definition": "The sum of the prices of the category's garments owned at any point in the range, divided by the sum of their lifetime wears. Unworn garments count with their full price and no wears; if none of them has ever been worn, the sum of prices is divided by 1 (as an unworn garment costs its full price). Garments without a price are left out. No Total row value.",
+   "formula": "Σ price / max(1, Σ lifetime-wears), over the category's garments owned during the range with a price",
+   "range_rule": "range (which garments) + lifetime (their wears)",
+   "null_when": "no garment of the category with a price was owned in the range",
+   "inputs": [
+    "field:garments.price"
+   ],
+   "depends_on": [
+    "metric:lifetime-wears"
+   ],
+   "decisions": [
+    "decision:D-2"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › pools prices over lifetime wears of all garments owned in the range, unworn ones included (D-2)",
+    "web/src/lib/metrics.test.ts › weights garments by lifetime wears, not by wears in the range (D-2)",
+    "web/src/lib/metrics.test.ts › divides by 1 when no garment of the category has ever been worn, and skips unknown prices"
+   ],
+   "note": "Equivalent to the average of the garments' cost per wear weighted by lifetime wears, with unworn garments' prices included. Until 2026-10-16 it was weighted by wears in the range and left unworn garments out. The original R pipeline used Σ price of all owned garments / Σ wears in the range."
+  },
+  {
+   "id": "days-used",
+   "label": "Days used",
+   "term": "term:days-used",
+   "grain": "category",
+   "unit": "share",
+   "definition": "Share of days with at least one wear of a category garment, from the later of the range start and the day the category's first garment was owned, to the range end. No Total row value.",
+   "formula": "|{days d in span : some category garment worn on d}| / |span|, span = max(range.from, min ownedFrom) .. range.to",
+   "range_rule": "range",
+   "depends_on": [
+    "metric:times-worn"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › summarises a category"
+   ]
+  },
+  {
+   "id": "yearly-cost",
+   "label": "Yearly cost",
+   "term": "term:yearly-cost",
+   "grain": "category",
+   "unit": "EUR per year",
+   "definition": "Category cost per wear × 365 × days used. Total row - the sum over categories.",
+   "formula": "category-cost-per-wear × 365 × days-used",
+   "range_rule": "range",
+   "null_when": "cost per wear or days used is missing",
+   "depends_on": [
+    "metric:category-cost-per-wear",
+    "metric:days-used"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › adds a total row"
+   ]
+  },
+  {
+   "id": "monthly-cost",
+   "label": "Monthly cost",
+   "term": "term:monthly-cost",
+   "grain": "category",
+   "unit": "EUR per month",
+   "definition": "Yearly cost divided by 12, as in the original R comparison chart.",
+   "formula": "yearly-cost / 12",
+   "range_rule": "range",
+   "depends_on": [
+    "metric:yearly-cost"
+   ],
+   "implementation": "web/src/pages/Dashboard.tsx#Dashboard"
+  },
+  {
+   "id": "turnover",
+   "label": "Inventory turnover",
+   "term": "term:turnover",
+   "grain": "category",
+   "unit": "share per year",
+   "definition": "Yearly cost divided by inventory value. Total row - Σ yearly cost / Σ inventory value.",
+   "formula": "yearly-cost / inventory-value",
+   "range_rule": "range",
+   "null_when": "yearly cost is missing or inventory value is 0",
+   "depends_on": [
+    "metric:yearly-cost",
+    "metric:inventory-value"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › adds a total row"
+   ]
+  },
+  {
+   "id": "second-hand-share",
+   "label": "Second hand share",
+   "term": "term:second-hand-share",
+   "grain": "category",
+   "unit": "share",
+   "definition": "Share of the category's garments active on the range's end date that carry the second-hand tag (by count). Total row - over all active garments.",
+   "formula": "|{active garments tagged second-hand}| / |{active garments}|",
+   "range_rule": "end-date",
+   "null_when": "no garment is active",
+   "inputs": [
+    "field:garments.tags"
+   ],
+   "implementation": "web/src/lib/metrics.ts#categoryListing",
+   "tests": [
+    "web/src/lib/metrics.test.ts › gives the second-hand share of active garments, per category and in total"
+   ]
+  },
+  {
+   "id": "divested-averages",
+   "label": "Divested items' averages",
+   "grain": "category",
+   "unit": "wears per month; EUR per wear",
+   "definition": "Over divested garments owned at least 30 days: wears per month (Σ times worn / Σ days owned × 30.5) and the use-weighted cost per wear. Reference lines on category pages.",
+   "formula": "(Σ times-worn / Σ days-owned) × 30.5; Σ (cost per wear × times-worn) / Σ times-worn",
+   "range_rule": "range",
+   "depends_on": [
+    "metric:times-worn",
+    "metric:days-owned",
+    "metric:garment-cost-per-wear"
+   ],
+   "implementation": "web/src/lib/metrics.ts#divestedAverages",
+   "tests": [
+    "web/src/lib/metrics.test.ts › averages divested items owned at least 30 days"
+   ]
+  },
+  {
+   "id": "active-items-over-time",
+   "label": "Active items over time",
+   "grain": "category × day",
+   "unit": "count",
+   "definition": "Active items per category on every day of the range, as step series (Sportswear left out on the Dashboard).",
+   "formula": "active-items(category, d) for each day d in range",
+   "range_rule": "each day",
+   "depends_on": [
+    "metric:active-items"
+   ],
+   "implementation": "web/src/lib/metrics.ts#activeItemsOverTime",
+   "tests": [
+    "web/src/lib/metrics.test.ts › steps up on purchase and down the day after divesting",
+    "web/src/lib/metrics.test.ts › agrees with isActive on every day"
+   ]
+  },
+  {
+   "id": "inventory-value-over-time",
+   "label": "Inventory value over time",
+   "grain": "category × day",
+   "unit": "EUR",
+   "definition": "Inventory value per category (and in total) on every day of the range, as step series.",
+   "formula": "inventory-value(category, d) for each day d in range",
+   "range_rule": "each day",
+   "depends_on": [
+    "metric:inventory-value"
+   ],
+   "implementation": "web/src/lib/metrics.ts#inventoryValueOverTime",
+   "tests": [
+    "web/src/lib/metrics.test.ts › sums prices of active garments per category, in whole cents",
+    "web/src/lib/metrics.test.ts › sums all categories for the total"
+   ]
+  },
+  {
+   "id": "daily-cost",
+   "label": "Daily cost",
+   "term": "term:daily-cost",
+   "grain": "day",
+   "unit": "EUR per day",
+   "definition": "For each logged day in the range with wears: the sum of the lifetime cost per wear of the garments worn and owned that day (unknown prices count 0); \"final\" when all of them are divested. Average - the mean of 30 consecutive logged days centred on the day (days i−14 … i+15), so days without wears are skipped.",
+   "formula": "Σ garment-cost-per-wear over garments worn on d; average(i) = mean(cost[i−14 .. i+15])",
+   "range_rule": "each day + lifetime (cost per wear)",
+   "depends_on": [
+    "metric:garment-cost-per-wear"
+   ],
+   "decisions": [
+    "decision:D-2",
+    "decision:Q-1"
+   ],
+   "implementation": "web/src/lib/metrics.ts#dailyCost",
+   "tests": [
+    "web/src/lib/metrics.test.ts › sums lifetime cost per wear of the garments worn each day (D-2)",
+    "web/src/lib/metrics.test.ts › centres a 30-value window on values i-14 … i+15"
+   ],
+   "note": "With \"as of\" a date (animations), cost per wear counts only wears up to that date."
+  },
+  {
+   "id": "fibre-mass",
+   "label": "Fibre mass",
+   "term": "term:fibre-mass",
+   "grain": "fibre",
+   "unit": "kg",
+   "definition": "Weight × main-part composition, summed per fibre, with recycled and organic kg. Owned basis - garments active on the range's end date. Worn basis - each wear in the range counts the garment's full weight. Only garments with a weight and readable materials are included; coverage says how many.",
+   "formula": "Σ weightG / 1000 × fibreShare",
+   "range_rule": "end-date (owned) or range (worn)",
+   "inputs": [
+    "field:garments.weightG",
+    "field:garments.materials"
+   ],
+   "implementation": "web/src/lib/materials.ts#materialBreakdown",
+   "tests": [
+    "web/src/lib/materials.test.ts › adds up owned fibre mass from weight × composition",
+    "web/src/lib/materials.test.ts › counts each wear for the worn basis, with the average outfit weight"
+   ]
+  },
+  {
+   "id": "average-outfit-weight",
+   "label": "Average outfit weight",
+   "term": "term:outfit-weight",
+   "grain": "range or month",
+   "unit": "kg per day",
+   "definition": "Mean total weight of the garments worn per logged day (garments with a known weight).",
+   "formula": "Σ weight of garments worn / number of logged days",
+   "range_rule": "range",
+   "inputs": [
+    "field:garments.weightG",
+    "field:days.worn"
+   ],
+   "implementation": "web/src/lib/materials.ts#materialsByMonth",
+   "tests": [
+    "web/src/lib/materials.test.ts › computes outfit weight and synthetic share per month"
+   ]
+  },
+  {
+   "id": "synthetic-share",
+   "label": "Synthetic share (worn)",
+   "grain": "month",
+   "unit": "share",
+   "definition": "Share of the worn fibre mass in a month that is synthetic.",
+   "formula": "synthetic kg / total kg (worn basis)",
+   "range_rule": "range (by month)",
+   "depends_on": [
+    "metric:fibre-mass"
+   ],
+   "implementation": "web/src/lib/materials.ts#materialsByMonth",
+   "tests": [
+    "web/src/lib/materials.test.ts › computes outfit weight and synthetic share per month"
+   ]
+  },
+  {
+   "id": "comparison-yearly-cost",
+   "label": "Yearly cost (comparison item)",
+   "grain": "comparison item",
+   "unit": "EUR per year",
+   "definition": "Monthly cost × 12.",
+   "formula": "monthlyCost × 12",
+   "range_rule": "none (fixed figures)",
+   "inputs": [
+    "field:comparison.monthlyCost"
+   ],
+   "implementation": "web/src/lib/comparison.ts#yearlyCost",
+   "tests": [
+    "web/src/lib/comparison.test.ts › derives yearly cost and cost per use as the Sheet did"
+   ]
+  },
+  {
+   "id": "comparison-cost-per-use",
+   "label": "Cost per use (comparison item)",
+   "term": "term:cost-per-use",
+   "grain": "comparison item",
+   "unit": "EUR per use",
+   "definition": "Monthly cost divided by (30.5 × use frequency); none if never used.",
+   "formula": "useFrequency > 0 ? monthlyCost / (30.5 × useFrequency) : null",
+   "range_rule": "none (fixed figures)",
+   "inputs": [
+    "field:comparison.monthlyCost",
+    "field:comparison.useFrequency"
+   ],
+   "implementation": "web/src/lib/comparison.ts#costPerUse",
+   "tests": [
+    "web/src/lib/comparison.test.ts › derives yearly cost and cost per use as the Sheet did"
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "id": "Person",
+   "label": "Person",
+   "definition": "The wardrobe's owner, who logs what they wear. In this data set there is exactly one.",
+   "maps_to": "schema:Person"
+  },
+  {
+   "id": "Garment",
+   "label": "Garment",
+   "definition": "One physical piece of clothing, footwear or accessory owned at some point since tracking began. Two identical items bought together are separate garments (e.g. \"Diesel gray 01\" and \"Diesel gray 02\").",
+   "maps_to": "schema:Product",
+   "stored_as": "dataset:garments",
+   "see": [
+    "term:garment"
+   ]
+  },
+  {
+   "id": "Category",
+   "label": "Category",
+   "definition": "A kind of clothing that groups garments, from a fixed list in a standard order.",
+   "maps_to": "schema:DefinedTerm",
+   "stored_as": "field:garments.category",
+   "see": [
+    "term:category"
+   ]
+  },
+  {
+   "id": "OwnershipPeriod",
+   "label": "Ownership period",
+   "definition": "The days a garment counts as owned: from its purchase date (at the earliest the start of tracking) to its divest date, inclusive; open-ended while it is still active.",
+   "derived": true,
+   "see": [
+    "term:ownership-period",
+    "term:active",
+    "term:divested"
+   ]
+  },
+  {
+   "id": "WearDay",
+   "label": "Wear day",
+   "definition": "One calendar day of the log and the set of garments worn on it.",
+   "stored_as": "dataset:days",
+   "see": [
+    "term:wear"
+   ]
+  },
+  {
+   "id": "Wear",
+   "label": "Wear",
+   "definition": "One garment worn on one day. Wearing a garment twice on the same day is one wear.",
+   "maps_to": "prov:Activity",
+   "derived": true,
+   "see": [
+    "term:wear"
+   ]
+  },
+  {
+   "id": "Tag",
+   "label": "Tag",
+   "definition": "A descriptive label from a fixed vocabulary, e.g. second hand or Hanko. Tags never change a calculation.",
+   "maps_to": "schema:DefinedTerm",
+   "stored_as": "field:garments.tags",
+   "see": [
+    "term:tag"
+   ]
+  },
+  {
+   "id": "MaterialComposition",
+   "label": "Material composition",
+   "definition": "The fibres a garment's main part is made of, with their shares (summing to 100 %), read from its free-text materials label.",
+   "derived": true,
+   "see": [
+    "term:materials",
+    "term:main-part",
+    "term:fibre"
+   ]
+  },
+  {
+   "id": "Fibre",
+   "label": "Fibre",
+   "definition": "A textile or material, e.g. cotton, wool, polyester, leather.",
+   "see": [
+    "term:fibre"
+   ]
+  },
+  {
+   "id": "FibreClass",
+   "label": "Fibre class",
+   "definition": "One of four groups of fibres: natural, regenerated cellulose, synthetic or other.",
+   "see": [
+    "term:fibre-class"
+   ]
+  },
+  {
+   "id": "ComparisonItem",
+   "label": "Comparison item",
+   "definition": "An item of other everyday spending (transport, subscriptions, tools…) with a monthly cost and a frequency of use, shown next to the clothing categories for comparison.",
+   "stored_as": "dataset:comparison",
+   "see": [
+    "term:comparison-item"
+   ]
+  }
+ ],
+ "properties": [
+  {
+   "id": "item",
+   "domain": "Garment",
+   "range": "text",
+   "label": "Name",
+   "definition": "The garment's name, e.g. brand, model and colour.",
+   "maps_to": "schema:name",
+   "stored_as": "field:garments.item"
+  },
+  {
+   "id": "inCategory",
+   "domain": "Garment",
+   "range": "Category",
+   "label": "Category",
+   "definition": "The garment's category.",
+   "maps_to": "schema:category",
+   "stored_as": "field:garments.category"
+  },
+  {
+   "id": "details",
+   "domain": "Garment",
+   "range": "text",
+   "label": "Details",
+   "definition": "Free-text details such as size or model code.",
+   "maps_to": "schema:description",
+   "stored_as": "field:garments.details"
+  },
+  {
+   "id": "price",
+   "domain": "Garment",
+   "range": "money-eur",
+   "label": "Price",
+   "definition": "What was paid, in euros, rounded to whole cents.",
+   "maps_to": "schema:price",
+   "stored_as": "field:garments.price",
+   "see": [
+    "term:price"
+   ]
+  },
+  {
+   "id": "purchased",
+   "domain": "Garment",
+   "range": "date",
+   "label": "Purchased",
+   "definition": "The date the garment was bought.",
+   "maps_to": "schema:purchaseDate",
+   "stored_as": "field:garments.purchased"
+  },
+  {
+   "id": "divested",
+   "domain": "Garment",
+   "range": "date",
+   "label": "Divested",
+   "definition": "The last day the garment was owned; empty while active.",
+   "stored_as": "field:garments.divested",
+   "see": [
+    "term:divested"
+   ]
+  },
+  {
+   "id": "timesUsedInit",
+   "domain": "Garment",
+   "range": "integer",
+   "label": "Times used before tracking",
+   "definition": "Wears before tracking began on 1 January 2018.",
+   "stored_as": "field:garments.timesUsedInit",
+   "see": [
+    "term:pre-tracking-wears"
+   ]
+  },
+  {
+   "id": "materials",
+   "domain": "Garment",
+   "range": "text",
+   "label": "Materials",
+   "definition": "The materials label as written (free text).",
+   "stored_as": "field:garments.materials",
+   "see": [
+    "term:materials"
+   ]
+  },
+  {
+   "id": "weight",
+   "domain": "Garment",
+   "range": "mass-g",
+   "label": "Weight",
+   "definition": "The garment's weight in grams.",
+   "maps_to": "schema:weight",
+   "stored_as": "field:garments.weightG"
+  },
+  {
+   "id": "hasTag",
+   "domain": "Garment",
+   "range": "Tag",
+   "label": "Tags",
+   "definition": "The garment's descriptive tags.",
+   "stored_as": "field:garments.tags"
+  },
+  {
+   "id": "photo",
+   "domain": "Garment",
+   "range": "image",
+   "label": "Photo",
+   "definition": "The garment's standard photo (228 × 228 PNG).",
+   "maps_to": "schema:image",
+   "stored_as": "field:garments.photo"
+  },
+  {
+   "id": "hasOwnershipPeriod",
+   "domain": "Garment",
+   "range": "OwnershipPeriod",
+   "label": "Ownership period",
+   "definition": "Derived from purchased and divested.",
+   "derived": true
+  },
+  {
+   "id": "hasComposition",
+   "domain": "Garment",
+   "range": "MaterialComposition",
+   "label": "Composition",
+   "definition": "Derived from materials.",
+   "derived": true
+  },
+  {
+   "id": "onDay",
+   "domain": "Wear",
+   "range": "WearDay",
+   "label": "Day",
+   "definition": "The day of the wear."
+  },
+  {
+   "id": "ofGarment",
+   "domain": "Wear",
+   "range": "Garment",
+   "label": "Garment",
+   "definition": "The garment worn.",
+   "maps_to": "prov:used"
+  },
+  {
+   "id": "date",
+   "domain": "WearDay",
+   "range": "date",
+   "label": "Date",
+   "definition": "The calendar date (no time zone).",
+   "stored_as": "field:days.date"
+  },
+  {
+   "id": "worn",
+   "domain": "WearDay",
+   "range": "Garment",
+   "label": "Worn",
+   "definition": "The garments worn that day.",
+   "stored_as": "field:days.worn"
+  },
+  {
+   "id": "fibreShare",
+   "domain": "MaterialComposition",
+   "range": "share",
+   "label": "Fibre share",
+   "definition": "Each fibre's share of the main part, 0–1, summing to 1."
+  },
+  {
+   "id": "inFibreClass",
+   "domain": "Fibre",
+   "range": "FibreClass",
+   "label": "Fibre class",
+   "definition": "The fibre's class."
+  },
+  {
+   "id": "monthlyCost",
+   "domain": "ComparisonItem",
+   "range": "money-eur",
+   "label": "Monthly cost",
+   "definition": "What the item costs per month, in euros (entered).",
+   "stored_as": "field:comparison.monthlyCost"
+  },
+  {
+   "id": "useFrequency",
+   "domain": "ComparisonItem",
+   "range": "share",
+   "label": "Use frequency",
+   "definition": "Share of days on which it is used, 0–1 (entered).",
+   "stored_as": "field:comparison.useFrequency"
+  }
+ ],
+ "datasets": [
+  {
+   "id": "garments",
+   "title": "Garments",
+   "description": "Every garment owned at some point since tracking began, with its details. The source of truth for garment details (decision D-4).",
+   "location": "Firestore users/{uid}/garments/{garmentId}",
+   "classification": "owner-only",
+   "published_via": [
+    "dataset:public-data"
+   ],
+   "represents": "class:Garment",
+   "key": "id",
+   "lineage": [
+    {
+     "from": "dataset:legacy-sheet",
+     "activity": "Sheet → Firestore migration and sync",
+     "until": "2026-10-09",
+     "decision": "decision:D-4"
+    },
+    {
+     "from": "owner",
+     "activity": "edited in the app (/manage)",
+     "since": "2026-10-09"
+    }
+   ],
+   "fields": [
+    {
+     "name": "id",
+     "type": "text",
+     "required": true,
+     "definition": "Garment id, from the original Sheet's Photo id (e.g. Jackets_and_hoodies-006); also the photo file name.",
+     "constraints": "pattern <Category_words>-NNN; unique"
+    },
+    {
+     "name": "category",
+     "type": "text",
+     "required": true,
+     "definition": "The garment's category.",
+     "constraints": "one of the 13 standard categories",
+     "term": "term:category"
+    },
+    {
+     "name": "item",
+     "type": "text",
+     "required": true,
+     "definition": "Name (brand, model, colour; numbered when identical items exist)."
+    },
+    {
+     "name": "details",
+     "type": "text",
+     "required": false,
+     "definition": "Free-text details such as size or model code."
+    },
+    {
+     "name": "photo",
+     "type": "text",
+     "required": true,
+     "definition": "Photo file name without .png in public storage."
+    },
+    {
+     "name": "photoVersion",
+     "type": "text",
+     "required": false,
+     "definition": "Set when the photo is replaced; part of the photo URL so caches show the new one."
+    },
+    {
+     "name": "price",
+     "type": "money-eur",
+     "required": false,
+     "definition": "What was paid, rounded to whole cents.",
+     "constraints": "≥ 0",
+     "term": "term:price"
+    },
+    {
+     "name": "purchased",
+     "type": "date",
+     "required": false,
+     "definition": "Purchase date.",
+     "constraints": "≤ divested"
+    },
+    {
+     "name": "divested",
+     "type": "date",
+     "required": false,
+     "definition": "Last day owned; empty while active.",
+     "term": "term:divested"
+    },
+    {
+     "name": "timesUsedInit",
+     "type": "integer",
+     "required": true,
+     "definition": "Wears before tracking began (estimate).",
+     "constraints": "≥ 0",
+     "term": "term:pre-tracking-wears"
+    },
+    {
+     "name": "materials",
+     "type": "text",
+     "required": false,
+     "definition": "The materials label as written.",
+     "term": "term:materials"
+    },
+    {
+     "name": "weightG",
+     "type": "mass-g",
+     "required": false,
+     "definition": "Weight in grams.",
+     "constraints": "> 0"
+    },
+    {
+     "name": "tags",
+     "type": "list of text",
+     "required": false,
+     "definition": "Descriptive tags.",
+     "constraints": "each one of: second-hand, hanko, bicycle, motorcycle, winter, summer",
+     "term": "term:tag"
+    },
+    {
+     "name": "detailsUnavailable",
+     "type": "boolean",
+     "required": false,
+     "definition": "Divested only: missing materials or weight can no longer be filled in (left off the review list)."
+    }
+   ]
+  },
+  {
+   "id": "garment-history",
+   "title": "Garment history",
+   "description": "Every saved version of every garment (an audit trail), including the version before each change.",
+   "location": "Firestore users/{uid}/garments/{garmentId}/history/{autoId}",
+   "classification": "owner-only",
+   "lineage": [
+    {
+     "from": "dataset:garments",
+     "activity": "written in the same transaction as each garment save"
+    }
+   ],
+   "fields": [
+    {
+     "name": "savedAt",
+     "type": "timestamp",
+     "required": true,
+     "definition": "When the version was saved."
+    },
+    {
+     "name": "before",
+     "type": "garment",
+     "required": false,
+     "definition": "The previous version; empty when the garment was created in the app."
+    },
+    {
+     "name": "after",
+     "type": "garment",
+     "required": true,
+     "definition": "The saved version."
+    },
+    {
+     "name": "note",
+     "type": "text",
+     "required": false,
+     "definition": "What happened, e.g. \"Photo replaced\"."
+    }
+   ]
+  },
+  {
+   "id": "deleted-garments",
+   "title": "Deleted garments",
+   "description": "Garments deleted in the app (only never-worn ones can be), kept as a record.",
+   "location": "Firestore users/{uid}/deletedGarments/{garmentId}",
+   "classification": "owner-only",
+   "fields": [
+    {
+     "name": "deletedAt",
+     "type": "timestamp",
+     "required": true,
+     "definition": "When it was deleted."
+    },
+    {
+     "name": "garment",
+     "type": "garment",
+     "required": true,
+     "definition": "The garment as it was."
+    }
+   ]
+  },
+  {
+   "id": "days",
+   "title": "Wear log",
+   "description": "One record per day with wears - the garments worn that day. Days with nothing worn have no record.",
+   "location": "Firestore users/{uid}/days/{YYYY-MM-DD}",
+   "classification": "owner-only",
+   "published_via": [
+    "dataset:public-data"
+   ],
+   "represents": "class:WearDay",
+   "key": "date",
+   "lineage": [
+    {
+     "from": "dataset:legacy-sheet",
+     "activity": "daily checkbox columns, migrated",
+     "until": "2026-10-09"
+    },
+    {
+     "from": "owner",
+     "activity": "logged in the app (/log)",
+     "since": "2026-10-10",
+     "decision": "decision:R-15"
+    }
+   ],
+   "fields": [
+    {
+     "name": "date",
+     "type": "date",
+     "required": true,
+     "definition": "The day (document id).",
+     "constraints": "≥ 2018-01-01; not in the future"
+    },
+    {
+     "name": "worn",
+     "type": "list of garment ids",
+     "required": true,
+     "definition": "The garments worn that day.",
+     "constraints": "each an existing garment id; no duplicates"
+    }
+   ]
+  },
+  {
+   "id": "settings",
+   "title": "Settings",
+   "description": "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced.",
+   "location": "Firestore users/{uid}/settings/app",
+   "classification": "owner-only",
+   "fields": [
+    {
+     "name": "sheetRetired",
+     "type": "date",
+     "required": false,
+     "definition": "Cut-over date (2026-10-09)."
+    }
+   ]
+  },
+  {
+   "id": "comparison",
+   "title": "Comparison items",
+   "description": "Other everyday spending shown next to the clothing categories in the monthly cost chart.",
+   "location": "Firestore users/{uid}/settings/comparison (items)",
+   "classification": "owner-only",
+   "published_via": [
+    "dataset:public-data"
+   ],
+   "represents": "class:ComparisonItem",
+   "key": "id",
+   "lineage": [
+    {
+     "from": "dataset:legacy-sheet",
+     "activity": "one-off import of the Comparison tab (values only)",
+     "until": "2026-10-12"
+    },
+    {
+     "from": "owner",
+     "activity": "edited in the app (/manage/comparison)",
+     "since": "2026-10-12"
+    }
+   ],
+   "fields": [
+    {
+     "name": "id",
+     "type": "text",
+     "required": true,
+     "definition": "Item id (from its name)."
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "required": false,
+     "definition": "Kind of spending, e.g. Content, Physical service."
+    },
+    {
+     "name": "item",
+     "type": "text",
+     "required": true,
+     "definition": "Name."
+    },
+    {
+     "name": "details",
+     "type": "text",
+     "required": false,
+     "definition": "Free-text details."
+    },
+    {
+     "name": "photo",
+     "type": "text",
+     "required": false,
+     "definition": "Photo file name (Comparison-<Name>) without .png; empty when none."
+    },
+    {
+     "name": "photoVersion",
+     "type": "text",
+     "required": false,
+     "definition": "Set when a photo is uploaded."
+    },
+    {
+     "name": "monthlyCost",
+     "type": "money-eur",
+     "required": true,
+     "definition": "Monthly cost (entered).",
+     "constraints": "≥ 0"
+    },
+    {
+     "name": "useFrequency",
+     "type": "share",
+     "required": true,
+     "definition": "Share of days used (entered).",
+     "constraints": "0–1",
+     "term": "term:use-frequency"
+    }
+   ]
+  },
+  {
+   "id": "public-data",
+   "title": "Public wardrobe data",
+   "description": "The world-readable copy for public pages and the MCP server: all garments, the full day-by-day log (as indexes into the garment list) and the comparison items, in one document, so any metric can be computed for any range with one read (decision D-1).",
+   "location": "Firestore users/{uid}/public/data",
+   "classification": "public",
+   "distribution": [
+    {
+     "format": "Firestore REST (JSON)",
+     "url": "https://firestore.googleapis.com/v1/projects/threddit-297417/databases/(default)/documents/users/0q0I90W7W3RAcgFN1c1JX6pZupG3/public/data"
+    },
+    {
+     "format": "web app",
+     "url": "https://wardrobediary.io/dashboard"
+    },
+    {
+     "format": "MCP server",
+     "url": "mcp/ (local; public server planned, R-29 phase 2)"
+    }
+   ],
+   "lineage": [
+    {
+     "from": [
+      "dataset:garments",
+      "dataset:days",
+      "dataset:comparison"
+     ],
+     "activity": "updated in the same write as every change in the app (transactions / batches)",
+     "decision": "decision:D-1"
+    }
+   ],
+   "fields": [
+    {
+     "name": "version",
+     "type": "integer",
+     "required": true,
+     "definition": "Format version (1)."
+    },
+    {
+     "name": "garments",
+     "type": "list of garment",
+     "required": true,
+     "definition": "All garments with all their fields (same as dataset garments)."
+    },
+    {
+     "name": "days",
+     "type": "map date → list of integer",
+     "required": true,
+     "definition": "The wear log as positions in the garments list."
+    },
+    {
+     "name": "comparison",
+     "type": "list of comparison item",
+     "required": false,
+     "definition": "The comparison items."
+    }
+   ]
+  },
+  {
+   "id": "photos",
+   "title": "Photos",
+   "description": "Garment photos (228 × 228 PNG), category images and comparison photos.",
+   "location": "Firebase Storage bucket threddit-297417.appspot.com",
+   "classification": "public",
+   "fields": []
+  },
+  {
+   "id": "backups",
+   "title": "Nightly backups",
+   "description": "A full JSON export of garments (with history), days, deleted garments and settings, every night, with git history keeping every day.",
+   "location": "private GitHub repository hoverfalt/wardrobe-diary-backups (wardrobe.json); local backups/ folder",
+   "classification": "private",
+   "update_frequency": "daily at 02:17 UTC",
+   "lineage": [
+    {
+     "from": [
+      "dataset:garments",
+      "dataset:garment-history",
+      "dataset:days",
+      "dataset:deleted-garments",
+      "dataset:settings"
+     ],
+     "activity": "tools/backup.py with a read-only service account",
+     "decision": "decision:R-28"
+    }
+   ],
+   "fields": []
+  },
+  {
+   "id": "legacy-sheet",
+   "title": "Google Sheet (retired)",
+   "description": "The original data entry, 2018-01-01 to 2026-10-09 - one row per garment, one checkbox column per day. Retired at the cut-over; kept read-only for reference.",
+   "location": "Google Sheet 1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM, tab Threddit (and Comparison)",
+   "classification": "private",
+   "status": "retired",
+   "fields": []
+  }
+ ],
+ "qualityRules": [
+  {
+   "id": "unique-ids",
+   "dataset": "dataset:garments",
+   "rule": "Every garment id is unique."
+  },
+  {
+   "id": "known-category",
+   "dataset": "dataset:garments",
+   "rule": "Every category is one of the 13 standard categories."
+  },
+  {
+   "id": "dates-ordered",
+   "dataset": "dataset:garments",
+   "rule": "purchased ≤ divested when both are set."
+  },
+  {
+   "id": "non-negative",
+   "dataset": "dataset:garments",
+   "rule": "price ≥ 0, timesUsedInit ≥ 0, weightG > 0 when set."
+  },
+  {
+   "id": "known-tags",
+   "dataset": "dataset:garments",
+   "rule": "Every tag is in the vocabulary."
+  },
+  {
+   "id": "worn-exists",
+   "dataset": "dataset:days",
+   "rule": "Every worn id is an existing garment."
+  },
+  {
+   "id": "wears-in-ownership",
+   "dataset": "dataset:days",
+   "rule": "Wears fall within the garment's ownership period.",
+   "severity": "warning",
+   "note": "Known exceptions are ignored by the metrics (Q-9)."
+  },
+  {
+   "id": "public-matches-source",
+   "dataset": "dataset:public-data",
+   "rule": "The public copy equals garments + days + comparison."
+  },
+  {
+   "id": "materials-coverage",
+   "dataset": "dataset:garments",
+   "rule": "Share of active garments with a weight and readable materials (reported, no threshold).",
+   "severity": "info"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "D-1",
+   "date": "2026-10-09",
+   "title": "Public pages get the full day-by-day log",
+   "decision": "Public pages and the MCP server read one world-readable document with all garments and the full wear log, and compute every metric from it, rather than precomputed summaries.",
+   "rationale": "Any metric for any date range can be computed in the browser with one document read.",
+   "affects": [
+    "dataset:public-data"
+   ]
+  },
+  {
+   "id": "D-2",
+   "date": "2026-10-09",
+   "title": "Cost per wear is always lifetime",
+   "decision": "A garment's cost per wear is price / all its wears over its whole ownership, regardless of the chosen date range, even when wears after the range lower it. A category's cost per wear for a range is Σ price / Σ lifetime wears over its garments owned at any point in the range, unworn garments included (divided by 1 if none has ever been worn).",
+   "rationale": "The concept must be treated consistently - a garment has one cost per wear, and unused purchases must not disappear from a category's cost.",
+   "amended": "2026-10-16 (Olof): the category figure was the average of the garments' cost per wear weighted by wears in the range, over garments worn in the range, which left unworn garments out entirely. Now pooled over lifetime wears with unworn garments included. Raises categories with unused garments (e.g. Socks +43 % in 2025) and changes Yearly cost, Turnover and the monthly cost comparison with it.",
+   "affects": [
+    "metric:garment-cost-per-wear",
+    "metric:category-cost-per-wear",
+    "metric:daily-cost"
+   ],
+   "exception": "Animations show values \"as of\" a date (only wears up to then)."
+  },
+  {
+   "id": "D-3",
+   "date": "2026-10-09",
+   "title": "Small multiples for per-category charts",
+   "decision": "Charts that show several categories use one small chart per category on a shared scale.",
+   "rationale": "The original 12-colour palette fails colour-blind and contrast checks.",
+   "affects": []
+  },
+  {
+   "id": "D-4",
+   "date": "2026-10-09",
+   "title": "Garment details are edited in the app",
+   "decision": "Garment details are edited in the app and stored in Firestore, which is their source of truth.",
+   "affects": [
+    "dataset:garments"
+   ]
+  },
+  {
+   "id": "Q-1",
+   "date": "2026-10-09",
+   "title": "Daily cost definition",
+   "decision": "Daily cost = Σ over garments worn that day (and owned then) of their lifetime cost per wear; \"final\" when every one of them is divested; plus a rolling mean centred on the day.",
+   "affects": [
+    "metric:daily-cost"
+   ]
+  },
+  {
+   "id": "R-15",
+   "date": "2026-10-09",
+   "title": "Cut-over to logging in the app",
+   "decision": "The app is the source of truth for wears from 2026-10-10; the Sheet holds the log through 2026-10-09 and is retired.",
+   "affects": [
+    "dataset:days",
+    "dataset:legacy-sheet"
+   ]
+  },
+  {
+   "id": "R-28",
+   "date": "2026-10-10",
+   "title": "Nightly backups",
+   "decision": "A nightly job exports all owner data to a private repository with a read-only account.",
+   "affects": [
+    "dataset:backups"
+   ]
+  },
+  {
+   "id": "2026-10-08-ranges",
+   "date": "2026-10-08",
+   "title": "Metrics work for any date range",
+   "decision": "All metric functions take a date range; the per-day data stays available rather than being pre-aggregated.",
+   "affects": [
+    "term:date-range"
+   ]
+  }
+ ],
+ "definitionsMarkdown": "# Wardrobe Diary: definitions (semantic layer 0.2.1)\n\nGenerated from the semantic layer (semantics/*.yaml); full detail: https://wardrobediary.io/glossary, /model, /data.\nData: one person's daily wardrobe log since 2018-01-01; every garment with purchase price, dates, materials and weight.\nAll metrics take a date range (from, to); by default from 2018-01-01 to the last logged day.\n\n## Terms\n- **Garment**: One physical piece of clothing, footwear or accessory in the wardrobe, owned at some point since tracking began. Identical items bought together are separate garments, each with its own wears.\n- **Category**: A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear. Categories are always listed in this order, never alphabetically.\n- **Start of tracking**: 1 January 2018, the first day of the daily log. Garments bought earlier count as owned from this date; their earlier wears are pre-tracking wears.\n- **Wear** (also: use): One garment worn on one day, as logged. Wearing a garment more than once on the same day is still one wear. Wears logged outside the garment's ownership period are ignored by every metric.\n- **Pre-tracking wears** (also: times used init): The number of times a garment was worn before tracking began, entered once as an estimate. They count only in figures whose range starts on the start of tracking, and always in lifetime wears.\n- **Price**: What was paid for the garment, in euros, rounded to whole cents. Second-hand garments have the price actually paid. Multipacks are split evenly per item.\n- **Ownership period**: The days a garment counts as owned: from its purchase date, but no earlier than the start of tracking, to its divest date, both inclusive.\n- **Active**: A garment is active on a day if that day is within its ownership period. The divest day itself still counts as owned (as in the original R pipeline).\n- **Divested**: No longer owned after the divest date, because it was sold, given away, recycled or discarded.\n- **Date range**: The period a figure is computed for, from a start date to an end date, both inclusive. Every metric takes a date range; the default is from the start of tracking to the last logged day.\n- **As of**: A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts. The one deliberate exception to the lifetime rule of cost per wear (decision D-2).\n- **Times worn**: The number of wears of a garment within the date range, plus its pre-tracking wears when the range starts on the start of tracking.\n- **Lifetime wears**: All wears of a garment over its whole ownership period, including pre-tracking wears.\n- **Cost per wear** (also: CPW, cost per use): For a garment: its price divided by its lifetime wears, regardless of the date range chosen. A garment never worn costs its full price. For a category: the sum of the prices of its garments owned in the range divided by the sum of their lifetime wears, so unworn garments count with their full price (divided by 1 if none has ever been worn). Using lifetime wears, even wears after the range ends, keeps the concept consistent: a garment has one cost per wear, which falls as it gets more use, and a category's cost per wear is what its garments cost over all the use they get. The date range decides only which garments count.\n- **Use-weighted average**: An average in which each garment counts as many times as it was worn in the range.\n- **Wears per month**: Times worn divided by the months owned in the range, where a month is 30.5 days.\n- **Days used** (also: frequency of use, category frequency of use): For a category: the share of days on which at least one of its garments was worn, counted from the later of the range start and the day the category's first garment was owned, to the range end.\n- **Yearly cost**: What a year of using a category costs at the current rate - its cost per wear × 365 × days used.\n- **Monthly cost**: Yearly cost divided by 12. Used to compare clothing categories with other monthly spending.\n- **Inventory value**: The sum of the prices of the garments active on the range's end date.\n- **Active items** (also: items): The number of garments active on the range's end date.\n- **Inventory turnover** (also: turnover): Yearly cost divided by inventory value - the share of the wardrobe's purchase value \"used up\" per year.\n- **Second hand share**: The share of the garments active on the range's end date that were bought second hand (a count, not a value share).\n- **Daily cost**: For a day, the sum of the cost per wear of the garments worn that day (and owned then). The Dashboard leaves Sportswear out of its daily cost charts.\n- **Final (daily cost)** (also: all divested): A day's cost is final when every garment worn that day has been divested, so it can no longer fall.\n- **Tag**: A descriptive label from a fixed vocabulary. Tags only describe garments; they never change any calculation.\n- **Second hand (tag)**: Bought second hand, i.e. used before. The price is what was paid and wears count from the purchase, without estimating earlier use.\n- **Hanko (tag)**: Kept at the summer home in Hanko, so worn only during stays there.\n- **Bicycle gear (tag)**: Cycling gear.\n- **Motorcycle gear (tag)**: Motorcycle gear.\n- **Winter / Summer (tags)**: Worn mainly in winter or in summer; used to narrow the logging list by season.\n- **Materials**: The garment's materials label as written, in free text (e.g. \"Shell 100% polyamide, lining 100% polyester\"). The text is never changed; it is interpreted on read into a material composition.\n- **Main part**: For a garment whose label lists several parts (shell, lining, padding…), the part that counts in material figures: the one whose label begins with shell, main, outer, body, fabric or belt, otherwise the first one listed.\n- **Fibre**: A material a garment is made of, under one normalised name (e.g. lycra and spandex are both elastane, nylon is polyamide).\n- **Fibre class**: Natural (cotton, wool, linen, leather, down, feather), regenerated cellulose (viscose, modal, lyocell), synthetic (polyester, polyamide, elastane, acrylic…) or other.\n- **Estimated composition**: A composition whose shares are not given on the label (or don't add up to 100 %), so the fibres are split equally or normalised.\n- **Fibre mass**: Weight × composition, summed per fibre. Owned basis: garments active on the range's end date. Worn basis: every wear in the range counts the garment's full weight.\n- **Average outfit weight**: The average total weight of the garments worn per logged day (garments with a known weight).\n- **Coverage**: How much of the data a material figure could use - garments or wears with both a weight and readable materials, out of all.\n- **Comparison item**: An item of other everyday spending, such as a transport ticket or a streaming service, with a monthly cost and a use frequency.\n- **Use frequency**: For a comparison item, the share of days on which it is used (entered by the owner).\n- **Cost per use (comparison)**: For a comparison item, its monthly cost divided by (30.5 × use frequency).\n\n## Metrics\n- **Times worn** [times-worn] (garment; count; range: range): Wears of the garment within the range (and within its ownership period), plus pre-tracking wears when the range starts on the start of tracking. Formula: |{wear days d : range.from ≤ d ≤ range.to, d in ownership}| + (range.from ≤ 2018-01-01 ? timesUsedInit : 0)\n- **Lifetime wears** [lifetime-wears] (garment; count; range: lifetime): All wears over the garment's whole ownership period, including pre-tracking wears. Formula: times-worn over {from: 2018-01-01, to: open}\n- **Cost per wear (garment)** [garment-cost-per-wear] (garment; EUR per wear; range: lifetime): Price divided by lifetime wears, independent of any chosen range; a garment never worn costs its full price. Formula: lifetime-wears = 0 ? price : price / lifetime-wears\n- **Days owned** [days-owned] (garment; days; range: range): Days owned within the range up to its end, frozen at the divest date. When the range starts on the start of tracking, counted from the purchase date even before tracking (since pre-tracking wears are included too). Formula: max(0, days(start .. min(range.to, divested))) with start = range.from ≤ 2018-01-01 ? purchased : max(range.from, ownedFrom)\n- **Wears per month** [wears-per-month] (garment; wears per month; range: range): Times worn divided by months owned in the range (30.5 days per month); 0 if not owned in the range. Formula: days-owned > 0 ? times-worn / (days-owned / 30.5) : 0\n- **Active items** [active-items] (category; count; range: end-date): Number of the category's garments active on the range's end date. Total row - the sum over categories. Formula: |{garments g in category : active(g, range.to)}|\n- **Inventory value** [inventory-value] (category; EUR; range: end-date): Sum of the prices of the category's garments active on the range's end date (unknown prices count as 0). Total row - the sum. Formula: Σ price over active garments on range.to\n- **Cost per wear (category)** [category-cost-per-wear] (category; EUR per wear; range: range (which garments) + lifetime (their wears)): The sum of the prices of the category's garments owned at any point in the range, divided by the sum of their lifetime wears. Unworn garments count with their full price and no wears; if none of them has ever been worn, the sum of prices is divided by 1 (as an unworn garment costs its full price). Garments without a price are left out. No Total row value. Formula: Σ price / max(1, Σ lifetime-wears), over the category's garments owned during the range with a price\n- **Days used** [days-used] (category; share; range: range): Share of days with at least one wear of a category garment, from the later of the range start and the day the category's first garment was owned, to the range end. No Total row value. Formula: |{days d in span : some category garment worn on d}| / |span|, span = max(range.from, min ownedFrom) .. range.to\n- **Yearly cost** [yearly-cost] (category; EUR per year; range: range): Category cost per wear × 365 × days used. Total row - the sum over categories. Formula: category-cost-per-wear × 365 × days-used\n- **Monthly cost** [monthly-cost] (category; EUR per month; range: range): Yearly cost divided by 12, as in the original R comparison chart. Formula: yearly-cost / 12\n- **Inventory turnover** [turnover] (category; share per year; range: range): Yearly cost divided by inventory value. Total row - Σ yearly cost / Σ inventory value. Formula: yearly-cost / inventory-value\n- **Second hand share** [second-hand-share] (category; share; range: end-date): Share of the category's garments active on the range's end date that carry the second-hand tag (by count). Total row - over all active garments. Formula: |{active garments tagged second-hand}| / |{active garments}|\n- **Divested items' averages** [divested-averages] (category; wears per month; EUR per wear; range: range): Over divested garments owned at least 30 days: wears per month (Σ times worn / Σ days owned × 30.5) and the use-weighted cost per wear. Reference lines on category pages. Formula: (Σ times-worn / Σ days-owned) × 30.5; Σ (cost per wear × times-worn) / Σ times-worn\n- **Active items over time** [active-items-over-time] (category × day; count; range: each day): Active items per category on every day of the range, as step series (Sportswear left out on the Dashboard). Formula: active-items(category, d) for each day d in range\n- **Inventory value over time** [inventory-value-over-time] (category × day; EUR; range: each day): Inventory value per category (and in total) on every day of the range, as step series. Formula: inventory-value(category, d) for each day d in range\n- **Daily cost** [daily-cost] (day; EUR per day; range: each day + lifetime (cost per wear)): For each logged day in the range with wears: the sum of the lifetime cost per wear of the garments worn and owned that day (unknown prices count 0); \"final\" when all of them are divested. Average - the mean of 30 consecutive logged days centred on the day (days i−14 … i+15), so days without wears are skipped. Formula: Σ garment-cost-per-wear over garments worn on d; average(i) = mean(cost[i−14 .. i+15])\n- **Fibre mass** [fibre-mass] (fibre; kg; range: end-date (owned) or range (worn)): Weight × main-part composition, summed per fibre, with recycled and organic kg. Owned basis - garments active on the range's end date. Worn basis - each wear in the range counts the garment's full weight. Only garments with a weight and readable materials are included; coverage says how many. Formula: Σ weightG / 1000 × fibreShare\n- **Average outfit weight** [average-outfit-weight] (range or month; kg per day; range: range): Mean total weight of the garments worn per logged day (garments with a known weight). Formula: Σ weight of garments worn / number of logged days\n- **Synthetic share (worn)** [synthetic-share] (month; share; range: range (by month)): Share of the worn fibre mass in a month that is synthetic. Formula: synthetic kg / total kg (worn basis)\n- **Yearly cost (comparison item)** [comparison-yearly-cost] (comparison item; EUR per year; range: none (fixed figures)): Monthly cost × 12. Formula: monthlyCost × 12\n- **Cost per use (comparison item)** [comparison-cost-per-use] (comparison item; EUR per use; range: none (fixed figures)): Monthly cost divided by (30.5 × use frequency); none if never used. Formula: useFrequency > 0 ? monthlyCost / (30.5 × useFrequency) : null\n\n## Decisions\n- **D-1** (2026-10-09) Public pages get the full day-by-day log: Public pages and the MCP server read one world-readable document with all garments and the full wear log, and compute every metric from it, rather than precomputed summaries.\n- **D-2** (2026-10-09) Cost per wear is always lifetime: A garment's cost per wear is price / all its wears over its whole ownership, regardless of the chosen date range, even when wears after the range lower it. A category's cost per wear for a range is Σ price / Σ lifetime wears over its garments owned at any point in the range, unworn garments included (divided by 1 if none has ever been worn). Amended: 2026-10-16 (Olof): the category figure was the average of the garments' cost per wear weighted by wears in the range, over garments worn in the range, which left unworn garments out entirely. Now pooled over lifetime wears with unworn garments included. Raises categories with unused garments (e.g. Socks +43 % in 2025) and changes Yearly cost, Turnover and the monthly cost comparison with it.\n- **D-3** (2026-10-09) Small multiples for per-category charts: Charts that show several categories use one small chart per category on a shared scale.\n- **D-4** (2026-10-09) Garment details are edited in the app: Garment details are edited in the app and stored in Firestore, which is their source of truth.\n- **Q-1** (2026-10-09) Daily cost definition: Daily cost = Σ over garments worn that day (and owned then) of their lifetime cost per wear; \"final\" when every one of them is divested; plus a rolling mean centred on the day.\n- **R-15** (2026-10-09) Cut-over to logging in the app: The app is the source of truth for wears from 2026-10-10; the Sheet holds the log through 2026-10-09 and is retired.\n- **R-28** (2026-10-10) Nightly backups: A nightly job exports all owner data to a private repository with a read-only account.\n- **2026-10-08-ranges** (2026-10-08) Metrics work for any date range: All metric functions take a date range; the per-day data stays available rather than being pre-aggregated.\n"
+}

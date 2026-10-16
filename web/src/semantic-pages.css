@@ -1,0 +1,42 @@
+/* Generated semantic pages (/glossary, /model, /data; web/scripts/semantics.mjs). Builds on the landing page. */
+@import "./landing.css";
+
+.semantic { max-width: 980px; }
+.semantic .landing-nav a[aria-current="page"] { color: var(--fg); font-weight: 600; }
+.semantic .meta { font-size: 13px; color: var(--muted); }
+.semantic .meta a, .semantic .links a, .semantic td a, .semantic dd a { color: var(--accent); }
+.semantic .alt { font-size: 13px; font-weight: 400; color: var(--muted); }
+.semantic .note { color: var(--muted); font-size: 14px; }
+.semantic .links { font-size: 14px; }
+.semantic code { font-size: 0.9em; }
+.semantic pre { overflow-x: auto; padding: 8px 10px; border-radius: 6px; background: color-mix(in srgb, var(--fg) 6%, transparent); }
+
+.glossary { margin: 0; }
+.glossary .entry { padding: 12px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 12px; }
+.glossary dt { font-weight: 600; font-size: 17px; }
+.glossary dd { margin: 4px 0 0; }
+.glossary dd p { margin: 0 0 6px; }
+.glossary .entry:target, .card:target, tr:target { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+.card { border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 12px 0; scroll-margin-top: 12px; }
+.card h3 { margin: 0 0 6px; font-size: 18px; }
+.card h3 code { font-size: 13px; font-weight: 400; color: var(--muted); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 8px 0; font-size: 14px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+
+.semantic table { font-size: 14px; }
+.semantic td, .semantic th { vertical-align: top; }
+.class-badge { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); vertical-align: middle; }
+.class-badge.public { border-color: #1f7a3d; color: #1f7a3d; }
+.class-badge.owner-only { border-color: #a35c00; color: #a35c00; }
+.class-badge.private { border-color: var(--muted); color: var(--muted); }
+.quality .result.pass { color: #1f7a3d; font-weight: 600; }
+.quality .result.warn { color: #a35c00; font-weight: 600; }
+.quality .result.fail { color: #b3261e; font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  .class-badge.public, .quality .result.pass { color: #5cc982; border-color: #5cc982; }
+  .class-badge.owner-only, .quality .result.warn { color: #e0a24a; border-color: #e0a24a; }
+  .quality .result.fail { color: #ff8a80; }
+}
+.mermaid { background: transparent; text-align: center; }

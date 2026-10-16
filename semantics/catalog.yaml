@@ -30,11 +30,11 @@ datasets:
     fields:
       - {name: id, type: text, required: true, definition: "Garment id, from the original Sheet's Photo id (e.g. Jackets_and_hoodies-006); also the photo file name.", constraints: "pattern <Category_words>-NNN; unique"}
       - {name: category, type: text, required: true, definition: The garment's category., constraints: one of the 13 standard categories, term: term:category}
-      - {name: item, type: text, required: true, definition: Name (brand, model, colour; numbered when identical items exist).}
+      - {name: item, type: text, required: true, definition: "Name (brand, model, colour; numbered when identical items exist)."}
       - {name: details, type: text, required: false, definition: Free-text details such as size or model code.}
       - {name: photo, type: text, required: true, definition: Photo file name without .png in public storage.}
       - {name: photoVersion, type: text, required: false, definition: Set when the photo is replaced; part of the photo URL so caches show the new one.}
-      - {name: price, type: money-eur, required: false, definition: What was paid, rounded to whole cents., constraints: "≥ 0", term: term:price}
+      - {name: price, type: money-eur, required: false, definition: "What was paid, rounded to whole cents.", constraints: "≥ 0", term: term:price}
       - {name: purchased, type: date, required: false, definition: Purchase date., constraints: "≤ divested"}
       - {name: divested, type: date, required: false, definition: Last day owned; empty while active., term: term:divested}
       - {name: timesUsedInit, type: integer, required: true, definition: Wears before tracking began (estimate)., constraints: "≥ 0", term: term:pre-tracking-wears}
@@ -166,4 +166,4 @@ quality_rules:
   - {id: worn-exists, dataset: dataset:days, rule: Every worn id is an existing garment.}
   - {id: wears-in-ownership, dataset: dataset:days, rule: "Wears fall within the garment's ownership period.", severity: warning, note: "Known exceptions are ignored by the metrics (Q-9)."}
   - {id: public-matches-source, dataset: dataset:public-data, rule: The public copy equals garments + days + comparison.}
-  - {id: materials-coverage, dataset: dataset:garments, rule: Share of active garments with a weight and readable materials (reported, no threshold).}
+  - {id: materials-coverage, dataset: dataset:garments, rule: "Share of active garments with a weight and readable materials (reported, no threshold).", severity: info}

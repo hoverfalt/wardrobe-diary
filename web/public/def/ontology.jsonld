@@ -1,0 +1,499 @@
+{
+ "@context": {
+  "@vocab": "https://wardrobediary.io/def/vocab#",
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "owl": "http://www.w3.org/2002/07/owl#",
+  "skos": "http://www.w3.org/2004/02/skos/core#",
+  "dcat": "http://www.w3.org/ns/dcat#",
+  "dct": "http://purl.org/dc/terms/",
+  "prov": "http://www.w3.org/ns/prov#",
+  "schema": "https://schema.org/",
+  "xsd": "http://www.w3.org/2001/XMLSchema#",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "foaf": "http://xmlns.com/foaf/0.1/",
+  "adms": "http://www.w3.org/ns/adms#"
+ },
+ "@graph": [
+  {
+   "@id": "https://wardrobediary.io/def/ontology",
+   "@type": "owl:Ontology",
+   "rdfs:label": "Wardrobe Diary ontology",
+   "owl:versionInfo": "0.2.1",
+   "dct:license": {
+    "@id": "https://creativecommons.org/licenses/by/4.0/"
+   },
+   "dct:publisher": {
+    "@type": "schema:Person",
+    "schema:name": "Olof Hoverfält",
+    "schema:url": "https://www.linkedin.com/in/hoverfalt/"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Person",
+   "@type": "owl:Class",
+   "rdfs:label": "Person",
+   "rdfs:comment": "The wardrobe's owner, who logs what they wear. In this data set there is exactly one.",
+   "rdfs:subClassOf": {
+    "@id": "https://schema.org/Person"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Garment",
+   "@type": "owl:Class",
+   "rdfs:label": "Garment",
+   "rdfs:comment": "One physical piece of clothing, footwear or accessory owned at some point since tracking began. Two identical items bought together are separate garments (e.g. \"Diesel gray 01\" and \"Diesel gray 02\").",
+   "rdfs:subClassOf": {
+    "@id": "https://schema.org/Product"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#garment"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Category",
+   "@type": "owl:Class",
+   "rdfs:label": "Category",
+   "rdfs:comment": "A kind of clothing that groups garments, from a fixed list in a standard order.",
+   "rdfs:subClassOf": {
+    "@id": "https://schema.org/DefinedTerm"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#category"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-OwnershipPeriod",
+   "@type": "owl:Class",
+   "rdfs:label": "Ownership period",
+   "rdfs:comment": "The days a garment counts as owned: from its purchase date (at the earliest the start of tracking) to its divest date, inclusive; open-ended while it is still active.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#ownership-period"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#active"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#divested"
+    }
+   ],
+   "derived": true
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-WearDay",
+   "@type": "owl:Class",
+   "rdfs:label": "Wear day",
+   "rdfs:comment": "One calendar day of the log and the set of garments worn on it.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#wear"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Wear",
+   "@type": "owl:Class",
+   "rdfs:label": "Wear",
+   "rdfs:comment": "One garment worn on one day. Wearing a garment twice on the same day is one wear.",
+   "rdfs:subClassOf": {
+    "@id": "http://www.w3.org/ns/prov#Activity"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#wear"
+    }
+   ],
+   "derived": true
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Tag",
+   "@type": "owl:Class",
+   "rdfs:label": "Tag",
+   "rdfs:comment": "A descriptive label from a fixed vocabulary, e.g. second hand or Hanko. Tags never change a calculation.",
+   "rdfs:subClassOf": {
+    "@id": "https://schema.org/DefinedTerm"
+   },
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#tag"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-MaterialComposition",
+   "@type": "owl:Class",
+   "rdfs:label": "Material composition",
+   "rdfs:comment": "The fibres a garment's main part is made of, with their shares (summing to 100 %), read from its free-text materials label.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#materials"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#main-part"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#fibre"
+    }
+   ],
+   "derived": true
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-Fibre",
+   "@type": "owl:Class",
+   "rdfs:label": "Fibre",
+   "rdfs:comment": "A textile or material, e.g. cotton, wool, polyester, leather.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#fibre"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-FibreClass",
+   "@type": "owl:Class",
+   "rdfs:label": "Fibre class",
+   "rdfs:comment": "One of four groups of fibres: natural, regenerated cellulose, synthetic or other.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#fibre-class"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#class-ComparisonItem",
+   "@type": "owl:Class",
+   "rdfs:label": "Comparison item",
+   "rdfs:comment": "An item of other everyday spending (transport, subscriptions, tools…) with a monthly cost and a frequency of use, shown next to the clothing categories for comparison.",
+   "rdfs:seeAlso": [
+    {
+     "@id": "https://wardrobediary.io/glossary#comparison-item"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-item",
+   "@type": "rdf:Property",
+   "rdfs:label": "Name",
+   "rdfs:comment": "The garment's name, e.g. brand, model and colour.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#text"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/name"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.item"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-inCategory",
+   "@type": "rdf:Property",
+   "rdfs:label": "Category",
+   "rdfs:comment": "The garment's category.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-Category"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/category"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.category"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-details",
+   "@type": "rdf:Property",
+   "rdfs:label": "Details",
+   "rdfs:comment": "Free-text details such as size or model code.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#text"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/description"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.details"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-price",
+   "@type": "rdf:Property",
+   "rdfs:label": "Price",
+   "rdfs:comment": "What was paid, in euros, rounded to whole cents.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#money-eur"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/price"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.price"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-purchased",
+   "@type": "rdf:Property",
+   "rdfs:label": "Purchased",
+   "rdfs:comment": "The date the garment was bought.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#date"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/purchaseDate"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.purchased"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-divested",
+   "@type": "rdf:Property",
+   "rdfs:label": "Divested",
+   "rdfs:comment": "The last day the garment was owned; empty while active.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#date"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.divested"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-timesUsedInit",
+   "@type": "rdf:Property",
+   "rdfs:label": "Times used before tracking",
+   "rdfs:comment": "Wears before tracking began on 1 January 2018.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#integer"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.timesUsedInit"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-materials",
+   "@type": "rdf:Property",
+   "rdfs:label": "Materials",
+   "rdfs:comment": "The materials label as written (free text).",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#text"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.materials"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-weight",
+   "@type": "rdf:Property",
+   "rdfs:label": "Weight",
+   "rdfs:comment": "The garment's weight in grams.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#mass-g"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/weight"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.weightG"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-hasTag",
+   "@type": "rdf:Property",
+   "rdfs:label": "Tags",
+   "rdfs:comment": "The garment's descriptive tags.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-Tag"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.tags"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-photo",
+   "@type": "rdf:Property",
+   "rdfs:label": "Photo",
+   "rdfs:comment": "The garment's standard photo (228 × 228 PNG).",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#image"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "https://schema.org/image"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#garments.photo"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-hasOwnershipPeriod",
+   "@type": "rdf:Property",
+   "rdfs:label": "Ownership period",
+   "rdfs:comment": "Derived from purchased and divested.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-OwnershipPeriod"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-hasComposition",
+   "@type": "rdf:Property",
+   "rdfs:label": "Composition",
+   "rdfs:comment": "Derived from materials.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-MaterialComposition"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-onDay",
+   "@type": "rdf:Property",
+   "rdfs:label": "Day",
+   "rdfs:comment": "The day of the wear.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Wear"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-WearDay"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-ofGarment",
+   "@type": "rdf:Property",
+   "rdfs:label": "Garment",
+   "rdfs:comment": "The garment worn.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Wear"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "rdfs:subPropertyOf": {
+    "@id": "http://www.w3.org/ns/prov#used"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-date",
+   "@type": "rdf:Property",
+   "rdfs:label": "Date",
+   "rdfs:comment": "The calendar date (no time zone).",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-WearDay"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#date"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#days.date"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-worn",
+   "@type": "rdf:Property",
+   "rdfs:label": "Worn",
+   "rdfs:comment": "The garments worn that day.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-WearDay"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-Garment"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#days.worn"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-fibreShare",
+   "@type": "rdf:Property",
+   "rdfs:label": "Fibre share",
+   "rdfs:comment": "Each fibre's share of the main part, 0–1, summing to 1.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-MaterialComposition"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#share"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-inFibreClass",
+   "@type": "rdf:Property",
+   "rdfs:label": "Fibre class",
+   "rdfs:comment": "The fibre's class.",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-Fibre"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/model#class-FibreClass"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-monthlyCost",
+   "@type": "rdf:Property",
+   "rdfs:label": "Monthly cost",
+   "rdfs:comment": "What the item costs per month, in euros (entered).",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-ComparisonItem"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#money-eur"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#comparison.monthlyCost"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/model#prop-useFrequency",
+   "@type": "rdf:Property",
+   "rdfs:label": "Use frequency",
+   "rdfs:comment": "Share of days on which it is used, 0–1 (entered).",
+   "rdfs:domain": {
+    "@id": "https://wardrobediary.io/model#class-ComparisonItem"
+   },
+   "rdfs:range": {
+    "@id": "https://wardrobediary.io/def/vocab#share"
+   },
+   "storedAs": {
+    "@id": "https://wardrobediary.io/data#comparison.useFrequency"
+   }
+  }
+ ]
+}

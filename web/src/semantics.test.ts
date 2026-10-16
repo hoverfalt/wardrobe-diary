@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 import { CATEGORY_ORDER } from "./lib/categories";
+import { CHECKS } from "./lib/quality";
 import { TAG_IDS } from "./lib/tags";
 
 const ROOT = resolve(__dirname, "../..");
@@ -113,6 +114,32 @@ describe("semantic layer", () => {
     for (const c of CATEGORY_ORDER) expect(category.definition, c).toContain(c);
     const tags = catalog.datasets.find((d: Item) => d.id === "garments").fields.find((f: { name: string }) => f.name === "tags");
     expect(tags.constraints).toBe(`each one of: ${TAG_IDS.join(", ")}`);
+  });
+
+  it("uses only known keys (an unquoted comma in a YAML one-liner silently cuts a value short)", () => {
+    const keys = (items: object[], allowed: string[]) =>
+      items.flatMap((it) => Object.keys(it).filter((k) => !allowed.includes(k)).map((k) => `${(it as Item).id ?? (it as { name?: string }).name}: ${k}`));
+    const stray = [
+      ...keys(ontology.classes, ["id", "label", "definition", "maps_to", "stored_as", "see", "derived"]),
+      ...keys(ontology.properties, ["id", "domain", "range", "label", "definition", "maps_to", "stored_as", "see", "derived"]),
+      ...keys(ontology.datatypes, ["id", "definition", "unit"]),
+      ...keys(glossary.terms, ["id", "label", "alt_labels", "definition", "note", "related", "metric", "decision"]),
+      ...keys(metrics.metrics, ["id", "label", "term", "grain", "unit", "definition", "formula", "range_rule", "null_when", "inputs", "depends_on", "decisions", "implementation", "tests", "note"]),
+      ...keys(catalog.datasets, ["id", "title", "description", "location", "classification", "published_via", "represents", "key", "lineage", "fields", "distribution", "update_frequency", "status"]),
+      ...keys(catalog.datasets.flatMap((d: { fields: object[] }) => d.fields), ["name", "type", "required", "definition", "constraints", "term"]),
+      ...keys(catalog.datasets.flatMap((d: { lineage?: object[] }) => d.lineage ?? []), ["from", "activity", "since", "until", "decision"]),
+      ...keys(catalog.datasets.flatMap((d: { distribution?: object[] }) => d.distribution ?? []), ["format", "url"]),
+      ...keys(catalog.quality_rules, ["id", "dataset", "rule", "severity", "note"]),
+      ...keys(decisions.decisions, ["id", "date", "title", "decision", "rationale", "affects", "exception", "amended"]),
+      ...keys(model.standards, ["prefix", "iri", "use"]),
+      ...keys(model.changelog, ["version", "date", "change"]),
+    ];
+    expect(stray).toEqual([]);
+  });
+
+  it("has a check in lib/quality.ts for every catalogued quality rule, and no others", () => {
+    const rules = catalog.quality_rules.map((r: Item) => r.id).sort();
+    expect(Object.keys(CHECKS).sort()).toEqual(rules);
   });
 
   it("only cites decisions that are in the roadmap's decision log", () => {
