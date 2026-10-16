@@ -75,7 +75,7 @@ describe.skipIf(!haveData)("category listing vs live site", () => {
     const report = { category, live: l, ours: o };
     // Tolerances: the Sheet has changed a little since the snapshot (dates, late-logged days).
     // Cost per wear, and so Yearly cost and Turnover, are not compared: decision D-2 defines them
-    // differently from R (lifetime cost per wear, use-weighted, unworn garments left out).
+    // differently from R (Σ price / Σ lifetime wears, not R's Σ price / Σ wears in the range).
     expect(Math.abs(o!.activeItems - l.activeItems!), JSON.stringify(report)).toBeLessThanOrEqual(1);
     expect(Math.abs(o!.inventoryValue - l.inventoryValue!), JSON.stringify(report)).toBeLessThan(0.05);
     expect(o!.daysUsed!).toBeCloseTo(l.daysUsed!, 2);

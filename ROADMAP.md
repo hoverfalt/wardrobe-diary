@@ -42,8 +42,9 @@ _(empty)_
   with fields, classification and lineage, 9 quality rules, 8 decisions; 10 consistency tests (each verified
   to fail on a deliberate break). Found while writing it: the MCP definitions text says Days used counts "days
   in the range", but the code counts from the category's first ownership day; the daily cost average is over 30
-  logged days with wears, not 30 calendar days - both now stated precisely, and phase 2 will generate the MCP
-  text from the semantic layer. Next: phase 2 (generators, pages, MCP resources + `explain`). The repo is being prepared to go public
+  logged days with wears, not 30 calendar days - both now stated precisely (the MCP text's Days used fixed
+  2026-10-16), and phase 2 will generate the MCP text from the semantic layer. v0.2.0 (2026-10-16): category
+  cost per wear pooled over lifetime wears, unworn garments included (D-2 amended, Olof's review). Next: phase 2 (generators, pages, MCP resources + `explain`). The repo is being prepared to go public
   (README, LICENSE, Hanko wording); Olof switches it to public in GitHub's settings.
 
 - **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
@@ -180,8 +181,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   writes it to the world-readable `users/{uid}/public/data` document; the Dashboard is public.
 - **2026-10-09 D-2** A garment's cost per wear is always price / all its wears over its whole ownership
   (purchase to divest day inclusive), regardless of the chosen time span, even when wears after the
-  span lower it: the concept must be treated consistently. A category's cost per wear for a span is the
+  span lower it: the concept must be treated consistently. A category's cost per wear for a span was the
   use-weighted average of the cost per wear of its garments worn at least once in the span.
+  **Amended 2026-10-16 (Olof):** a category's cost per wear is Σ price / Σ lifetime wears over its garments
+  owned at any point in the span, unworn garments included (÷ 1 if none was ever worn), so unused purchases
+  count. Changes Yearly cost, Turnover and the monthly cost comparison too (semantic layer 0.2.0).
 - **2026-10-09 Q-8** The divest dates of *Boss Modern black 15* and *16* (2023-05-05) were typos; now
   blank in the Sheet.
 

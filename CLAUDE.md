@@ -146,8 +146,8 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 - Wears per month = times worn / (days owned / 30.5); days owned count from purchase, frozen at divest.
 - Category listing (the live site's portfolio table):
   - Active items, Inventory value: garments active on `to`, and the sum of their prices.
-  - Cost per wear (D-2) = use-weighted average of garment cost per wear over the category's garments
-    with ≥ 1 wear in the range, weighted by their wears in the range. (R instead used Σ price of all
+  - Cost per wear (D-2, amended 2026-10-16) = Σ price / Σ lifetime wears over the category's garments owned at
+    any point in the range, unworn garments included (÷ 1 if none was ever worn). (R instead used Σ price of all
     owned garments / Σ wears, so this column, Yearly cost and Turnover differ from the live site.)
   - Days used = share of days from the category's first ownership day to `to` with ≥ 1 wear in the category.
   - Yearly cost = cost per wear × 365 × days used.

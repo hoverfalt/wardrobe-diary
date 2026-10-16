@@ -7,6 +7,8 @@
 // Exception, by decision D-2 (2026-10-09): a garment's cost per wear never depends on the range. It is
 // always price / all wears over the garment's whole ownership (purchase to divest day inclusive, plus
 // pre-tracking wears), even wears after the range's end, so the concept is treated consistently.
+// A category's cost per wear pools the same lifetime figures (D-2 amended 2026-10-16): Σ price / Σ lifetime
+// wears over its garments owned in the range, so unworn garments count with their full price.
 import type { Day, Garment, IsoDate } from "../types";
 import { compareCategories } from "./categories";
 import { hasTag } from "./tags";
@@ -156,8 +158,9 @@ export interface CategoryRow {
   activeItems: number;
   /** Sum of purchase prices of garments active on range.to. */
   inventoryValue: number;
-  /** Use-weighted average of the garments' (lifetime) cost per wear, over garments worn in the range,
-   *  weighted by their wears in the range (D-2). */
+  /** Σ price / Σ lifetime wears over the category's garments owned at any point in the range, unworn ones
+   *  included (their price counts, with no wears); divided by 1 when none has ever been worn (D-2, amended
+   *  2026-10-16). Garments without a price are left out. */
   costPerWear: number | null;
   /** Share of days in the range on which any garment of the category was worn ("Days used"). */
   daysUsed: number | null;
@@ -184,16 +187,11 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
     .map(([category, items]): CategoryRow => {
       const active = items.filter((g) => isActive(g, range.to));
       const inventoryValue = sum(active.map((g) => g.price ?? 0));
-      let weighted = 0;
-      let uses = 0;
-      for (const g of items) {
-        const n = timesWorn(g, wears, range);
-        const cpw = costPerWear(g, wears);
-        if (n === 0 || cpw == null) continue;
-        weighted += cpw * n;
-        uses += n;
-      }
-      const avgCostPerWear = uses > 0 ? weighted / uses : null;
+      // Pooled lifetime cost per wear (D-2 amended): what the garments cost over all the use they get.
+      const priced = items.filter((g) => g.price != null);
+      const prices = sum(priced.map((g) => g.price!));
+      const lifetime = sum(priced.map((g) => lifetimeWears(g, wears)));
+      const avgCostPerWear = priced.length > 0 ? prices / Math.max(1, lifetime) : null;
 
       // Category days counted from when the category's first garment was owned (as in R).
       const start = max(range.from, items.map(ownedFrom).reduce(min));

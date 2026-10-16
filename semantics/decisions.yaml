@@ -16,9 +16,16 @@ decisions:
     title: Cost per wear is always lifetime
     decision: >-
       A garment's cost per wear is price / all its wears over its whole ownership, regardless of the chosen date range,
-      even when wears after the range lower it. A category's cost per wear for a range is the use-weighted average of
-      its garments' cost per wear over the garments worn at least once in the range.
-    rationale: The concept must be treated consistently - a garment has one cost per wear.
+      even when wears after the range lower it. A category's cost per wear for a range is Σ price / Σ lifetime wears
+      over its garments owned at any point in the range, unworn garments included (divided by 1 if none has ever
+      been worn).
+    rationale: The concept must be treated consistently - a garment has one cost per wear, and unused purchases
+      must not disappear from a category's cost.
+    amended: >-
+      2026-10-16 (Olof): the category figure was the average of the garments' cost per wear weighted by wears in the
+      range, over garments worn in the range, which left unworn garments out entirely. Now pooled over lifetime wears
+      with unworn garments included. Raises categories with unused garments (e.g. Socks +43 % in 2025) and changes
+      Yearly cost, Turnover and the monthly cost comparison with it.
     affects: [metric:garment-cost-per-wear, metric:category-cost-per-wear, metric:daily-cost]
     exception: Animations show values "as of" a date (only wears up to then).
 

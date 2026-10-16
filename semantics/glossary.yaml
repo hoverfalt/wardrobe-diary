@@ -86,14 +86,15 @@ terms:
     alt_labels: [CPW, cost per use]
     definition: >-
       For a garment: its price divided by its lifetime wears, regardless of the date range chosen. A garment never
-      worn costs its full price. For a category: the use-weighted average of its garments' cost per wear over the
-      garments worn in the range, weighted by their wears in the range.
+      worn costs its full price. For a category: the sum of the prices of its garments owned in the range divided
+      by the sum of their lifetime wears, so unworn garments count with their full price (divided by 1 if none has
+      ever been worn).
     note: >-
       Using lifetime wears, even wears after the range ends, keeps the concept consistent: a garment has one cost
-      per wear, which falls as it gets more use.
+      per wear, which falls as it gets more use, and a category's cost per wear is what its garments cost over all
+      the use they get. The date range decides only which garments count.
     decision: decision:D-2
     metric: metric:garment-cost-per-wear
-    related: [term:use-weighted-average]
 
   - id: use-weighted-average
     label: Use-weighted average

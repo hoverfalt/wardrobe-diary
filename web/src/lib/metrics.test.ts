@@ -90,16 +90,29 @@ describe("categoryListing", () => {
   it("summarises a category", () => {
     expect(jackets.activeItems).toBe(1); // warmer divested before range end
     expect(jackets.inventoryValue).toBe(50);
-    expect(jackets.costPerWear).toBe((12.5 * 4 + 150 * 1) / 5); // use-weighted average cost per wear
+    expect(jackets.costPerWear).toBe((50 + 150) / (4 + 1)); // Σ price / Σ lifetime wears
     expect(jackets.daysUsed).toBe(2 / 4);
     expect(jackets.yearlyCost).toBe(40 * 365 * 0.5);
     expect(jackets.turnover).toBe((40 * 365 * 0.5) / 50);
   });
 
-  it("averages cost per wear over garments worn in the range, weighted by wears in the range (D-2)", () => {
+  it("pools prices over lifetime wears of all garments owned in the range, unworn ones included (D-2)", () => {
     const unworn = garment({ id: "unworn", price: 1000 });
     const [, c] = categoryListing([vest, warmer, unworn], days, { from: "2018-01-02", to: "2018-01-02" });
-    expect(c.costPerWear).toBe((12.5 * 1 + 150 * 1) / 2); // unworn garment left out
+    expect(c.costPerWear).toBe((50 + 150 + 1000) / (4 + 1 + 0)); // the unworn garment's price counts
+  });
+
+  it("weights garments by lifetime wears, not by wears in the range (D-2)", () => {
+    const [, c] = categoryListing([vest, warmer], days, { from: "2018-01-02", to: "2018-01-02" });
+    expect(c.costPerWear).toBe((50 + 150) / (4 + 1)); // the same as over the whole period
+  });
+
+  it("divides by 1 when no garment of the category has ever been worn, and skips unknown prices", () => {
+    const a = garment({ id: "a", price: 30 });
+    const b = garment({ id: "b", price: 20 });
+    const noPrice = garment({ id: "n", price: null });
+    expect(categoryListing([a, b, noPrice], [], all)[1].costPerWear).toBe(50);
+    expect(categoryListing([noPrice], [], all)[1].costPerWear).toBeNull();
   });
 
   it("gives the second-hand share of active garments, per category and in total", () => {

@@ -282,9 +282,10 @@ All metrics accept a date range (from, to); by default from ${TRACKING_START} to
   starts on ${TRACKING_START}.
 - **Cost per wear (garment):** price ÷ all wears over the garment's whole ownership, regardless of the chosen
   range (an unworn garment costs its full price).
-- **Cost per wear (category):** wear-weighted average of its garments' cost per wear, over garments worn at
-  least once in the range.
-- **Days used (category):** share of days in the range on which any garment of the category was worn.
+- **Cost per wear (category):** Σ price ÷ Σ lifetime wears over the category's garments owned at any point in
+  the range; unworn garments count with their full price (÷ 1 if none was ever worn).
+- **Days used (category):** share of days on which any garment of the category was worn, counted from the later
+  of the range start and the day the category's first garment was owned, to the range end.
 - **Yearly cost (category):** cost per wear × 365 × days used.
 - **Second hand (category):** share of the active garments at the end of the range that were bought second hand.
 - **Inventory value / turnover:** sum of purchase prices of active garments at the end of the range;

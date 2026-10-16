@@ -113,17 +113,25 @@ metrics:
     grain: category
     unit: EUR per wear
     definition: >-
-      Use-weighted average of the garments' (lifetime) cost per wear, over the category's garments worn at least
-      once in the range, weighted by their times worn in the range. No Total row value.
-    formula: "Σ (garment-cost-per-wear × times-worn) / Σ times-worn, over garments with times-worn > 0"
-    range_rule: range (weights) + lifetime (each garment's cost per wear)
-    null_when: no garment of the category was worn in the range
-    depends_on: [metric:garment-cost-per-wear, metric:times-worn]
+      The sum of the prices of the category's garments owned at any point in the range, divided by the sum of their
+      lifetime wears. Unworn garments count with their full price and no wears; if none of them has ever been worn,
+      the sum of prices is divided by 1 (as an unworn garment costs its full price). Garments without a price are
+      left out. No Total row value.
+    formula: "Σ price / max(1, Σ lifetime-wears), over the category's garments owned during the range with a price"
+    range_rule: range (which garments) + lifetime (their wears)
+    null_when: no garment of the category with a price was owned in the range
+    inputs: [field:garments.price]
+    depends_on: [metric:lifetime-wears]
     decisions: [decision:D-2]
     implementation: web/src/lib/metrics.ts#categoryListing
     tests:
-      - web/src/lib/metrics.test.ts › averages cost per wear over garments worn in the range, weighted by wears in the range (D-2)
-    note: The original R pipeline used Σ price of all owned garments / Σ wears instead, so this column differs from the old site.
+      - web/src/lib/metrics.test.ts › pools prices over lifetime wears of all garments owned in the range, unworn ones included (D-2)
+      - web/src/lib/metrics.test.ts › weights garments by lifetime wears, not by wears in the range (D-2)
+      - web/src/lib/metrics.test.ts › divides by 1 when no garment of the category has ever been worn, and skips unknown prices
+    note: >-
+      Equivalent to the average of the garments' cost per wear weighted by lifetime wears, with unworn garments'
+      prices included. Until 2026-10-16 it was weighted by wears in the range and left unworn garments out. The
+      original R pipeline used Σ price of all owned garments / Σ wears in the range.
 
   - id: days-used
     label: Days used
