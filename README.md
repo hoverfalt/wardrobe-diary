@@ -11,9 +11,9 @@ served to AI assistants through an MCP server, so answers about the data are exp
 
 | Folder | What |
 |---|---|
-| [`semantics/`](semantics/) | **Semantic layer:** ontology (conceptual model), glossary, metric definitions (semantic model), data catalog with lineage and quality rules, decision register. [Start here](semantics/README.md). |
+| [`semantics/`](semantics/) | **Semantic layer:** ontology (conceptual model), glossary, metric definitions (semantic model), data catalog with lineage and quality rules, decision register. [Start here](semantics/README.md). Published at [/glossary](https://wardrobediary.io/glossary), [/model](https://wardrobediary.io/model), [/data](https://wardrobediary.io/data) (with live data quality) and as JSON-LD and ODCS data contracts under [/def/](https://wardrobediary.io/def/catalog.jsonld). |
 | [`web/`](web/) | The app: TypeScript, React, Vite, Observable Plot, Firebase. Public pages compute every metric in the browser from one public data document. Metric logic is in [`web/src/lib/metrics.ts`](web/src/lib/metrics.ts), with tests. |
-| [`mcp/`](mcp/) | A read-only [Model Context Protocol](https://modelcontextprotocol.io) server, so AI assistants can query the data with the app's own metrics. |
+| [`mcp/`](mcp/) | A read-only [Model Context Protocol](https://modelcontextprotocol.io) server, so AI assistants can query the data with the app's own metrics; it serves the semantic layer (`explain`, provenance in every answer). [`mcp/evals/`](mcp/evals/) measures whether the semantic layer makes AI answers more reliable ([results](https://wardrobediary.io/evals)). |
 | [`tools/`](tools/) | Python: backups, restore, migrations from the original Google Sheet, local test data. |
 | [`ROADMAP.md`](ROADMAP.md) | Status, plans, open questions and the decision log. |
 | [`CLAUDE.md`](CLAUDE.md) | The project context for the AI coding assistant that builds this app (architecture, data model, conventions). |

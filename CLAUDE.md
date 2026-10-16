@@ -212,19 +212,41 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 The machine-readable meaning of the data: `ontology.yaml` (conceptual model), `glossary.yaml` (terms),
 `metrics.yaml` (semantic model: formula, grain, unit, range rule, implementation and tests per metric),
 `catalog.yaml` (datasets, fields, classification, lineage, quality rules), `decisions.yaml`, `model.yaml`
-(version, changelog). `web/src/semantics.test.ts` checks it against the code. **When you add or change a metric,
-a Garment field, a Firestore collection, a category or a tag, update `semantics/` in the same change** (the tests
-fail otherwise), and bump `version` + changelog in `model.yaml` when a definition changes. Phase 2 generates
-JSON-LD (SKOS, DCAT, PROV-O, schema.org), the `/glossary`, `/model`, `/data` pages and the MCP definitions from
-it. **This repository is (to be) public** (code MIT, semantics/content/data CC BY 4.0, see LICENSE): never commit
-secrets or private details (keys, `.env.local`, backups, home or travel details); `.gitignore` covers the files.
+(version, changelog). **When you add or change a metric, a Garment field, a Firestore collection, a category, a
+tag or a quality rule, update `semantics/` in the same change, run `cd web && npm run semantics`, and bump
+`version` + changelog in `model.yaml` when a definition changes.** The tests fail otherwise:
+- `web/src/semantics.test.ts`: references resolve, metrics point at existing code and tests, the Garment type and
+  catalog agree, collections and vocabularies match, only known keys (a comma in a YAML one-liner cuts a value
+  short: quote such values), every quality rule has a check.
+- `web/src/semantics.generated.test.ts`: the generated files are up to date.
+- `tools/tests/test_semantics_jsonld.py` (JSON-LD parses as RDF), `test_data_contracts.py` (valid ODCS v3.0.2).
+
+`web/scripts/semantics.mjs` generates (all committed): the static pages `/glossary`, `/model`, `/data`, `/evals`
+(`web/*.html`, styled by `src/semantic-pages.css`; `/model` draws the Mermaid diagram via `src/model-page.ts`,
+`/data` runs the quality checks live via `src/data-page.ts`), JSON-LD in `web/public/def/` (SKOS glossary, DCAT
+catalog, RDFS/OWL ontology, metrics), ODCS data contracts in `web/public/def/contracts/`, the source YAML, and
+`web/src/generated/semantics.json` (used by the app's page scripts and bundled into the MCP server).
+Data quality: one check per catalogued rule in `web/src/lib/quality.ts`, run on `/data`, by the MCP tool
+`get_data_quality`, and by `node web/scripts/quality-check.mjs` (`--source <backup>` also compares the public copy
+with the owner's data). The repository is public (code MIT, semantics/content/data CC BY 4.0, see LICENSE and
+LICENSE-CONTENT.md): never commit secrets or private details (keys, `.env.local`, backups, home or travel details).
+
+**AI evaluation (`mcp/evals/`, phase 4):** 30 questions (lookup / metric / definition) whose correct answers are
+computed from a frozen snapshot (`evals/data/public-data.json`) with the app's metrics; three conditions (raw data
+in the prompt; the real MCP server with `WARDROBE_SEMANTICS=off`; with the semantic layer) on the snapshot
+(`WARDROBE_SNAPSHOT`); graded in code. `cd mcp && npm run evals -- expected | run | report` (run needs
+`ANTHROPIC_API_KEY`); results in `evals/results/`, then `cd web && npm run semantics` to update `/evals`.
 
 ## MCP server (`mcp/`, R-29)
 
-Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key), caches
-it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own. Tools: overview, category listing,
-garments (list/one, incl. materials, composition and weight, fibre and weight filters), wears by day, daily
-cost, inventory over time, material breakdown; resource `wardrobe://definitions`.
+Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key;
+`web/src/lib/firestoreRest.ts`), caches it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own.
+Tools: overview, category listing, garments (list/one, incl. materials, composition and weight, fibre and weight
+filters), wears by day, daily cost, inventory over time, material breakdown, `get_data_quality`, `explain` (any
+term, metric, field, dataset or decision). Every answer carries `provenance` (metric definitions used, semantic
+version, data as of; `TOOL_METRICS` in `src/semantics.ts` must name the metrics for every new tool). Resources,
+generated from the semantic layer: `wardrobe://definitions`, `wardrobe://glossary`, `wardrobe://semantic-model`,
+`wardrobe://catalog`.
 Registered for Claude Code by `.mcp.json`; Claude Desktop setup in `mcp/README.md`. **Rebuild it
 (`cd mcp && npm run build`) after changing `web/src/lib/`.**
 
@@ -261,6 +283,9 @@ cd web && npm run dev:emulator             # app on http://localhost:5174 agains
 cd web && npm run ui-check                 # signed-in UI smoke check + screenshots (emulators + dev:emulator running)
 cd web && node e2e/public-check.mjs        # live public pages: load without errors, JS per first visit (read-only)
 cd web && node e2e/redirect-check.mjs      # every old wardrobediary.io address redirects and loads (read-only)
+cd web && npm run semantics                # regenerate pages, JSON-LD, contracts from semantics/*.yaml
+cd web && node scripts/quality-check.mjs   # data quality on the live public data (--source <backup> for the full check)
+cd mcp && npm run evals -- run             # AI evaluation (needs ANTHROPIC_API_KEY); then npm run semantics in web/
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 

@@ -37,15 +37,15 @@ _(empty)_
 
 ## Now
 
-- **R-40 Semantic layer, phase 1 done (2026-10-16), awaiting Olof's review:** `semantics/` v0.1.0 (draft) with
-  11 classes and 21 properties, 42 glossary terms, 22 metrics (each linked to its code and tests), 10 datasets
-  with fields, classification and lineage, 9 quality rules, 8 decisions; 10 consistency tests (each verified
-  to fail on a deliberate break). Found while writing it: the MCP definitions text says Days used counts "days
-  in the range", but the code counts from the category's first ownership day; the daily cost average is over 30
-  logged days with wears, not 30 calendar days - both now stated precisely (the MCP text's Days used fixed
-  2026-10-16), and phase 2 will generate the MCP text from the semantic layer. v0.2.0 (2026-10-16): category
-  cost per wear pooled over lifetime wears, unworn garments included (D-2 amended, Olof's review). Next: phase 2 (generators, pages, MCP resources + `explain`). The repo is being prepared to go public
-  (README, LICENSE, Hanko wording); Olof switches it to public in GitHub's settings.
+- **R-40 Semantic layer, phases 1–4 built (2026-10-16), reviewed by Olof.** Semantic layer 0.2.1; generated
+  `/glossary`, `/model`, `/data` (live quality), `/evals` pages, JSON-LD (SKOS, DCAT, RDFS/OWL, PROV-O) and ODCS
+  contracts, all checked by tests (RDF parse, ODCS schema, up to date); MCP `explain`, `get_data_quality`,
+  semantic resources and provenance; quality checks shared by the page, the MCP and `quality-check.mjs`
+  (public copy = source verified with a backup: 3,833 records match); AI evaluation set of 30 questions with
+  computed answers and a runner. **Waiting for Olof:** (a) add the two workflow files in `.github/workflows/`
+  (tests on every push; nightly data quality) - the stored GitHub token lacks the `workflow` scope; (b) an
+  Anthropic API key to run the evaluation (`cd mcp && ANTHROPIC_API_KEY=… npm run evals -- run`, a few dollars),
+  then publish the results. Phase 5 (public remote MCP server) = R-29 phase 2, after R-16.
 
 - **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
