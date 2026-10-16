@@ -22,6 +22,10 @@ import {
   resolveRange,
 } from "./tools";
 
+// WARDROBE_SEMANTICS=off: run without the semantic layer (no explain tool, semantic resources or provenance), as
+// the "tools only" condition of the AI evaluation (mcp/evals/).
+const SEMANTICS = process.env.WARDROBE_SEMANTICS !== "off";
+
 const server = new McpServer({ name: "wardrobe-diary", version: "0.1.0" });
 
 const from = z.string().optional().describe("Start date YYYY-MM-DD (default 2018-01-01, when tracking began)");
@@ -36,7 +40,7 @@ async function run(tool: string, fn: () => Promise<unknown> | unknown) {
     const result = await fn();
     const body = result && typeof result === "object" && !Array.isArray(result) ? result : { result };
     const wardrobe = await loadWardrobe().catch(() => null); // provenance without data details if it can't be read
-    return { content: [{ type: "text" as const, text: JSON.stringify({ ...body, provenance: provenance(tool, wardrobe) }, null, 1) }] };
+    return { content: [{ type: "text" as const, text: JSON.stringify(SEMANTICS ? { ...body, provenance: provenance(tool, wardrobe) } : body, null, 1) }] };
   } catch (e) {
     return { content: [{ type: "text" as const, text: e instanceof Error ? e.message : String(e) }], isError: true };
   }
@@ -144,48 +148,52 @@ server.registerTool(
   ({ from, to, basis, category }) => run("get_material_breakdown", async () => { const w = await loadWardrobe(); return materialTable(w, resolveRange(w, from, to), basis, category); }),
 );
 
-server.registerTool(
-  "explain",
-  {
-    title: "Explain a term, metric or field",
-    description:
-      "The full, authoritative definition of any term (e.g. \"cost per wear\", \"days used\"), metric id, field (e.g. \"garments.price\"), dataset or decision (e.g. \"D-2\") from the semantic layer: definition, formula, grain, unit, how the date range applies, inputs, decisions behind it, implementing code and tests. Use it before interpreting a number.",
-    inputSchema: { query: z.string().describe("A term, metric id, field (dataset.field), dataset id or decision id") },
-    annotations: readOnly,
-  },
-  ({ query }) => run("explain", () => explain(query)),
-);
+if (SEMANTICS) {
+  server.registerTool(
+    "explain",
+    {
+      title: "Explain a term, metric or field",
+      description:
+        "The full, authoritative definition of any term (e.g. \"cost per wear\", \"days used\"), metric id, field (e.g. \"garments.price\"), dataset or decision (e.g. \"D-2\") from the semantic layer: definition, formula, grain, unit, how the date range applies, inputs, decisions behind it, implementing code and tests. Use it before interpreting a number.",
+      inputSchema: { query: z.string().describe("A term, metric id, field (dataset.field), dataset id or decision id") },
+      annotations: readOnly,
+    },
+    ({ query }) => run("explain", () => explain(query)),
+  );
 
-server.registerTool(
-  "get_data_quality",
-  {
-    title: "Data quality",
-    description: "Runs the semantic layer's data quality rules on the current public data (unique ids, valid dates and amounts, worn garments exist, wears within ownership, materials coverage) and reports the results.",
-    annotations: readOnly,
-  },
-  () =>
-    run("get_data_quality", async () => {
-      const { raw, wardrobe } = await loadPublic();
-      const ids = (semanticsJson as { qualityRules: { id: string }[] }).qualityRules.map((r) => r.id);
-      return { asOf: lastLoggedDay(wardrobe), results: runQuality(raw, ids, lastLoggedDay(wardrobe)) };
-    }),
-);
+  server.registerTool(
+    "get_data_quality",
+    {
+      title: "Data quality",
+      description: "Runs the semantic layer's data quality rules on the current public data (unique ids, valid dates and amounts, worn garments exist, wears within ownership, materials coverage) and reports the results.",
+      annotations: readOnly,
+    },
+    () =>
+      run("get_data_quality", async () => {
+        const { raw, wardrobe } = await loadPublic();
+        const ids = (semanticsJson as { qualityRules: { id: string }[] }).qualityRules.map((r) => r.id);
+        return { asOf: lastLoggedDay(wardrobe), results: runQuality(raw, ids, lastLoggedDay(wardrobe)) };
+      }),
+  );
 
-for (const [name, uri, title, description, body] of [
-  ["glossary", "wardrobe://glossary", "Glossary", "Every term with its definition (SKOS-style JSON)", GLOSSARY],
-  ["semantic-model", "wardrobe://semantic-model", "Semantic model", "Every metric (formula, grain, unit, range rule, code, tests), decisions and the conceptual model", SEMANTIC_MODEL],
-  ["catalog", "wardrobe://catalog", "Data catalog", "Datasets, fields, access, lineage and quality rules", CATALOG],
-] as const) {
-  server.registerResource(name, uri, { title, description: `${description} (semantic layer ${SEMANTIC_VERSION})`, mimeType: "application/json" }, (u) => ({
-    contents: [{ uri: u.href, mimeType: "application/json", text: JSON.stringify(body, null, 1) }],
-  }));
+  for (const [name, uri, title, description, body] of [
+    ["glossary", "wardrobe://glossary", "Glossary", "Every term with its definition (SKOS-style JSON)", GLOSSARY],
+    ["semantic-model", "wardrobe://semantic-model", "Semantic model", "Every metric (formula, grain, unit, range rule, code, tests), decisions and the conceptual model", SEMANTIC_MODEL],
+    ["catalog", "wardrobe://catalog", "Data catalog", "Datasets, fields, access, lineage and quality rules", CATALOG],
+  ] as const) {
+    server.registerResource(name, uri, { title, description: `${description} (semantic layer ${SEMANTIC_VERSION})`, mimeType: "application/json" }, (u) => ({
+      contents: [{ uri: u.href, mimeType: "application/json", text: JSON.stringify(body, null, 1) }],
+    }));
+  }
 }
 
-server.registerResource(
-  "definitions",
-  "wardrobe://definitions",
-  { title: "Metric definitions", description: "How every Wardrobe Diary metric is calculated", mimeType: "text/markdown" },
-  (uri) => ({ contents: [{ uri: uri.href, mimeType: "text/markdown", text: DEFINITIONS }] }),
-);
+if (SEMANTICS) {
+  server.registerResource(
+    "definitions",
+    "wardrobe://definitions",
+    { title: "Metric definitions", description: "How every Wardrobe Diary metric is calculated", mimeType: "text/markdown" },
+    (uri) => ({ contents: [{ uri: uri.href, mimeType: "text/markdown", text: DEFINITIONS }] }),
+  );
+}
 
 await server.connect(new StdioServerTransport());

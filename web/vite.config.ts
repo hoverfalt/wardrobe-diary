@@ -7,7 +7,7 @@ function appFallback(): Plugin {
   const rewrite: Connect.NextHandleFunction = (req, _res, next) => {
     const path = (req.url ?? "/").split("?")[0];
     const isFile = /\.[a-z0-9]+$/i.test(path) || path.startsWith("/@") || path.startsWith("/src/") || path.startsWith("/node_modules/");
-    if (["/glossary", "/model", "/data"].includes(path)) req.url = `${path}.html`; // generated semantic pages
+    if (["/glossary", "/model", "/data", "/evals"].includes(path)) req.url = `${path}.html`; // generated semantic pages
     else if (path !== "/" && !isFile) req.url = "/app.html";
     next();
   };
@@ -26,7 +26,7 @@ export default defineConfig({
     // further would not load less; it is cached across deploys.
     chunkSizeWarningLimit: 700,
     rollupOptions: {
-      input: { index: "index.html", app: "app.html", glossary: "glossary.html", model: "model.html", data: "data.html" },
+      input: { index: "index.html", app: "app.html", glossary: "glossary.html", model: "model.html", data: "data.html", evals: "evals.html" },
       output: {
         // Libraries in their own files (R-18): they change rarely, so browsers keep them cached across deploys
         // of the app's own code. Pages are split separately by the lazy imports in App.tsx.

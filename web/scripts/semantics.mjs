@@ -349,6 +349,7 @@ function page(s, { path, title, description, intro, body, jsonld, script }) {
         <a href="/glossary"${path === "/glossary" ? ' aria-current="page"' : ""}>Glossary</a>
         <a href="/model"${path === "/model" ? ' aria-current="page"' : ""}>Model</a>
         <a href="/data"${path === "/data" ? ' aria-current="page"' : ""}>Data</a>
+        <a href="/evals"${path === "/evals" ? ' aria-current="page"' : ""}>AI evaluation</a>
       </nav>
       <h1>${esc(title)}</h1>
       ${intro}
@@ -517,6 +518,77 @@ ${datasets}`;
   });
 }
 
+// ---------- AI evaluation page (R-40 phase 4; inputs from mcp/evals/) ----------
+const readJson = (file) => {
+  try {
+    return JSON.parse(readFileSync(resolve(ROOT, file), "utf8"));
+  } catch {
+    return null;
+  }
+};
+const fmtExpected = (e) =>
+  e.type === "number" ? `${Math.round(e.value * 1000) / 1000} ${e.unit === "count" ? "" : e.unit} (± ${e.tolerance})`.replace("  ", " ") : e.type === "name" ? e.oneOf.join(" / ") : e.value.join("; ");
+const CONDITION_LABEL = { raw: "Raw data in the prompt", tools: "MCP tools", semantic: "MCP tools + semantic layer" };
+
+export function evalsHtml(s) {
+  const expected = readJson("mcp/evals/expected.json");
+  const summary = readJson("mcp/evals/results/summary.json");
+  const results = summary?.summary ?? [];
+  const models = [...new Set(results.map((r) => r.model))];
+  const kinds = ["all", "lookup", "metric", "definition"];
+  const resultsTable = results.length
+    ? models
+        .map(
+          (m) => `      <h3>${esc(m)}</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Condition</th>${kinds.map((k) => `<th class="num">${k === "all" ? "All questions" : esc(k)}</th>`).join("")}<th class="num">Avg tokens</th><th class="num">Avg tool calls</th></tr></thead>
+        <tbody>
+${["raw", "tools", "semantic"]
+  .map((c) => {
+    const cell = (k) => results.find((r) => r.model === m && r.condition === c && r.kind === k);
+    const all = cell("all");
+    if (!all) return "";
+    return `          <tr><td>${esc(CONDITION_LABEL[c])}</td>${kinds.map((k) => (cell(k) ? `<td class="num"><strong>${Math.round(cell(k).accuracy * 100)} %</strong> <span class="alt">${cell(k).correct}/${cell(k).total}</span></td>` : '<td class="num">–</td>')).join("")}<td class="num">${all.avgTokens.toLocaleString("en-GB")}</td><td class="num">${all.avgToolCalls.toFixed(1)}</td></tr>`;
+  })
+  .join("\n")}
+        </tbody>
+      </table></div>`,
+        )
+        .join("\n")
+    : `      <p class="note">Not run yet: the question set and the correct answers are ready (below); results appear here after the first run.</p>`;
+  const questions = expected
+    ? `      <div class="table-wrap"><table>
+        <thead><tr><th>Question</th><th>Kind</th><th>Correct answer</th><th>Metrics</th></tr></thead>
+        <tbody>
+${expected.questions.map((q) => `          <tr id="q-${esc(q.id)}"><td>${esc(q.question)}</td><td>${esc(q.kind)}</td><td>${esc(fmtExpected(q.expected))}</td><td>${linkList(s, q.metrics.map((m) => `metric:${m}`))}</td></tr>`).join("\n")}
+        </tbody>
+      </table></div>`
+    : "";
+  const body = `      <h2 id="question">The question</h2>
+      <p>Does a governed semantic layer make an AI assistant's answers about this data more reliable? The same ${expected ? expected.questions.length : ""} questions are put to the same model under three conditions, and every answer is graded in code against the correct value, computed with the app's own metrics from a frozen snapshot of the data${expected ? ` (taken ${esc(expected.snapshot.takenAt)}, last logged day ${esc(expected.snapshot.lastLoggedDay)})` : ""}. No AI judges the answers.</p>
+      <dl class="facts">
+        <dt>Raw data</dt><dd>The public data document pasted into the prompt, with a short note on its format. No tools.</dd>
+        <dt>MCP tools</dt><dd>The <a href="https://github.com/hoverfalt/wardrobe-diary/tree/main/mcp">MCP server</a>'s tools on the snapshot, with the semantic layer switched off: no definitions, no <code>explain</code> tool, no provenance.</dd>
+        <dt>Tools + semantic layer</dt><dd>The same server with the semantic layer: every definition in the prompt, the <code>explain</code> tool, and provenance (which definitions a number comes from) in every answer.</dd>
+      </dl>
+      <p>Questions come in three kinds: <strong>lookup</strong> (a stored fact), <strong>metric</strong> (a defined figure where a plain reading usually works) and <strong>definition</strong> (where the precise definition matters: lifetime cost per wear, unworn garments, ownership periods, Sportswear left out of daily cost…).</p>
+
+      <h2 id="results">Results</h2>
+${resultsTable}
+
+      <h2 id="questions">Questions and correct answers</h2>
+${questions}
+      <p class="note">Code: <a href="https://github.com/hoverfalt/wardrobe-diary/tree/main/mcp/evals">mcp/evals</a> (questions, runner, grading). Run it yourself with an Anthropic API key: <code>cd mcp && npm run evals -- run</code>.</p>`;
+  return page(s, {
+    path: "/evals",
+    title: "AI evaluation",
+    description: "Does a governed semantic layer make AI answers about data more reliable? The same questions under three conditions, graded against computed answers.",
+    intro: `<p class="lead">An experiment: how often does an AI assistant answer questions about this data correctly with raw data, with tools, and with tools plus the semantic layer?</p>`,
+    body,
+    jsonld: { href: "/def/metrics.jsonld", data: { "@context": CONTEXT, "@id": `${SITE}/evals`, "@type": "schema:Dataset", "schema:name": "Wardrobe Diary AI evaluation", "schema:license": s.model.license } },
+  });
+}
+
 // ---------- write ----------
 export function outputs(s) {
   const json = (v) => JSON.stringify(v, null, 1) + "\n";
@@ -529,6 +601,7 @@ export function outputs(s) {
     "web/glossary.html": glossaryHtml(s),
     "web/model.html": modelHtml(s),
     "web/data.html": dataHtml(s),
+    "web/evals.html": evalsHtml(s),
   };
   for (const d of s.datasets.filter((x) => x.fields.length)) {
     out[`web/public/def/contracts/${d.id}.odcs.yaml`] = `# Generated by web/scripts/semantics.mjs from semantics/catalog.yaml. Do not edit.\n${stringify(contract(s, d), { lineWidth: 0 })}`;

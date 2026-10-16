@@ -21,6 +21,10 @@
         "destination": "/data.html"
       },
       {
+        "source": "/evals",
+        "destination": "/evals.html"
+      },
+      {
         "source": "**",
         "destination": "/app.html"
       }

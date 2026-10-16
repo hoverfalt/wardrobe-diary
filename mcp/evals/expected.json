@@ -1,0 +1,430 @@
+{
+ "snapshot": {
+  "takenAt": "2026-10-16",
+  "lastLoggedDay": "2026-10-16"
+ },
+ "questions": [
+  {
+   "id": "price-vest",
+   "kind": "lookup",
+   "question": "What was the purchase price of the garment named \"North Bend black vest\", in euros?",
+   "metrics": [],
+   "expected": {
+    "type": "number",
+    "value": 50,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "purchased-barbour",
+   "kind": "lookup",
+   "question": "In which year was the \"Barbour Classic Tartan navy\" bought? Answer with the year.",
+   "metrics": [],
+   "expected": {
+    "type": "number",
+    "value": 2025,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "worn-2025-06-15",
+   "kind": "lookup",
+   "question": "Which garments were worn on 15 June 2025? List their names, separated by semicolons.",
+   "metrics": [],
+   "expected": {
+    "type": "names",
+    "value": [
+     "Marmot crossover shorts blue",
+     "Ballin Amsterdam",
+     "Pier One black 01 (43-46)",
+     "Nike M Tanjun black 2",
+     "Zalando Essentials black 27",
+     "Jack & Jones Jacsummer Mid blue",
+     "SOC Tech black melange S 02",
+     "Under Armour Vanish woven shorts M",
+     "Contra regular boxer Khaki green 03",
+     "Tesma Coolmax 03",
+     "Nike Air Zoom Vomero 15"
+    ]
+   }
+  },
+  {
+   "id": "wears-march-2025",
+   "kind": "lookup",
+   "question": "How many wears in total were logged in March 2025 (one garment on one day = one wear)?",
+   "metrics": [],
+   "expected": {
+    "type": "number",
+    "value": 408,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "distinct-2025",
+   "kind": "lookup",
+   "question": "How many different garments were worn at least once in 2025?",
+   "metrics": [],
+   "expected": {
+    "type": "number",
+    "value": 250,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "divested-2024",
+   "kind": "lookup",
+   "question": "How many garments were divested (got a divest date) in 2024?",
+   "metrics": [],
+   "expected": {
+    "type": "number",
+    "value": 2,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "active-2026-10-01",
+   "kind": "metric",
+   "question": "How many garments were active (owned) on 1 October 2026?",
+   "metrics": [
+    "active-items"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 316,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "value-2025-12-31",
+   "kind": "metric",
+   "question": "What was the total inventory value (sum of purchase prices of active garments) on 31 December 2025, in euros?",
+   "metrics": [
+    "inventory-value"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 15589.199999999999,
+    "tolerance": 1,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "value-jackets-2020",
+   "kind": "metric",
+   "question": "What was the inventory value of the Jackets and hoodies category on 1 January 2020, in euros?",
+   "metrics": [
+    "inventory-value"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 1426,
+    "tolerance": 1,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "most-worn-2025",
+   "kind": "metric",
+   "question": "Which garment was worn the most times in 2025? Give its name.",
+   "metrics": [
+    "times-worn"
+   ],
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Diesel black matte 02"
+    ]
+   }
+  },
+  {
+   "id": "times-vest-2023",
+   "kind": "metric",
+   "question": "How many times was the \"North Bend black vest\" worn in 2023?",
+   "metrics": [
+    "times-worn"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 82,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "days-used-shoes-2025",
+   "kind": "metric",
+   "question": "In 2025, on what share of days was at least one pair of shoes (category Shoes) worn? Answer as a percentage.",
+   "metrics": [
+    "days-used"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 89.04109589041096,
+    "tolerance": 0.5,
+    "unit": "percent"
+   }
+  },
+  {
+   "id": "hanko-active",
+   "kind": "metric",
+   "question": "How many garments tagged Hanko were active on 1 October 2026?",
+   "metrics": [
+    "active-items"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 49,
+    "tolerance": 0,
+    "unit": "count"
+   }
+  },
+  {
+   "id": "second-hand-share-2025",
+   "kind": "metric",
+   "question": "What share of the garments active at the end of 2025 were bought second hand? Answer as a percentage.",
+   "metrics": [
+    "second-hand-share"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 5.993690851735016,
+    "tolerance": 0.5,
+    "unit": "percent"
+   }
+  },
+  {
+   "id": "outfit-weight-2025",
+   "kind": "metric",
+   "question": "What was the average weight of an outfit (garments worn per logged day, those with a known weight) in 2025, in kilograms?",
+   "metrics": [
+    "average-outfit-weight"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 3.9284986301369953,
+    "tolerance": 0.02,
+    "unit": "kg"
+   }
+  },
+  {
+   "id": "wool-owned",
+   "kind": "metric",
+   "question": "How many kilograms of wool did the wardrobe contain on 30 September 2026 (garments active then, weight × material composition)?",
+   "metrics": [
+    "fibre-mass"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 1.8624800000000001,
+    "tolerance": 0.1,
+    "unit": "kg"
+   }
+  },
+  {
+   "id": "synthetic-2025",
+   "kind": "metric",
+   "question": "What share of the mass of clothes worn in 2025 (each wear counting the garment's weight) was synthetic fibre? Answer as a percentage.",
+   "metrics": [
+    "synthetic-share",
+    "fibre-mass"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 33.20148964649001,
+    "tolerance": 1,
+    "unit": "percent"
+   }
+  },
+  {
+   "id": "cpw-vest-2024",
+   "kind": "definition",
+   "question": "What was the cost per wear of the \"North Bend black vest\" in 2024, in euros?",
+   "metrics": [
+    "garment-cost-per-wear"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 0.05030181086519115,
+    "tolerance": 0.002,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "cpw-shirts-2025",
+   "kind": "definition",
+   "question": "What was the cost per wear of the Shirts category in 2025, in euros?",
+   "metrics": [
+    "category-cost-per-wear"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 1.2957848605577693,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "cpw-socks-2025",
+   "kind": "definition",
+   "question": "What was the cost per wear of the Socks category in 2025, in euros?",
+   "metrics": [
+    "category-cost-per-wear"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 0.1385922122379119,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "cpw-belts-2025",
+   "kind": "definition",
+   "question": "What was the cost per wear of the Belts category in 2025, in euros?",
+   "metrics": [
+    "category-cost-per-wear"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 0.26296296296296295,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "cpw-blazers-2025",
+   "kind": "definition",
+   "question": "What was the cost per wear of the Blazers and vests category in 2025, in euros?",
+   "metrics": [
+    "category-cost-per-wear"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 13.177777777777779,
+    "tolerance": 0.01,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "yearly-pants-2024",
+   "kind": "definition",
+   "question": "What was the yearly cost of the Pants category in 2024, in euros?",
+   "metrics": [
+    "yearly-cost",
+    "category-cost-per-wear",
+    "days-used"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 170.95909982063154,
+    "tolerance": 1,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "monthly-shoes-2025",
+   "kind": "definition",
+   "question": "What was the monthly cost of the Shoes category in 2025, in euros?",
+   "metrics": [
+    "monthly-cost",
+    "yearly-cost"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 22.730283794981062,
+    "tolerance": 0.1,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "turnover-boxers",
+   "kind": "definition",
+   "question": "What is the inventory turnover of the Underwear boxers category over the whole period from 1 January 2018 to 30 September 2026? Answer as a percentage.",
+   "metrics": [
+    "turnover"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 49.58385027222119,
+    "tolerance": 0.5,
+    "unit": "percent"
+   }
+  },
+  {
+   "id": "highest-yearly",
+   "kind": "definition",
+   "question": "Which category had the highest yearly cost over the whole period from 1 January 2018 to 30 September 2026? Give the category name.",
+   "metrics": [
+    "yearly-cost"
+   ],
+   "expected": {
+    "type": "name",
+    "oneOf": [
+     "Shirts"
+    ]
+   }
+  },
+  {
+   "id": "days-used-socks-all",
+   "kind": "definition",
+   "question": "Over the whole period from 1 January 2018 to 30 September 2026, on what share of days were socks worn? Answer as a percentage.",
+   "metrics": [
+    "days-used"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 80.71987480438185,
+    "tolerance": 0.5,
+    "unit": "percent"
+   }
+  },
+  {
+   "id": "daily-cost-sep-2025",
+   "kind": "definition",
+   "question": "What was the average daily cost (the cost per wear of everything worn that day, Sportswear excluded) over the days with wears in September 2025, in euros?",
+   "metrics": [
+    "daily-cost"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 5.269836059303483,
+    "tolerance": 0.05,
+    "unit": "EUR"
+   }
+  },
+  {
+   "id": "wears-per-month-vest",
+   "kind": "definition",
+   "question": "How many times per month, on average, has the \"North Bend black vest\" been worn over its whole ownership up to 30 September 2026?",
+   "metrics": [
+    "wears-per-month"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 8.890944066291802,
+    "tolerance": 0.05,
+    "unit": "wears per month"
+   }
+  },
+  {
+   "id": "synthetic-share-sep-2025",
+   "kind": "definition",
+   "question": "In September 2025, what share of the worn fibre mass was synthetic? Answer as a percentage.",
+   "metrics": [
+    "synthetic-share"
+   ],
+   "expected": {
+    "type": "number",
+    "value": 35.75546315993038,
+    "tolerance": 1,
+    "unit": "percent"
+   }
+  }
+ ]
+}
