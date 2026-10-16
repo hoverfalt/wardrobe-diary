@@ -20,7 +20,7 @@ export const TAGS = {
   hanko: {
     label: "Hanko",
     badge: "HKO",
-    description: "Kept at the summer home in Hanko, so only worn there.",
+    description: "Kept at the summer home in Hanko, so worn only during stays there.",
   },
   bicycle: {
     label: "Bicycle gear",

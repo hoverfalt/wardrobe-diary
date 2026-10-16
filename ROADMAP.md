@@ -43,7 +43,8 @@ _(empty)_
   to fail on a deliberate break). Found while writing it: the MCP definitions text says Days used counts "days
   in the range", but the code counts from the category's first ownership day; the daily cost average is over 30
   logged days with wears, not 30 calendar days - both now stated precisely, and phase 2 will generate the MCP
-  text from the semantic layer. Next: phase 2 (generators, pages, MCP resources + `explain`, public repo).
+  text from the semantic layer. Next: phase 2 (generators, pages, MCP resources + `explain`). The repo is being prepared to go public
+  (README, LICENSE, Hanko wording); Olof switches it to public in GitHub's settings.
 
 - **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
@@ -73,14 +74,13 @@ _(empty)_
 
 ## Next
 
-1. **R-40 Semantic layer and data governance showcase** (started 2026-10-16; decisions by Olof: a separate
-   public repo + the website; English only for now; public MCP server after the domain switch). One
+1. **R-40 Semantic layer and data governance showcase** (started 2026-10-16; decisions by Olof: publish in this repo,
+   made public (2026-10-16; code MIT, semantics/content/data CC BY 4.0), and on the website; English only for now; public MCP server after the domain switch). One
    machine-readable source in `semantics/` (YAML) from which the standard formats, web pages and MCP resources
    are generated, kept consistent with the code by tests. Phases:
    (1) semantic layer v1: ontology / conceptual model, glossary, metrics (semantic model), data catalog,
    decision register, plus consistency tests; (2) generators: JSON-LD (schema.org, SKOS, DCAT, PROV-O),
-   `/glossary`, `/model`, `/data` pages, MCP resources + `explain` tool, provenance in MCP answers; public repo
-   `hoverfalt/wardrobe-diary-semantics` (CC BY 4.0); (3) data contracts (ODCS) validated nightly in the backup
+   `/glossary`, `/model`, `/data` pages, MCP resources + `explain` tool, provenance in MCP answers; (3) data contracts (ODCS) validated nightly in the backup
    job, published quality figures; (4) AI evaluation set (questions with computed answers; raw data vs MCP vs
    MCP + semantics) and a results page; (5) public remote MCP server = R-29 phase 2 (after R-16).
 
@@ -95,12 +95,14 @@ _(empty)_
 - **R-32 User-defined tags** (for the multi-user version, R-17): today's tags are a fixed vocabulary
   (`web/src/lib/tags.ts`); let users create their own tags with a badge text, filter by them everywhere.
 - **R-33 Garment location** (refined with Olof 2026-10-11, parked for now): garments are kept either at the
-  main home in Helsinki (available year-round) or at the summer home in Hanko (where they are worn only during stays there), so the two sets have very different statistics, and Olof keeps them separate. Goal:
+  main home in Helsinki or at the summer home in Hanko, where they are worn only during stays there, so the two
+  sets have very different statistics, and Olof keeps them separate. Goal:
   **filter the Dashboard (and category pages) and the Log page by location.** "ex Hanko" in a name = moved to
   Helsinki. Likely design: a location filter next to the date range, built on the Hanko tag. Since R-37 the "hanko" tag marks the Hanko
   garments, and since R-38 the Log page's tag toggles can hide or show them, which covers the logging half;
   what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
-  dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the time spent there.
+  dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the
+  time spent there.
 - **R-16 Domain switch:** point wardrobediary.io at the new app, keeping every old link working.
   Findings (2026-10-13): wardrobediary.io is GitHub Pages (repo `hoverfalt/hoverfalt.github.io`, DNS at
   Bluehost), not Firebase; hoverfalt.github.io 301s to it. 16 real pages: `index.html` (project, media

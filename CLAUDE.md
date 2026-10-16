@@ -216,7 +216,8 @@ The machine-readable meaning of the data: `ontology.yaml` (conceptual model), `g
 a Garment field, a Firestore collection, a category or a tag, update `semantics/` in the same change** (the tests
 fail otherwise), and bump `version` + changelog in `model.yaml` when a definition changes. Phase 2 generates
 JSON-LD (SKOS, DCAT, PROV-O, schema.org), the `/glossary`, `/model`, `/data` pages and the MCP definitions from
-it, and publishes it in the public repo `hoverfalt/wardrobe-diary-semantics`.
+it. **This repository is (to be) public** (code MIT, semantics/content/data CC BY 4.0, see LICENSE): never commit
+secrets or private details (keys, `.env.local`, backups, home or travel details); `.gitignore` covers the files.
 
 ## MCP server (`mcp/`, R-29)
 
