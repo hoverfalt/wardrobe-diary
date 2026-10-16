@@ -1,0 +1,114 @@
+# Conceptual model / ontology (R-40). Classes, their properties and relations. `maps_to` aligns a class or
+# property with an established vocabulary; `stored_as` points to where it lives in the data catalog.
+
+classes:
+  - id: Person
+    label: Person
+    definition: The wardrobe's owner, who logs what they wear. In this data set there is exactly one.
+    maps_to: schema:Person
+
+  - id: Garment
+    label: Garment
+    definition: >-
+      One physical piece of clothing, footwear or accessory owned at some point since tracking began. Two
+      identical items bought together are separate garments (e.g. "Diesel gray 01" and "Diesel gray 02").
+    maps_to: schema:Product
+    stored_as: dataset:garments
+    see: [term:garment]
+
+  - id: Category
+    label: Category
+    definition: A kind of clothing that groups garments, from a fixed list in a standard order.
+    maps_to: schema:DefinedTerm
+    stored_as: field:garments.category
+    see: [term:category]
+
+  - id: OwnershipPeriod
+    label: Ownership period
+    definition: >-
+      The days a garment counts as owned: from its purchase date (at the earliest the start of tracking) to its
+      divest date, inclusive; open-ended while it is still active.
+    derived: true
+    see: [term:ownership-period, term:active, term:divested]
+
+  - id: WearDay
+    label: Wear day
+    definition: One calendar day of the log and the set of garments worn on it.
+    stored_as: dataset:days
+    see: [term:wear]
+
+  - id: Wear
+    label: Wear
+    definition: One garment worn on one day. Wearing a garment twice on the same day is one wear.
+    maps_to: prov:Activity
+    derived: true
+    see: [term:wear]
+
+  - id: Tag
+    label: Tag
+    definition: A descriptive label from a fixed vocabulary, e.g. second hand or Hanko. Tags never change a calculation.
+    maps_to: schema:DefinedTerm
+    stored_as: field:garments.tags
+    see: [term:tag]
+
+  - id: MaterialComposition
+    label: Material composition
+    definition: >-
+      The fibres a garment's main part is made of, with their shares (summing to 100 %), read from its free-text
+      materials label.
+    derived: true
+    see: [term:materials, term:main-part, term:fibre]
+
+  - id: Fibre
+    label: Fibre
+    definition: A textile or material, e.g. cotton, wool, polyester, leather.
+    see: [term:fibre]
+
+  - id: FibreClass
+    label: Fibre class
+    definition: "One of four groups of fibres: natural, regenerated cellulose, synthetic or other."
+    see: [term:fibre-class]
+
+  - id: ComparisonItem
+    label: Comparison item
+    definition: >-
+      An item of other everyday spending (transport, subscriptions, tools…) with a monthly cost and a frequency
+      of use, shown next to the clothing categories for comparison.
+    stored_as: dataset:comparison
+    see: [term:comparison-item]
+
+properties:
+  # Garment
+  - {id: item, domain: Garment, range: text, label: Name, definition: "The garment's name, e.g. brand, model and colour.", maps_to: schema:name, stored_as: field:garments.item}
+  - {id: inCategory, domain: Garment, range: Category, label: Category, definition: The garment's category., maps_to: schema:category, stored_as: field:garments.category}
+  - {id: details, domain: Garment, range: text, label: Details, definition: "Free-text details such as size or model code.", maps_to: schema:description, stored_as: field:garments.details}
+  - {id: price, domain: Garment, range: money-eur, label: Price, definition: "What was paid, in euros, rounded to whole cents.", maps_to: schema:price, stored_as: field:garments.price, see: [term:price]}
+  - {id: purchased, domain: Garment, range: date, label: Purchased, definition: The date the garment was bought., maps_to: schema:purchaseDate, stored_as: field:garments.purchased}
+  - {id: divested, domain: Garment, range: date, label: Divested, definition: "The last day the garment was owned; empty while active.", stored_as: field:garments.divested, see: [term:divested]}
+  - {id: timesUsedInit, domain: Garment, range: integer, label: Times used before tracking, definition: Wears before tracking began on 1 January 2018., stored_as: field:garments.timesUsedInit, see: [term:pre-tracking-wears]}
+  - {id: materials, domain: Garment, range: text, label: Materials, definition: The materials label as written (free text)., stored_as: field:garments.materials, see: [term:materials]}
+  - {id: weight, domain: Garment, range: mass-g, label: Weight, definition: The garment's weight in grams., maps_to: schema:weight, stored_as: field:garments.weightG}
+  - {id: hasTag, domain: Garment, range: Tag, label: Tags, definition: The garment's descriptive tags., stored_as: field:garments.tags}
+  - {id: photo, domain: Garment, range: image, label: Photo, definition: "The garment's standard photo (228 × 228 PNG).", maps_to: schema:image, stored_as: field:garments.photo}
+  - {id: hasOwnershipPeriod, domain: Garment, range: OwnershipPeriod, label: Ownership period, definition: "Derived from purchased and divested.", derived: true}
+  - {id: hasComposition, domain: Garment, range: MaterialComposition, label: Composition, definition: "Derived from materials.", derived: true}
+  # Wears
+  - {id: onDay, domain: Wear, range: WearDay, label: Day, definition: The day of the wear.}
+  - {id: ofGarment, domain: Wear, range: Garment, label: Garment, definition: The garment worn., maps_to: prov:used}
+  - {id: date, domain: WearDay, range: date, label: Date, definition: The calendar date (no time zone)., stored_as: field:days.date}
+  - {id: worn, domain: WearDay, range: Garment, label: Worn, definition: The garments worn that day., stored_as: field:days.worn}
+  # Composition
+  - {id: fibreShare, domain: MaterialComposition, range: share, label: Fibre share, definition: "Each fibre's share of the main part, 0–1, summing to 1."}
+  - {id: inFibreClass, domain: Fibre, range: FibreClass, label: Fibre class, definition: The fibre's class.}
+  # Comparison
+  - {id: monthlyCost, domain: ComparisonItem, range: money-eur, label: Monthly cost, definition: "What the item costs per month, in euros (entered).", stored_as: field:comparison.monthlyCost}
+  - {id: useFrequency, domain: ComparisonItem, range: share, label: Use frequency, definition: "Share of days on which it is used, 0–1 (entered).", stored_as: field:comparison.useFrequency}
+
+datatypes:
+  - {id: text, definition: Unicode text.}
+  - {id: date, definition: "Calendar date as an ISO string YYYY-MM-DD, without time or time zone."}
+  - {id: integer, definition: Whole number.}
+  - {id: share, definition: "A proportion from 0 to 1, shown as a percentage."}
+  - {id: money-eur, definition: Amount in euros., unit: qudt:currency/EUR}
+  - {id: mass-g, definition: Mass in grams., unit: qudt:unit/GM}
+  - {id: image, definition: "URL of an image in public storage."}

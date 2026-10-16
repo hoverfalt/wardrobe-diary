@@ -1,0 +1,323 @@
+# Semantic model (R-40): every metric the app and the MCP server compute. For each:
+#   grain        what one value describes (a garment, a category, a day…)
+#   formula      the calculation, in plain notation (normative together with `definition`)
+#   range_rule   how the chosen date range applies
+#   inputs       catalog fields it reads; `depends_on` other metrics
+#   implementation   file#export of the code that computes it (checked to exist by web/src/semantics.test.ts)
+#   tests        "file › test name" of tests that pin it down (checked to exist)
+#   null_when    when it has no value
+# Shared rules: wears outside a garment's ownership period never count; dates are inclusive; one month = 30.5 days.
+
+metrics:
+  # --- Garment level
+  - id: times-worn
+    label: Times worn
+    term: term:times-worn
+    grain: garment
+    unit: count
+    definition: Wears of the garment within the range (and within its ownership period), plus pre-tracking wears when the range starts on the start of tracking.
+    formula: "|{wear days d : range.from ≤ d ≤ range.to, d in ownership}| + (range.from ≤ 2018-01-01 ? timesUsedInit : 0)"
+    range_rule: range
+    inputs: [field:days.worn, field:days.date, field:garments.timesUsedInit, field:garments.purchased, field:garments.divested]
+    implementation: web/src/lib/metrics.ts#timesWorn
+    tests:
+      - web/src/lib/metrics.test.ts › counts times worn including pre-tracking wears, ignoring wears outside ownership
+      - web/src/lib/metrics.test.ts › counts pre-tracking wears only when the range starts at the start of tracking
+
+  - id: lifetime-wears
+    label: Lifetime wears
+    term: term:lifetime-wears
+    grain: garment
+    unit: count
+    definition: All wears over the garment's whole ownership period, including pre-tracking wears.
+    formula: "times-worn over {from: 2018-01-01, to: open}"
+    range_rule: lifetime
+    depends_on: [metric:times-worn]
+    implementation: web/src/lib/metrics.ts#lifetimeWears
+
+  - id: garment-cost-per-wear
+    label: Cost per wear (garment)
+    term: term:cost-per-wear
+    grain: garment
+    unit: EUR per wear
+    definition: Price divided by lifetime wears, independent of any chosen range; a garment never worn costs its full price.
+    formula: "lifetime-wears = 0 ? price : price / lifetime-wears"
+    range_rule: lifetime
+    null_when: the price is unknown
+    inputs: [field:garments.price]
+    depends_on: [metric:lifetime-wears]
+    decisions: [decision:D-2]
+    implementation: web/src/lib/metrics.ts#costPerWear
+    tests:
+      - web/src/lib/metrics.test.ts › computes cost per wear over the whole ownership; unworn garments cost their full price
+      - web/src/lib/metrics.test.ts › computes cost per wear independently of any range, including wears after it (D-2)
+
+  - id: days-owned
+    label: Days owned
+    grain: garment
+    unit: days
+    definition: >-
+      Days owned within the range up to its end, frozen at the divest date. When the range starts on the start of
+      tracking, counted from the purchase date even before tracking (since pre-tracking wears are included too).
+    formula: "max(0, days(start .. min(range.to, divested))) with start = range.from ≤ 2018-01-01 ? purchased : max(range.from, ownedFrom)"
+    range_rule: range
+    inputs: [field:garments.purchased, field:garments.divested]
+    implementation: web/src/lib/metrics.ts#daysOwned
+    tests:
+      - web/src/lib/metrics.test.ts › counts days owned from purchase, frozen at the divest date
+
+  - id: wears-per-month
+    label: Wears per month
+    term: term:wears-per-month
+    grain: garment
+    unit: wears per month
+    definition: Times worn divided by months owned in the range (30.5 days per month); 0 if not owned in the range.
+    formula: "days-owned > 0 ? times-worn / (days-owned / 30.5) : 0"
+    range_rule: range
+    depends_on: [metric:times-worn, metric:days-owned]
+    implementation: web/src/lib/metrics.ts#itemListing
+    tests:
+      - web/src/lib/metrics.test.ts › lists items with wears per month
+
+  # --- Category level (the Dashboard's category listing; a Total row sums or recomputes where stated)
+  - id: active-items
+    label: Active items
+    term: term:active-items
+    grain: category
+    unit: count
+    definition: Number of the category's garments active on the range's end date. Total row - the sum over categories.
+    formula: "|{garments g in category : active(g, range.to)}|"
+    range_rule: end-date
+    inputs: [field:garments.category, field:garments.purchased, field:garments.divested]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › summarises a category
+
+  - id: inventory-value
+    label: Inventory value
+    term: term:inventory-value
+    grain: category
+    unit: EUR
+    definition: Sum of the prices of the category's garments active on the range's end date (unknown prices count as 0). Total row - the sum.
+    formula: "Σ price over active garments on range.to"
+    range_rule: end-date
+    inputs: [field:garments.price]
+    depends_on: [metric:active-items]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › summarises a category
+
+  - id: category-cost-per-wear
+    label: Cost per wear (category)
+    term: term:cost-per-wear
+    grain: category
+    unit: EUR per wear
+    definition: >-
+      Use-weighted average of the garments' (lifetime) cost per wear, over the category's garments worn at least
+      once in the range, weighted by their times worn in the range. No Total row value.
+    formula: "Σ (garment-cost-per-wear × times-worn) / Σ times-worn, over garments with times-worn > 0"
+    range_rule: range (weights) + lifetime (each garment's cost per wear)
+    null_when: no garment of the category was worn in the range
+    depends_on: [metric:garment-cost-per-wear, metric:times-worn]
+    decisions: [decision:D-2]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › averages cost per wear over garments worn in the range, weighted by wears in the range (D-2)
+    note: The original R pipeline used Σ price of all owned garments / Σ wears instead, so this column differs from the old site.
+
+  - id: days-used
+    label: Days used
+    term: term:days-used
+    grain: category
+    unit: share
+    definition: >-
+      Share of days with at least one wear of a category garment, from the later of the range start and the day the
+      category's first garment was owned, to the range end. No Total row value.
+    formula: "|{days d in span : some category garment worn on d}| / |span|, span = max(range.from, min ownedFrom) .. range.to"
+    range_rule: range
+    depends_on: [metric:times-worn]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › summarises a category
+
+  - id: yearly-cost
+    label: Yearly cost
+    term: term:yearly-cost
+    grain: category
+    unit: EUR per year
+    definition: Category cost per wear × 365 × days used. Total row - the sum over categories.
+    formula: "category-cost-per-wear × 365 × days-used"
+    range_rule: range
+    null_when: cost per wear or days used is missing
+    depends_on: [metric:category-cost-per-wear, metric:days-used]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › adds a total row
+
+  - id: monthly-cost
+    label: Monthly cost
+    term: term:monthly-cost
+    grain: category
+    unit: EUR per month
+    definition: Yearly cost divided by 12, as in the original R comparison chart.
+    formula: "yearly-cost / 12"
+    range_rule: range
+    depends_on: [metric:yearly-cost]
+    implementation: web/src/pages/Dashboard.tsx#Dashboard
+
+  - id: turnover
+    label: Inventory turnover
+    term: term:turnover
+    grain: category
+    unit: share per year
+    definition: Yearly cost divided by inventory value. Total row - Σ yearly cost / Σ inventory value.
+    formula: "yearly-cost / inventory-value"
+    range_rule: range
+    null_when: yearly cost is missing or inventory value is 0
+    depends_on: [metric:yearly-cost, metric:inventory-value]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › adds a total row
+
+  - id: second-hand-share
+    label: Second hand share
+    term: term:second-hand-share
+    grain: category
+    unit: share
+    definition: Share of the category's garments active on the range's end date that carry the second-hand tag (by count). Total row - over all active garments.
+    formula: "|{active garments tagged second-hand}| / |{active garments}|"
+    range_rule: end-date
+    null_when: no garment is active
+    inputs: [field:garments.tags]
+    implementation: web/src/lib/metrics.ts#categoryListing
+    tests:
+      - web/src/lib/metrics.test.ts › gives the second-hand share of active garments, per category and in total
+
+  - id: divested-averages
+    label: Divested items' averages
+    grain: category
+    unit: wears per month; EUR per wear
+    definition: >-
+      Over divested garments owned at least 30 days: wears per month (Σ times worn / Σ days owned × 30.5) and the
+      use-weighted cost per wear. Reference lines on category pages.
+    formula: "(Σ times-worn / Σ days-owned) × 30.5; Σ (cost per wear × times-worn) / Σ times-worn"
+    range_rule: range
+    depends_on: [metric:times-worn, metric:days-owned, metric:garment-cost-per-wear]
+    implementation: web/src/lib/metrics.ts#divestedAverages
+    tests:
+      - web/src/lib/metrics.test.ts › averages divested items owned at least 30 days
+
+  # --- Over time
+  - id: active-items-over-time
+    label: Active items over time
+    grain: category × day
+    unit: count
+    definition: Active items per category on every day of the range, as step series (Sportswear left out on the Dashboard).
+    formula: "active-items(category, d) for each day d in range"
+    range_rule: each day
+    depends_on: [metric:active-items]
+    implementation: web/src/lib/metrics.ts#activeItemsOverTime
+    tests:
+      - web/src/lib/metrics.test.ts › steps up on purchase and down the day after divesting
+      - web/src/lib/metrics.test.ts › agrees with isActive on every day
+
+  - id: inventory-value-over-time
+    label: Inventory value over time
+    grain: category × day
+    unit: EUR
+    definition: Inventory value per category (and in total) on every day of the range, as step series.
+    formula: "inventory-value(category, d) for each day d in range"
+    range_rule: each day
+    depends_on: [metric:inventory-value]
+    implementation: web/src/lib/metrics.ts#inventoryValueOverTime
+    tests:
+      - web/src/lib/metrics.test.ts › sums prices of active garments per category, in whole cents
+      - web/src/lib/metrics.test.ts › sums all categories for the total
+
+  - id: daily-cost
+    label: Daily cost
+    term: term:daily-cost
+    grain: day
+    unit: EUR per day
+    definition: >-
+      For each logged day in the range with wears: the sum of the lifetime cost per wear of the garments worn and
+      owned that day (unknown prices count 0); "final" when all of them are divested. Average - the mean of 30
+      consecutive logged days centred on the day (days i−14 … i+15), so days without wears are skipped.
+    formula: "Σ garment-cost-per-wear over garments worn on d; average(i) = mean(cost[i−14 .. i+15])"
+    range_rule: each day + lifetime (cost per wear)
+    depends_on: [metric:garment-cost-per-wear]
+    decisions: [decision:D-2, decision:Q-1]
+    implementation: web/src/lib/metrics.ts#dailyCost
+    tests:
+      - web/src/lib/metrics.test.ts › sums lifetime cost per wear of the garments worn each day (D-2)
+      - web/src/lib/metrics.test.ts › centres a 30-value window on values i-14 … i+15
+    note: With "as of" a date (animations), cost per wear counts only wears up to that date.
+
+  # --- Materials
+  - id: fibre-mass
+    label: Fibre mass
+    term: term:fibre-mass
+    grain: fibre
+    unit: kg
+    definition: >-
+      Weight × main-part composition, summed per fibre, with recycled and organic kg. Owned basis - garments active on
+      the range's end date. Worn basis - each wear in the range counts the garment's full weight. Only garments with a
+      weight and readable materials are included; coverage says how many.
+    formula: "Σ weightG / 1000 × fibreShare"
+    range_rule: end-date (owned) or range (worn)
+    inputs: [field:garments.weightG, field:garments.materials]
+    implementation: web/src/lib/materials.ts#materialBreakdown
+    tests:
+      - web/src/lib/materials.test.ts › adds up owned fibre mass from weight × composition
+      - web/src/lib/materials.test.ts › counts each wear for the worn basis, with the average outfit weight
+
+  - id: average-outfit-weight
+    label: Average outfit weight
+    term: term:outfit-weight
+    grain: range or month
+    unit: kg per day
+    definition: Mean total weight of the garments worn per logged day (garments with a known weight).
+    formula: "Σ weight of garments worn / number of logged days"
+    range_rule: range
+    inputs: [field:garments.weightG, field:days.worn]
+    implementation: web/src/lib/materials.ts#materialsByMonth
+    tests:
+      - web/src/lib/materials.test.ts › computes outfit weight and synthetic share per month
+
+  - id: synthetic-share
+    label: Synthetic share (worn)
+    grain: month
+    unit: share
+    definition: Share of the worn fibre mass in a month that is synthetic.
+    formula: "synthetic kg / total kg (worn basis)"
+    range_rule: range (by month)
+    depends_on: [metric:fibre-mass]
+    implementation: web/src/lib/materials.ts#materialsByMonth
+    tests:
+      - web/src/lib/materials.test.ts › computes outfit weight and synthetic share per month
+
+  # --- Comparison
+  - id: comparison-yearly-cost
+    label: Yearly cost (comparison item)
+    grain: comparison item
+    unit: EUR per year
+    definition: Monthly cost × 12.
+    formula: "monthlyCost × 12"
+    range_rule: none (fixed figures)
+    inputs: [field:comparison.monthlyCost]
+    implementation: web/src/lib/comparison.ts#yearlyCost
+    tests:
+      - web/src/lib/comparison.test.ts › derives yearly cost and cost per use as the Sheet did
+
+  - id: comparison-cost-per-use
+    label: Cost per use (comparison item)
+    term: term:cost-per-use
+    grain: comparison item
+    unit: EUR per use
+    definition: Monthly cost divided by (30.5 × use frequency); none if never used.
+    formula: "useFrequency > 0 ? monthlyCost / (30.5 × useFrequency) : null"
+    range_rule: none (fixed figures)
+    inputs: [field:comparison.monthlyCost, field:comparison.useFrequency]
+    implementation: web/src/lib/comparison.ts#costPerUse
+    tests:
+      - web/src/lib/comparison.test.ts › derives yearly cost and cost per use as the Sheet did

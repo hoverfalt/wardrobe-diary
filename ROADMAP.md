@@ -37,6 +37,14 @@ _(empty)_
 
 ## Now
 
+- **R-40 Semantic layer, phase 1 done (2026-10-16), awaiting Olof's review:** `semantics/` v0.1.0 (draft) with
+  11 classes and 21 properties, 42 glossary terms, 22 metrics (each linked to its code and tests), 10 datasets
+  with fields, classification and lineage, 9 quality rules, 8 decisions; 10 consistency tests (each verified
+  to fail on a deliberate break). Found while writing it: the MCP definitions text says Days used counts "days
+  in the range", but the code counts from the category's first ownership day; the daily cost average is over 30
+  logged days with wears, not 30 calendar days - both now stated precisely, and phase 2 will generate the MCP
+  text from the semantic layer. Next: phase 2 (generators, pages, MCP resources + `explain`, public repo).
+
 - **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
   23 redirects, sitemap; `node web/e2e/redirect-check.mjs` all OK). wardrobediary.io still shows the old
@@ -65,10 +73,24 @@ _(empty)_
 
 ## Next
 
+1. **R-40 Semantic layer and data governance showcase** (started 2026-10-16; decisions by Olof: a separate
+   public repo + the website; English only for now; public MCP server after the domain switch). One
+   machine-readable source in `semantics/` (YAML) from which the standard formats, web pages and MCP resources
+   are generated, kept consistent with the code by tests. Phases:
+   (1) semantic layer v1: ontology / conceptual model, glossary, metrics (semantic model), data catalog,
+   decision register, plus consistency tests; (2) generators: JSON-LD (schema.org, SKOS, DCAT, PROV-O),
+   `/glossary`, `/model`, `/data` pages, MCP resources + `explain` tool, provenance in MCP answers; public repo
+   `hoverfalt/wardrobe-diary-semantics` (CC BY 4.0); (3) data contracts (ODCS) validated nightly in the backup
+   job, published quality figures; (4) AI evaluation set (questions with computed answers; raw data vs MCP vs
+   MCP + semantics) and a results page; (5) public remote MCP server = R-29 phase 2 (after R-16).
+
 1. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
+
+- **R-41 Finnish and Swedish** for the whole site (landing page, app, glossary and other semantic pages); the
+  semantic layer is English-only until then (Olof, 2026-10-16).
 
 - **R-32 User-defined tags** (for the multi-user version, R-17): today's tags are a fixed vocabulary
   (`web/src/lib/tags.ts`); let users create their own tags with a badge text, filter by them everywhere.

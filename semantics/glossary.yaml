@@ -1,0 +1,244 @@
+# Business glossary (R-40), published as SKOS concepts. One entry per term people and AI assistants use when
+# talking about the data. `definition` is normative; `note` explains choices; `related` links terms;
+# `metric` links to the metric that computes it; `decision` to the decision that settled it.
+
+terms:
+  # --- Core
+  - id: garment
+    label: Garment
+    definition: One physical piece of clothing, footwear or accessory in the wardrobe, owned at some point since tracking began.
+    note: Identical items bought together are separate garments, each with its own wears.
+    related: [term:category, term:ownership-period]
+
+  - id: category
+    label: Category
+    definition: >-
+      A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies,
+      Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts,
+      Underwear boxers, Sportswear.
+    note: Categories are always listed in this order, never alphabetically.
+
+  - id: tracking-start
+    label: Start of tracking
+    definition: 1 January 2018, the first day of the daily log.
+    note: Garments bought earlier count as owned from this date; their earlier wears are pre-tracking wears.
+
+  - id: wear
+    label: Wear
+    alt_labels: [use]
+    definition: One garment worn on one day, as logged. Wearing a garment more than once on the same day is still one wear.
+    note: Wears logged outside the garment's ownership period are ignored by every metric.
+
+  - id: pre-tracking-wears
+    label: Pre-tracking wears
+    alt_labels: [times used init]
+    definition: The number of times a garment was worn before tracking began, entered once as an estimate.
+    note: They count only in figures whose range starts on the start of tracking, and always in lifetime wears.
+
+  - id: price
+    label: Price
+    definition: What was paid for the garment, in euros, rounded to whole cents.
+    note: Second-hand garments have the price actually paid. Multipacks are split evenly per item.
+
+  - id: ownership-period
+    label: Ownership period
+    definition: >-
+      The days a garment counts as owned: from its purchase date, but no earlier than the start of tracking, to its
+      divest date, both inclusive.
+    related: [term:active, term:divested]
+
+  - id: active
+    label: Active
+    definition: A garment is active on a day if that day is within its ownership period.
+    note: The divest day itself still counts as owned (as in the original R pipeline).
+
+  - id: divested
+    label: Divested
+    definition: No longer owned after the divest date, because it was sold, given away, recycled or discarded.
+
+  - id: date-range
+    label: Date range
+    definition: >-
+      The period a figure is computed for, from a start date to an end date, both inclusive. Every metric takes a
+      date range; the default is from the start of tracking to the last logged day.
+    decision: decision:2026-10-08-ranges
+
+  - id: as-of
+    label: As of
+    definition: >-
+      A figure computed as it was known on a past date, counting only wears logged up to then. Used by the
+      animated charts.
+    note: The one deliberate exception to the lifetime rule of cost per wear (decision D-2).
+
+  # --- Garment metrics
+  - id: times-worn
+    label: Times worn
+    definition: The number of wears of a garment within the date range, plus its pre-tracking wears when the range starts on the start of tracking.
+    metric: metric:times-worn
+
+  - id: lifetime-wears
+    label: Lifetime wears
+    definition: All wears of a garment over its whole ownership period, including pre-tracking wears.
+    metric: metric:lifetime-wears
+
+  - id: cost-per-wear
+    label: Cost per wear
+    alt_labels: [CPW, cost per use]
+    definition: >-
+      For a garment: its price divided by its lifetime wears, regardless of the date range chosen. A garment never
+      worn costs its full price. For a category: the use-weighted average of its garments' cost per wear over the
+      garments worn in the range, weighted by their wears in the range.
+    note: >-
+      Using lifetime wears, even wears after the range ends, keeps the concept consistent: a garment has one cost
+      per wear, which falls as it gets more use.
+    decision: decision:D-2
+    metric: metric:garment-cost-per-wear
+    related: [term:use-weighted-average]
+
+  - id: use-weighted-average
+    label: Use-weighted average
+    definition: An average in which each garment counts as many times as it was worn in the range.
+
+  - id: wears-per-month
+    label: Wears per month
+    definition: Times worn divided by the months owned in the range, where a month is 30.5 days.
+    metric: metric:wears-per-month
+
+  # --- Category and wardrobe metrics
+  - id: days-used
+    label: Days used
+    alt_labels: [frequency of use, category frequency of use]
+    definition: >-
+      For a category: the share of days on which at least one of its garments was worn, counted from the later of the
+      range start and the day the category's first garment was owned, to the range end.
+    metric: metric:days-used
+
+  - id: yearly-cost
+    label: Yearly cost
+    definition: What a year of using a category costs at the current rate - its cost per wear × 365 × days used.
+    metric: metric:yearly-cost
+
+  - id: monthly-cost
+    label: Monthly cost
+    definition: Yearly cost divided by 12. Used to compare clothing categories with other monthly spending.
+    metric: metric:monthly-cost
+
+  - id: inventory-value
+    label: Inventory value
+    definition: The sum of the prices of the garments active on the range's end date.
+    metric: metric:inventory-value
+
+  - id: active-items
+    label: Active items
+    alt_labels: [items]
+    definition: The number of garments active on the range's end date.
+    metric: metric:active-items
+
+  - id: turnover
+    label: Inventory turnover
+    alt_labels: [turnover]
+    definition: Yearly cost divided by inventory value - the share of the wardrobe's purchase value "used up" per year.
+    metric: metric:turnover
+
+  - id: second-hand-share
+    label: Second hand share
+    definition: The share of the garments active on the range's end date that were bought second hand (a count, not a value share).
+    metric: metric:second-hand-share
+
+  - id: daily-cost
+    label: Daily cost
+    definition: For a day, the sum of the cost per wear of the garments worn that day (and owned then).
+    note: The Dashboard leaves Sportswear out of its daily cost charts.
+    metric: metric:daily-cost
+    decision: decision:Q-1
+
+  - id: final-daily-cost
+    label: Final (daily cost)
+    alt_labels: [all divested]
+    definition: A day's cost is final when every garment worn that day has been divested, so it can no longer fall.
+
+  # --- Tags
+  - id: tag
+    label: Tag
+    definition: A descriptive label from a fixed vocabulary. Tags only describe garments; they never change any calculation.
+
+  - id: second-hand
+    label: Second hand (tag)
+    definition: Bought second hand, i.e. used before. The price is what was paid and wears count from the purchase, without estimating earlier use.
+    related: [term:tag]
+
+  - id: hanko
+    label: Hanko (tag)
+    definition: Kept at the summer home in Hanko, so worn only during stays there.
+    related: [term:tag]
+
+  - id: bicycle-gear
+    label: Bicycle gear (tag)
+    definition: Cycling gear.
+    related: [term:tag]
+
+  - id: motorcycle-gear
+    label: Motorcycle gear (tag)
+    definition: Motorcycle gear.
+    related: [term:tag]
+
+  - id: season-tags
+    label: Winter / Summer (tags)
+    definition: Worn mainly in winter or in summer; used to narrow the logging list by season.
+    related: [term:tag]
+
+  # --- Materials
+  - id: materials
+    label: Materials
+    definition: The garment's materials label as written, in free text (e.g. "Shell 100% polyamide, lining 100% polyester").
+    note: The text is never changed; it is interpreted on read into a material composition.
+
+  - id: main-part
+    label: Main part
+    definition: >-
+      For a garment whose label lists several parts (shell, lining, padding…), the part that counts in material
+      figures: the one whose label begins with shell, main, outer, body, fabric or belt, otherwise the first one listed.
+
+  - id: fibre
+    label: Fibre
+    definition: A material a garment is made of, under one normalised name (e.g. lycra and spandex are both elastane, nylon is polyamide).
+
+  - id: fibre-class
+    label: Fibre class
+    definition: >-
+      Natural (cotton, wool, linen, leather, down, feather), regenerated cellulose (viscose, modal, lyocell),
+      synthetic (polyester, polyamide, elastane, acrylic…) or other.
+
+  - id: estimated-composition
+    label: Estimated composition
+    definition: A composition whose shares are not given on the label (or don't add up to 100 %), so the fibres are split equally or normalised.
+
+  - id: fibre-mass
+    label: Fibre mass
+    definition: >-
+      Weight × composition, summed per fibre. Owned basis: garments active on the range's end date. Worn basis: every
+      wear in the range counts the garment's full weight.
+    metric: metric:fibre-mass
+
+  - id: outfit-weight
+    label: Average outfit weight
+    definition: The average total weight of the garments worn per logged day (garments with a known weight).
+    metric: metric:average-outfit-weight
+
+  - id: coverage
+    label: Coverage
+    definition: How much of the data a material figure could use - garments or wears with both a weight and readable materials, out of all.
+
+  # --- Comparison
+  - id: comparison-item
+    label: Comparison item
+    definition: An item of other everyday spending, such as a transport ticket or a streaming service, with a monthly cost and a use frequency.
+
+  - id: use-frequency
+    label: Use frequency
+    definition: For a comparison item, the share of days on which it is used (entered by the owner).
+
+  - id: cost-per-use
+    label: Cost per use (comparison)
+    definition: For a comparison item, its monthly cost divided by (30.5 × use frequency).
+    metric: metric:comparison-cost-per-use

@@ -207,6 +207,17 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
 | `components/DateRangeControl.tsx`, `AsOfControl.tsx`, `PlotFigure.tsx` | Date range (slider + boxes), "as of" player, Plot wrapper |
 
+## Semantic layer (`semantics/`, R-40)
+
+The machine-readable meaning of the data: `ontology.yaml` (conceptual model), `glossary.yaml` (terms),
+`metrics.yaml` (semantic model: formula, grain, unit, range rule, implementation and tests per metric),
+`catalog.yaml` (datasets, fields, classification, lineage, quality rules), `decisions.yaml`, `model.yaml`
+(version, changelog). `web/src/semantics.test.ts` checks it against the code. **When you add or change a metric,
+a Garment field, a Firestore collection, a category or a tag, update `semantics/` in the same change** (the tests
+fail otherwise), and bump `version` + changelog in `model.yaml` when a definition changes. Phase 2 generates
+JSON-LD (SKOS, DCAT, PROV-O, schema.org), the `/glossary`, `/model`, `/data` pages and the MCP definitions from
+it, and publishes it in the public repo `hoverfalt/wardrobe-diary-semantics`.
+
 ## MCP server (`mcp/`, R-29)
 
 Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key), caches

@@ -1,0 +1,62 @@
+# Decision register (R-40): decisions that definitions in this folder refer to. The full log with context is
+# ROADMAP.md "Decisions made"; ids match it. `affects` lists what each decision governs.
+
+decisions:
+  - id: D-1
+    date: 2026-10-09
+    title: Public pages get the full day-by-day log
+    decision: >-
+      Public pages and the MCP server read one world-readable document with all garments and the full wear log, and
+      compute every metric from it, rather than precomputed summaries.
+    rationale: Any metric for any date range can be computed in the browser with one document read.
+    affects: [dataset:public-data]
+
+  - id: D-2
+    date: 2026-10-09
+    title: Cost per wear is always lifetime
+    decision: >-
+      A garment's cost per wear is price / all its wears over its whole ownership, regardless of the chosen date range,
+      even when wears after the range lower it. A category's cost per wear for a range is the use-weighted average of
+      its garments' cost per wear over the garments worn at least once in the range.
+    rationale: The concept must be treated consistently - a garment has one cost per wear.
+    affects: [metric:garment-cost-per-wear, metric:category-cost-per-wear, metric:daily-cost]
+    exception: Animations show values "as of" a date (only wears up to then).
+
+  - id: D-3
+    date: 2026-10-09
+    title: Small multiples for per-category charts
+    decision: Charts that show several categories use one small chart per category on a shared scale.
+    rationale: The original 12-colour palette fails colour-blind and contrast checks.
+    affects: []
+
+  - id: D-4
+    date: 2026-10-09
+    title: Garment details are edited in the app
+    decision: Garment details are edited in the app and stored in Firestore, which is their source of truth.
+    affects: [dataset:garments]
+
+  - id: Q-1
+    date: 2026-10-09
+    title: Daily cost definition
+    decision: >-
+      Daily cost = Σ over garments worn that day (and owned then) of their lifetime cost per wear; "final" when every
+      one of them is divested; plus a rolling mean centred on the day.
+    affects: [metric:daily-cost]
+
+  - id: R-15
+    date: 2026-10-09
+    title: Cut-over to logging in the app
+    decision: The app is the source of truth for wears from 2026-10-10; the Sheet holds the log through 2026-10-09 and is retired.
+    affects: [dataset:days, dataset:legacy-sheet]
+
+  - id: R-28
+    date: 2026-10-10
+    title: Nightly backups
+    decision: A nightly job exports all owner data to a private repository with a read-only account.
+    affects: [dataset:backups]
+
+  - id: 2026-10-08-ranges
+    date: 2026-10-08
+    title: Metrics work for any date range
+    decision: All metric functions take a date range; the per-day data stays available rather than being pre-aggregated.
+    affects: [term:date-range]

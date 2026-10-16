@@ -1,0 +1,37 @@
+# Wardrobe Diary semantic layer: model metadata (ROADMAP R-40).
+#
+# This folder is the single, machine-readable source for what the Wardrobe Diary data means:
+#   ontology.yaml   conceptual model / ontology: classes, properties, relations (aligned to schema.org, PROV-O)
+#   glossary.yaml   business glossary: terms and definitions (SKOS concepts)
+#   metrics.yaml    semantic model: every metric, its formula, grain, unit, time-range rule and implementation
+#   catalog.yaml    data catalog: datasets, fields, lineage, classification, quality checks (DCAT)
+#   decisions.yaml  decision register: the decisions that definitions refer to
+# Web pages, JSON-LD and the MCP server's definitions are generated from these files (R-40 phase 2), and
+# web/src/semantics.test.ts checks them against the code, so they cannot silently drift.
+#
+# References between files use prefixed ids: class:, prop:, term:, metric:, dataset:, field:, decision:.
+
+id: wardrobe-diary-semantics
+title: Wardrobe Diary semantic layer
+description: >-
+  Meaning, definitions, lineage and quality of the Wardrobe Diary data: one person's daily log of every garment
+  worn since 1 January 2018, with purchase prices, dates, materials and weights, and the metrics derived from it.
+version: 0.1.0
+status: draft
+base_iri: https://wardrobediary.io/def/
+language: en
+license: https://creativecommons.org/licenses/by/4.0/
+publisher: Olof Hoverfält
+contact: https://www.linkedin.com/in/hoverfalt/
+steward: Olof Hoverfält
+created: 2026-10-16
+modified: 2026-10-16
+standards:
+  - {prefix: schema, iri: "https://schema.org/", use: garments as products, prices, dates}
+  - {prefix: skos, iri: "http://www.w3.org/2004/02/skos/core#", use: glossary}
+  - {prefix: dcat, iri: "http://www.w3.org/ns/dcat#", use: data catalog}
+  - {prefix: prov, iri: "http://www.w3.org/ns/prov#", use: lineage}
+  - {prefix: qudt, iri: "http://qudt.org/schema/qudt/", use: units}
+  - {prefix: odcs, iri: "https://bitol-io.github.io/open-data-contract-standard/", use: data contracts (phase 3)}
+changelog:
+  - {version: 0.1.0, date: 2026-10-16, change: "First version, written from the app's code, tests and decisions."}
