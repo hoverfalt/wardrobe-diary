@@ -202,6 +202,15 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-42** 2026-10-16 Repo made public (history rewritten first to drop a home-usage detail; safety mirror in
+  `backups/`), README for visitors, MIT licence for code + CC BY 4.0 (LICENSE-CONTENT.md) for semantics, content
+  and data; secret scanning, push protection, Dependabot and malware alerts on. Dependabot's first scan: 9 alerts
+  (2 critical), all in dev tools or Node-only paths, none in the browser bundle. Fixed: vitest 3 → 5,
+  puppeteer-core 24 → 25, firebase-tools 15.34, npm overrides for `@grpc/grpc-js` 1.14.6, `uuid` 11.1.1,
+  `@opentelemetry/core` 2.12 (verified: tests, build, emulators + signed-in checks, deploy, live checks).
+  **Accepted:** `braces` ≤ 3.0.3 (stack-exhaustion DoS on crafted glob patterns) via firebase-tools' file watcher -
+  no fixed version exists yet; dev-only, no untrusted input. Revisit when a fix ships.
+
 - **R-18b** 2026-10-13 Python 3.12 for `tools/` (3.9 is end of life): standalone CPython 3.12.15 installed
   user-locally (`~/.local/share/python-3.12.15`, checksum verified), `tools/.venv` rebuilt (firebase-admin 7.7,
   google-cloud-firestore 2.34). Verified: 16 tests, backup (identical to the nightly one apart from today's

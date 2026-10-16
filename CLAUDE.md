@@ -312,6 +312,10 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - Bundle (R-18): pages are lazy-loaded in `App.tsx` (add new pages with `page(...)`), libraries are split into
   `react` / `firebase` / `firebase-storage` (uploads only, imported on demand in `firebase.ts`) / `plot` chunks in
   `vite.config.ts`, and `firebase.json` caches `/assets/**` for a year (hashed names) and revalidates every page.
+- Dependencies: GitHub Dependabot (alerts + security updates, malware alerts) and secret scanning with push
+  protection are on. `web/package.json` `overrides` force patched versions of vulnerable transitive packages
+  (`@grpc/grpc-js`, `uuid`, `@opentelemetry/core`); drop an override once the parent package ships the fix. Check
+  with `npm audit` in `web/` and `mcp/`.
 - Never commit `.env.local` or service-account JSON.
 - Git: run `git add`, `git commit` and `git push` as separate commands (not chained with `&&`); the local
   permission rules in `.claude/settings.local.json` allow commit, push and `tools/sync.sh` only individually.
