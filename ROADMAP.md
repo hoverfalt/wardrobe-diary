@@ -10,26 +10,20 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-13)
+## Where we left off (2026-10-16)
 
-- **Paused mid-R-16 (domain switch):** see Now for the step-by-step pickup, planned for Friday 2026-10-16.
-- 2026-10-13 also: local emulator testing (R-39), code splitting and Python 3.12 (R-18 done).
-
-## Earlier (2026-10-12)
-
-- **Every chart on the live site is rebuilt**, and everything is deployed to wardrobediary.web.app and committed.
-  Built so far: public Dashboard, category, garment and materials pages; garment management (R-27); logging in
-  the app (R-13/R-15, the Sheet is retired); nightly backups with restore (R-28); read-only MCP server (R-29
-  phase 1); materials, weight and details (R-30); sortable tables (R-35).
-- **This session (2026-10-12):** monthly cost compared with other spending, managed at `/manage/comparison`,
-  with photos (R-26, R-36); tags Hanko / Bicycle / Motorcycle from the Sheet's row colours (R-37, Q-2) and
-  Winter / Summer (R-38), with a "Filters" popup of tag toggles on the Log page; only the SH badge on charts;
-  Materials moved out of the top nav; filter selects fit on phones.
-- **Waiting for Olof:** tag the Winter and Summer garments on Manage (bulk "Add tag"); try the Log Filters
-  popup and `/manage/comparison` on the iPhone (not checked in a signed-in browser).
-- **Next candidates:** R-16 domain switch (point wardrobediary.io at the new app, port the static pages),
-  R-33 location filter for the Dashboard and category pages (the logging half is done by R-38), R-17
-  multi-user (with R-32 user-defined tags).
+- **Next: the domain switch (R-16)**, see Now for the step-by-step pickup. Then the public remote MCP server
+  (R-29 phase 2), which waits for the domain.
+- **Done 2026-10-13 … 16:** local emulator testing of the signed-in UI (R-39); code splitting and Python 3.12
+  (R-18); the new site's landing page, redirects and sitemap, ready for the switch (R-16 steps 1–2); the repo
+  made public with a cleaned history, MIT + CC BY 4.0 licences, security scanning, and Dependabot fixes (R-42);
+  category cost per wear pooled over lifetime wears (D-2 amended); the semantic layer and data governance
+  showcase, phases 1–4 (R-40): `/glossary`, `/model`, `/data`, `/evals`, JSON-LD, ODCS contracts, live and
+  nightly quality checks, MCP `explain` and provenance, and the first AI evaluation (raw data 7/30, MCP tools
+  29/30, tools + semantic layer 30/30).
+- **Possibly still open for Olof:** tag the Winter and Summer garments on Manage (bulk "Add tag").
+- **Earlier (to 2026-10-12):** every live-site chart rebuilt; garment management, logging in the app, backups,
+  materials, tags, comparison (see Done).
 
 ## Inbox
 
@@ -37,19 +31,7 @@ _(empty)_
 
 ## Now
 
-- **R-40 Semantic layer, phases 1–4 built (2026-10-16), reviewed by Olof.** Semantic layer 0.2.1; generated
-  `/glossary`, `/model`, `/data` (live quality), `/evals` pages, JSON-LD (SKOS, DCAT, RDFS/OWL, PROV-O) and ODCS
-  contracts, all checked by tests (RDF parse, ODCS schema, up to date); MCP `explain`, `get_data_quality`,
-  semantic resources and provenance; quality checks shared by the page, the MCP and `quality-check.mjs`
-  (public copy = source verified with a backup: 3,833 records match); AI evaluation set of 30 questions with
-  computed answers and a runner. GitHub Actions (added by Olof 2026-10-16, as the stored token lacks the
-  `workflow` scope): `Tests` on every push (first runs green) and `Data quality` nightly at 03:30 UTC.
-  **First evaluation run (2026-10-16, Claude Sonnet 5.5, $7.51, Olof's account):** raw data 7/30, MCP tools
-  29/30, tools + semantic layer 30/30, published on `/evals` with findings and caveats (single run; the one
-  tools-vs-semantic difference is the D-2 lifetime cost-per-wear trap; raw data mostly hit the 4,096-token answer
-  limit). Possible next: `--repeat 3`, a higher answer limit for raw, more interpretation-heavy questions.
-
-- **R-16 Domain switch – paused 2026-10-13, to resume Friday 2026-10-16.** Everything on the new site is done
+- **R-16 Domain switch – paused 2026-10-13; next up.** Everything on the new site is done
   and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
   23 redirects, sitemap; `node web/e2e/redirect-check.mjs` all OK). wardrobediary.io still shows the old
   GitHub Pages site, so nothing is broken meanwhile. Olof had trouble with Bluehost's DNS settings.
@@ -77,17 +59,13 @@ _(empty)_
 
 ## Next
 
-1. **R-40 Semantic layer and data governance showcase** (started 2026-10-16; decisions by Olof: publish in this repo,
-   made public (2026-10-16; code MIT, semantics/content/data CC BY 4.0), and on the website; English only for now; public MCP server after the domain switch). One
-   machine-readable source in `semantics/` (YAML) from which the standard formats, web pages and MCP resources
-   are generated, kept consistent with the code by tests. Phases:
-   (1) semantic layer v1: ontology / conceptual model, glossary, metrics (semantic model), data catalog,
-   decision register, plus consistency tests; (2) generators: JSON-LD (schema.org, SKOS, DCAT, PROV-O),
-   `/glossary`, `/model`, `/data` pages, MCP resources + `explain` tool, provenance in MCP answers; (3) data contracts (ODCS) validated nightly in the backup
-   job, published quality figures; (4) AI evaluation set (questions with computed answers; raw data vs MCP vs
-   MCP + semantics) and a results page; (5) public remote MCP server = R-29 phase 2 (after R-16).
-
-1. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
+1. **R-29 phase 2 / R-40 phase 5: public remote MCP server** (after R-16): the MCP server over HTTP on Cloud Run
+   (or similar), reading only the public data, so anyone can connect an AI assistant to wardrobediary.io;
+   listed on the site with setup instructions.
+2. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
+   condition, more interpretation-heavy questions; a comparison tool in the MCP server (comparison questions
+   were left out of the evaluation for lack of one).
+3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
@@ -207,6 +185,20 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-40** 2026-10-16 Semantic layer and data governance showcase, phases 1–4 (decisions by Olof: in this repo,
+  made public, and on the website; English only; public MCP server after the domain switch). `semantics/` 0.2.1
+  (reviewed by Olof): ontology, glossary (42 terms), semantic model (22 metrics, each linked to code and tests),
+  catalog (10 datasets, lineage, classification, 9 quality rules), decision register. Generated and committed:
+  `/glossary`, `/model` (Mermaid diagram), `/data` (live quality checks), `/evals`; JSON-LD (SKOS, DCAT, RDFS/OWL,
+  PROV-O; parsed as RDF in tests); 7 ODCS v3 contracts (validated against the schema). Quality checks in one place
+  (`lib/quality.ts`) for the page, the MCP and the nightly `Data quality` workflow; public copy = source verified
+  with a backup. MCP: `explain`, `get_data_quality`, semantic resources, provenance in every answer. GitHub
+  Actions: `Tests` on every push, `Data quality` nightly. AI evaluation (`mcp/evals/`, 30 questions, answers
+  computed by the app, graded in code): first run 2026-10-16 with Claude Sonnet 5.5 ($7.51): raw data 7/30, MCP
+  tools 29/30, tools + semantic layer 30/30; the one difference was the D-2 lifetime cost-per-wear trap.
+  Found on the way: four definitions cut short by YAML commas (now prevented by a test); a JSON-LD named-graph
+  mistake (caught by the RDF test); MCP text inaccuracies (Days used, now generated).
 
 - **R-42** 2026-10-16 Repo made public (history rewritten first to drop a home-usage detail; safety mirror in
   `backups/`), README for visitors, MIT licence for code + CC BY 4.0 (LICENSE-CONTENT.md) for semantics, content

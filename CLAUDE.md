@@ -2,7 +2,7 @@
 
 Rebuild of https://wardrobediary.io (R pipeline: github.com/hoverfalt/Threddit) as a dynamic web app.
 Owner: Olof Hoverfält. Daily wardrobe log since 2018-01-01.
-Repo: github.com/hoverfalt/wardrobe-diary (private).
+Repo: github.com/hoverfalt/wardrobe-diary (**public** since 2026-10-16; code MIT, semantics/content/data CC BY 4.0).
 
 **Roadmap, status and open decisions live in [ROADMAP.md](ROADMAP.md).** Read it at the start of a
 session; update it when work is finished, started, or newly identified (see its header for the rules).
@@ -17,7 +17,12 @@ data entry, storage, tables and charts all live in one Firebase-backed web app.
 Google Sheet is retired; logged through 2026-10-09). The public app at https://wardrobediary.web.app rebuilds
 everything on the live site except the static text pages, and goes beyond it: garment pages, a materials page, tags (second hand, Hanko, bicycle, motorcycle,
 winter, summer) with Log page filters, sortable tables, a managed spending comparison, nightly backups and a
-read-only MCP server. The live site must not be touched until the domain switch (ROADMAP R-16).
+read-only MCP server. The project is also a public example of data governance for AI (R-40): a semantic layer
+(`semantics/`) published as `/glossary`, `/model`, `/data`, JSON-LD and data contracts, served by the MCP server
+(`explain`, provenance), with live and nightly quality checks and an AI evaluation (`/evals`). The static landing
+page at `/`, redirects for the old pages and the sitemap are ready on wardrobediary.web.app; **next is the domain
+switch (ROADMAP R-16, Now)**, after which the public MCP server follows. The live site must not be touched until
+the domain switch.
 
 ## Environment
 
@@ -32,6 +37,8 @@ read-only MCP server. The live site must not be touched until the domain switch 
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
 | Web config | `web/.env.local` (git-ignored), from the registered web app "Wardrobe Diary" |
+| GitHub | Repo public. Actions: `Tests` (`.github/workflows/ci.yml`, every push) and `Data quality` (`data-quality.yml`, nightly 03:30 UTC). Secret scanning + push protection, Dependabot alerts + security updates, malware alerts on. **The stored git token lacks the `workflow` scope**: changes under `.github/workflows/` must be made by Olof in GitHub's web editor (then `git fetch` and fast-forward) |
+| AI evaluation | Olof's own Anthropic API account (prepaid credits), used only by `mcp/evals` runs he starts with `ANTHROPIC_API_KEY` set via `read -s` (never stored in files) |
 | Toolchain | Node 24 (≥ 20.19 required); `firebase-tools` is a devDependency of `web/` (use `npx firebase`, not the stale global one); Python 3.12 venv in `tools/.venv`, built from the user-local standalone Python in `~/.local/share/python-3.12.*` (the system's 3.9 is end of life; recreate with `~/.local/share/python-3.12.15/bin/python3 -m venv tools/.venv && tools/.venv/bin/pip install -r tools/requirements.txt`); the nightly backup job also runs 3.12 |
 
 ## Architecture (decided)
