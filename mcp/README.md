@@ -26,16 +26,33 @@ key needed), caches it for 5 minutes, and computes everything with the web app's
 Resources, all generated from the [semantic layer](../semantics/): `wardrobe://definitions` (every term,
 metric and decision as text), `wardrobe://glossary`, `wardrobe://semantic-model`, `wardrobe://catalog` (JSON).
 
+## Connect
+
+**Public server: `https://wardrobediary.io/mcp`** (Streamable HTTP, read-only, no sign-in; public data only).
+
+- **Claude** (claude.ai or Claude Desktop): Settings → Connectors → *Add custom connector* → name it
+  "Wardrobe Diary" and paste the URL.
+- **Claude Code**: `claude mcp add --transport http wardrobe-diary https://wardrobediary.io/mcp`
+- **Other MCP clients**: add a remote (Streamable HTTP) server with that URL.
+
+Then ask, for example: *"What did shirts cost per wear in 2025, and how is that defined?"*
+
+The server runs as a Cloud Function (`src/function.ts`, europe-north1, at most 2 instances), behind a Firebase
+Hosting rewrite. Each request is handled by a fresh server (stateless), so answers are always computed from the
+current public data (cached for 5 minutes).
+
 ## Build and test
 
 ```bash
-cd mcp && npm install && npm run build   # → dist/server.mjs (git-ignored)
-npm test                                  # unit tests + an end-to-end test against the live data
+cd mcp && npm install && npm run build   # → dist/server.mjs (stdio) + dist/http-local.mjs (git-ignored)
+npm test                                  # unit tests + end-to-end tests (stdio and HTTP) against the live data
+node dist/http-local.mjs                  # the HTTP server locally: http://localhost:8787/mcp
+npm run build:function                    # bundle the Cloud Function into ../functions/lib (also run on deploy)
 ```
 
 Rebuild after changing `web/src/lib/` so the server uses the same metrics as the app.
 
-## Use it
+## Run it locally (stdio)
 
 - **Claude Code** in this repo: the project's `.mcp.json` registers it; approve it when asked (or `/mcp`).
 - **Claude Desktop**: quit it first (it rewrites the file while running), then open

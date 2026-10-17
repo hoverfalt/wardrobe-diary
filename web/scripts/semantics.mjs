@@ -633,6 +633,10 @@ export function llmsTxt(s) {
 - [Data contracts](${SITE}/def/contracts/public-data.odcs.yaml): Open Data Contract Standard v3, one per dataset
 - [AI evaluation](${SITE}/evals): how reliably an AI answers questions about this data, with and without the semantic layer
 
+## Connect an AI assistant
+- MCP server (Model Context Protocol, Streamable HTTP, read-only, no sign-in): ${SITE}/mcp
+  Tools compute every figure with the app's own metrics; \`explain\` returns any definition; every answer carries provenance.
+
 ## Data
 - Public data document (JSON via Firestore REST): ${s.datasets.find((d) => d.id === "public-data")?.distribution?.[0]?.url ?? ""}
 - Interactive: [Dashboard](${SITE}/dashboard)

@@ -12,8 +12,9 @@ How this file works:
 
 ## Where we left off (2026-10-17)
 
-- **wardrobediary.io now serves the new app** (R-16, switched 2026-10-17); three small follow-ups for Olof are in
-  Now. Next: the public remote MCP server (R-29 phase 2).
+- **wardrobediary.io serves the new app** (R-16, 2026-10-17; Olof added the auth domain, submitted the sitemap and
+  checked GA4), and **the public MCP server is live at https://wardrobediary.io/mcp** (R-29 phase 2). Suggested
+  for Olof: a budget alert in Google Cloud Billing (e.g. €5/month) now that a Cloud Function is public.
 - **Done 2026-10-13 … 16:** local emulator testing of the signed-in UI (R-39); code splitting and Python 3.12
   (R-18); the new site's landing page, redirects and sitemap, ready for the switch (R-16 steps 1–2); the repo
   made public with a cleaned history, MIT + CC BY 4.0 licences, security scanning, and Dependabot fixes (R-42);
@@ -31,20 +32,14 @@ _(empty)_
 
 ## Now
 
-- **R-16 Domain switch: live since 2026-10-17.** Remaining for Olof: (a) Firebase console → Authentication →
-  Settings → Authorized domains → add `wardrobediary.io` (sign-in for Log/Manage on the new domain); (b) Search
-  Console → Sitemaps → submit `https://wardrobediary.io/sitemap.xml`; (c) check in GA4 Realtime that visits
-  arrive. Then close R-16.
+_(nothing in progress)_
 
 ## Next
 
-1. **R-29 phase 2 / R-40 phase 5: public remote MCP server** (after R-16): the MCP server over HTTP on Cloud Run
-   (or similar), reading only the public data, so anyone can connect an AI assistant to wardrobediary.io;
-   listed on the site with setup instructions.
-2. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
+1. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
    condition, more interpretation-heavy questions; a comparison tool in the MCP server (comparison questions
    were left out of the evaluation for lack of one).
-3. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
+2. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
    the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
@@ -165,7 +160,15 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
-- **R-16** 2026-10-17 Domain switch: wardrobediary.io now served by Firebase Hosting (site `wardrobediary`), with a
+- **R-29 phase 2 / R-40 phase 5** 2026-10-17 Public MCP server at `https://wardrobediary.io/mcp`: the same server
+  definition over MCP Streamable HTTP (stateless, read-only, public data, semantic layer and provenance on), as a
+  2nd-gen Cloud Function in europe-north1 (≤ 2 instances, 256 MiB, 60 s) behind a Hosting rewrite; own codebase
+  `mcp` so the old v1 image-resize extension function is untouched; image cleanup policy 1 day. Tested: HTTP
+  end-to-end test with a real client (CI), the Functions emulator, then live (10 tools, figures match the
+  Dashboard, provenance, `explain`). Listed in `/llms.txt`, on the landing page and in `mcp/README.md#connect`;
+  the catalog's public-data distribution updated (semantic layer 0.2.2).
+
+- **R-16** 2026-10-17 Domain switch (follow-ups done by Olof: auth domain, sitemap, GA4): wardrobediary.io now served by Firebase Hosting (site `wardrobediary`), with a
   certificate issued before the switch (Advanced setup: ownership TXT, `_acme-challenge` TXT, then the A record
   `199.36.158.100`), so visitors never saw a certificate warning. `www` redirects to the apex with its own
   certificate. Verified live: all 23 old-page redirects incl. `?trk=` links, all pages, old hoverfalt.github.io

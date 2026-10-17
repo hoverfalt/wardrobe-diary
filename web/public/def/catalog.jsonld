@@ -31,7 +31,7 @@
   "@type": "dct:PeriodOfTime",
   "dcat:startDate": "2018-01-01"
  },
- "owl:versionInfo": "0.2.1",
+ "owl:versionInfo": "0.2.2",
  "dcat:dataset": [
   {
    "@id": "https://wardrobediary.io/data#garments",
@@ -520,8 +520,8 @@
     },
     {
      "@type": "dcat:Distribution",
-     "dct:format": "MCP server",
-     "dcat:accessURL": "mcp/ (local; public server planned, R-29 phase 2)"
+     "dct:format": "MCP server (Streamable HTTP)",
+     "dcat:accessURL": "https://wardrobediary.io/mcp"
     }
    ],
    "prov:wasDerivedFrom": [

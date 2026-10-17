@@ -120,7 +120,7 @@ datasets:
     distribution:
       - {format: Firestore REST (JSON), url: "https://firestore.googleapis.com/v1/projects/threddit-297417/databases/(default)/documents/users/0q0I90W7W3RAcgFN1c1JX6pZupG3/public/data"}
       - {format: web app, url: "https://wardrobediary.io/dashboard"}
-      - {format: MCP server, url: "mcp/ (local; public server planned, R-29 phase 2)"}
+      - {format: "MCP server (Streamable HTTP)", url: "https://wardrobediary.io/mcp"}
     lineage:
       - {from: [dataset:garments, dataset:days, dataset:comparison], activity: "updated in the same write as every change in the app (transactions / batches)", decision: decision:D-1}
     fields:

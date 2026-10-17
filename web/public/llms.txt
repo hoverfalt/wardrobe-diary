@@ -2,7 +2,7 @@
 
 > One person's daily log, since 1 January 2018, of every garment worn, with what each garment cost, and the
 > real cost and use of a wardrobe derived from it. All data is open (CC BY 4.0) and every figure is defined in a
-> machine-readable semantic layer (version 0.2.1). Use these definitions when interpreting the data.
+> machine-readable semantic layer (version 0.2.2). Use these definitions when interpreting the data.
 
 ## Definitions and metadata
 - [Glossary](https://wardrobediary.io/glossary): every term (cost per wear, days used, ownership, wears…); SKOS JSON-LD: https://wardrobediary.io/def/glossary.jsonld
@@ -10,6 +10,10 @@
 - [Data catalog](https://wardrobediary.io/data): datasets, fields, access, lineage, live quality checks; DCAT JSON-LD: https://wardrobediary.io/def/catalog.jsonld
 - [Data contracts](https://wardrobediary.io/def/contracts/public-data.odcs.yaml): Open Data Contract Standard v3, one per dataset
 - [AI evaluation](https://wardrobediary.io/evals): how reliably an AI answers questions about this data, with and without the semantic layer
+
+## Connect an AI assistant
+- MCP server (Model Context Protocol, Streamable HTTP, read-only, no sign-in): https://wardrobediary.io/mcp
+  Tools compute every figure with the app's own metrics; `explain` returns any definition; every answer carries provenance.
 
 ## Data
 - Public data document (JSON via Firestore REST): https://firestore.googleapis.com/v1/projects/threddit-297417/databases/(default)/documents/users/0q0I90W7W3RAcgFN1c1JX6pZupG3/public/data

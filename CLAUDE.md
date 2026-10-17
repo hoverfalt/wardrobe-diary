@@ -21,7 +21,7 @@ read-only MCP server. The project is also a public example of data governance fo
 (`semantics/`) published as `/glossary`, `/model`, `/data`, JSON-LD and data contracts, served by the MCP server
 (`explain`, provenance), with live and nightly quality checks and an AI evaluation (`/evals`). Since 2026-10-17
 **wardrobediary.io serves this app** (domain switch R-16): the static landing page at `/`, 301 redirects for every
-old page, the sitemap. Next: the public MCP server (R-29 phase 2).
+old page, the sitemap. The public MCP server runs at https://wardrobediary.io/mcp (R-29 phase 2, 2026-10-17).
 
 ## Environment
 
@@ -245,6 +245,14 @@ in the prompt; the real MCP server with `WARDROBE_SEMANTICS=off`; with the seman
 
 ## MCP server (`mcp/`, R-29)
 
+**Public at `https://wardrobediary.io/mcp`** (since 2026-10-17): MCP Streamable HTTP, stateless, read-only. The
+server definition is `mcp/src/createServer.ts`; `src/server.ts` serves it over stdio (Claude Code via `.mcp.json`,
+Claude Desktop), `src/http.ts` over HTTP (`src/http-local.mjs` locally). The Cloud Function `mcp`
+(`src/function.ts`, 2nd gen, europe-north1, ≤ 2 instances, 256 MiB, 60 s) is bundled into `functions/lib/` by
+`npm run build:function` (also the functions predeploy) and deployed as codebase `mcp`
+(`cd web && npx firebase deploy --only functions:mcp`), which never touches the project's other functions;
+Firebase Hosting rewrites `/mcp` to it. Container images in europe-north1 are cleaned after 1 day.
+
 Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key;
 `web/src/lib/firestoreRest.ts`), caches it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own.
 Tools: overview, category listing, garments (list/one, incl. materials, composition and weight, fibre and weight
@@ -292,6 +300,7 @@ cd web && node e2e/redirect-check.mjs      # every old wardrobediary.io address 
 cd web && npm run semantics                # regenerate pages, JSON-LD, contracts from semantics/*.yaml
 cd web && node scripts/quality-check.mjs   # data quality on the live public data (--source <backup> for the full check)
 cd mcp && npm run evals -- run             # AI evaluation (needs ANTHROPIC_API_KEY); then npm run semantics in web/
+cd web && npx firebase deploy --only functions:mcp   # the public MCP server (after changes in mcp/src or web/src/lib)
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 

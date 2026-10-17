@@ -21,7 +21,7 @@
     "@value": "Wardrobe Diary glossary",
     "@language": "en"
    },
-   "owl:versionInfo": "0.2.1",
+   "owl:versionInfo": "0.2.2",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    },

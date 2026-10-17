@@ -16,7 +16,7 @@ title: Wardrobe Diary semantic layer
 description: >-
   Meaning, definitions, lineage and quality of the Wardrobe Diary data: one person's daily log of every garment
   worn since 1 January 2018, with purchase prices, dates, materials and weights, and the metrics derived from it.
-version: 0.2.1
+version: 0.2.2
 status: draft
 base_iri: https://wardrobediary.io/def/
 language: en
@@ -37,3 +37,4 @@ changelog:
   - {version: 0.1.0, date: 2026-10-16, change: "First version, written from the app's code, tests and decisions."}
   - {version: 0.2.0, date: 2026-10-16, change: "Category cost per wear pooled over lifetime wears with unworn garments included (D-2 amended)."}
   - {version: 0.2.1, date: 2026-10-16, change: "Fixed four definitions cut short at a comma (YAML quoting); materials coverage marked informational."}
+  - {version: 0.2.2, date: 2026-10-17, change: "Public data distributed through the public MCP server at https://wardrobediary.io/mcp."}

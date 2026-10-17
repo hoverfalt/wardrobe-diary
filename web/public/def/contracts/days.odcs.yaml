@@ -3,7 +3,7 @@ apiVersion: v3.0.2
 kind: DataContract
 id: wardrobe-diary-days
 name: Wear log
-version: 0.2.1
+version: 0.2.2
 status: active
 domain: wardrobe-diary
 dataProduct: The Wardrobe Diary Project

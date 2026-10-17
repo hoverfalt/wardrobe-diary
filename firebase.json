@@ -9,6 +9,13 @@
     ],
     "rewrites": [
       {
+        "source": "/mcp",
+        "function": {
+          "functionId": "mcp",
+          "region": "europe-north1"
+        }
+      },
+      {
         "source": "/glossary",
         "destination": "/glossary.html"
       },
@@ -236,5 +243,20 @@
       "port": 4000
     },
     "singleProjectMode": true
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "mcp",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".gitignore",
+        "README.md"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR/../mcp\" run build:function"
+      ]
+    }
+  ]
 }
