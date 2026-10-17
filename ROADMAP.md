@@ -40,8 +40,6 @@ _(nothing in progress)_
 1. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
    condition, more interpretation-heavy questions; a comparison tool in the MCP server (comparison questions
    were left out of the evaluation for lack of one).
-2. **R-10 Golden data from R** (optional now): the live-site tables in `reference/live/` already validate
-   the port; exporting more R outputs only matters if a metric is disputed.
 
 ## Later
 
@@ -104,6 +102,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-17 R-10 closed (Olof):** no further golden data exported from the R pipeline. The live site's tables
+  (snapshot 2026-09-03) already validate the port in `metrics.reference.test.ts`, and the deliberate differences
+  (e.g. D-2) are documented there and in the semantic layer.
 
 - **2026-10-12 Q-2** Sheet row colours in column B: light blue = kept in Hanko (not consistently applied, so
   combined with "(Hanko)" in names), grey-blue = bicycle gear, pink = motorcycle gear. Now tags (R-37).
