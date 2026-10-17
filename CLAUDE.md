@@ -251,7 +251,9 @@ Claude Desktop), `src/http.ts` over HTTP (`src/http-local.mjs` locally). The Clo
 (`src/function.ts`, 2nd gen, europe-north1, ≤ 2 instances, 256 MiB, 60 s) is bundled into `functions/lib/` by
 `npm run build:function` (also the functions predeploy) and deployed as codebase `mcp`
 (`cd web && npx firebase deploy --only functions:mcp`), which never touches the project's other functions;
-Firebase Hosting rewrites `/mcp` to it. Container images in europe-north1 are cleaned after 1 day.
+Firebase Hosting rewrites `/mcp` to it. Container images in europe-north1 are cleaned after 1 day. `mcp` is the project's
+only function since the old 2021 `storage-resize-images` extension was removed (2026-10-17; its `thumbs/` files
+remain). `firebase.json` has an empty `extensions` list: deploying extensions removes any extension not listed.
 
 Read-only MCP server over stdio: reads the public `public/data` document via Firestore REST (no key;
 `web/src/lib/firestoreRest.ts`), caches it 5 minutes, and bundles `web/src/lib/*` so its metrics are the app's own.

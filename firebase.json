@@ -258,5 +258,6 @@
         "npm --prefix \"$RESOURCE_DIR/../mcp\" run build:function"
       ]
     }
-  ]
+  ],
+  "extensions": {}
 }
