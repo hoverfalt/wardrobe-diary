@@ -10,10 +10,10 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-16)
+## Where we left off (2026-10-17)
 
-- **Next: the domain switch (R-16)**, see Now for the step-by-step pickup. Then the public remote MCP server
-  (R-29 phase 2), which waits for the domain.
+- **wardrobediary.io now serves the new app** (R-16, switched 2026-10-17); three small follow-ups for Olof are in
+  Now. Next: the public remote MCP server (R-29 phase 2).
 - **Done 2026-10-13 … 16:** local emulator testing of the signed-in UI (R-39); code splitting and Python 3.12
   (R-18); the new site's landing page, redirects and sitemap, ready for the switch (R-16 steps 1–2); the repo
   made public with a cleaned history, MIT + CC BY 4.0 licences, security scanning, and Dependabot fixes (R-42);
@@ -31,41 +31,10 @@ _(empty)_
 
 ## Now
 
-- **R-16 Domain switch – in progress (2026-10-16 evening).** Status: Firebase custom domain (site `wardrobediary`,
-  Advanced setup) stages 1 (ownership TXT `hosting-site=wardrobediary`) and 2 (certificate, `_acme-challenge` TXT)
-  **done**; certificate issued (Google Trust Services, valid to 2027-01-11) and verified by Claude via Firebase's IP:
-  all redirects and pages OK under wardrobediary.io. Stage 3: Olof changed the Bluehost `@` A record to
-  `199.36.158.100` (TTL 15 min) at ~19:15 UTC; **Bluehost had not published it an hour later** (its servers are
-  slow to publish `@` changes: the TXT edit took over an hour). When `dig wardrobediary.io` shows 199.36.158.100:
-  run the step-5 checks below, then add `www.wardrobediary.io` in Firebase (redirect to the apex) and submit the
-  sitemap. If it still isn't published by the next session, confirm the Bluehost page shows the new value, then
-  ask Bluehost support. Keep the `_acme-challenge` and `hosting-site` TXT records.
-
-  Original plan (2026-10-13): Everything on the new site is done
-  and live on wardrobediary.web.app (landing page at `/` with Olof's content edits, Dashboard at `/dashboard`,
-  23 redirects, sitemap; `node web/e2e/redirect-check.mjs` all OK). wardrobediary.io still shows the old
-  GitHub Pages site, so nothing is broken meanwhile. Olof had trouble with Bluehost's DNS settings.
-
-  **Pick up here** (Olof does steps 1–4 in the consoles; Claude checks each step):
-  1. **Firebase console → Hosting → site `wardrobediary`** (not `threddit-297417`) → *Add custom domain* →
-     `wardrobediary.io`. Then add `www.wardrobediary.io` with "Redirect to wardrobediary.io". Firebase lists
-     the records to create: a TXT record (ownership) and A record(s) (and possibly an ACME TXT/CNAME for the
-     certificate). Screenshot it for Claude.
-  2. **Bluehost → Domains → wardrobediary.io → DNS** (the DNS zone editor; the domain uses Bluehost's
-     nameservers ns1/ns2.bluehost.com, so records are edited there). Today's records: `@` A
-     `185.199.108.153` (GitHub Pages) and `www` CNAME `wardrobediary.io`. Change: add Firebase's TXT; replace
-     the `@` A value(s) with Firebase's; set `www` as Firebase says. Lowest TTL offered. If Bluehost's editor
-     won't allow a change (e.g. a locked or "managed" record), screenshot it for Claude, or ask Bluehost
-     support to set the records (send them Firebase's list).
-  3. Back in Firebase, wait for *Connected* (DNS minutes to hours; certificate usually < 1 h).
-  4. Search Console: submit `https://wardrobediary.io/sitemap.xml`.
-  5. Claude: `dig wardrobediary.io` shows Firebase's IPs; `node web/e2e/redirect-check.mjs https://wardrobediary.io`
-     all OK; old `hoverfalt.github.io/portfolio.html` → `wardrobediary.io/portfolio.html` → `/dashboard`; GA4
-     receives page views; then close R-16.
-
-  Keep: the GitHub Pages repo `hoverfalt/hoverfalt.github.io` and its `CNAME` file (keeps github.io links
-  redirecting) and the Firebase site `threddit-297417` (old chart images). Rollback if anything goes wrong:
-  set the `@` A record back to `185.199.108.153`.
+- **R-16 Domain switch: live since 2026-10-17.** Remaining for Olof: (a) Firebase console → Authentication →
+  Settings → Authorized domains → add `wardrobediary.io` (sign-in for Log/Manage on the new domain); (b) Search
+  Console → Sitemaps → submit `https://wardrobediary.io/sitemap.xml`; (c) check in GA4 Realtime that visits
+  arrive. Then close R-16.
 
 ## Next
 
@@ -195,6 +164,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-16** 2026-10-17 Domain switch: wardrobediary.io now served by Firebase Hosting (site `wardrobediary`), with a
+  certificate issued before the switch (Advanced setup: ownership TXT, `_acme-challenge` TXT, then the A record
+  `199.36.158.100`), so visitors never saw a certificate warning. `www` redirects to the apex with its own
+  certificate. Verified live: all 23 old-page redirects incl. `?trk=` links, all pages, old hoverfalt.github.io
+  links (two hops to the right page), http → https. Bluehost took about an hour or more to publish each `@` change.
 
 - **R-43** 2026-10-16 The semantic layer made findable: an "Open data, explained" section on the landing page
   (with the evaluation result as a first experiment, linked to its caveats) and a "Data & definitions" menu item;

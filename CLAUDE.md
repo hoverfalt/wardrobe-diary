@@ -19,18 +19,17 @@ everything on the live site except the static text pages, and goes beyond it: ga
 winter, summer) with Log page filters, sortable tables, a managed spending comparison, nightly backups and a
 read-only MCP server. The project is also a public example of data governance for AI (R-40): a semantic layer
 (`semantics/`) published as `/glossary`, `/model`, `/data`, JSON-LD and data contracts, served by the MCP server
-(`explain`, provenance), with live and nightly quality checks and an AI evaluation (`/evals`). The static landing
-page at `/`, redirects for the old pages and the sitemap are ready on wardrobediary.web.app; **next is the domain
-switch (ROADMAP R-16, Now)**, after which the public MCP server follows. The live site must not be touched until
-the domain switch.
+(`explain`, provenance), with live and nightly quality checks and an AI evaluation (`/evals`). Since 2026-10-17
+**wardrobediary.io serves this app** (domain switch R-16): the static landing page at `/`, 301 redirects for every
+old page, the sitemap. Next: the public MCP server (R-29 phase 2).
 
 ## Environment
 
 | Thing | Value |
 |---|---|
 | Firebase project | `threddit-297417` ("Threddit") |
-| Live site wardrobediary.io (do not touch until R-16) | **GitHub Pages**, public repo `hoverfalt/hoverfalt.github.io` (R Markdown output; `CNAME` = wardrobediary.io; hoverfalt.github.io 301s to it). DNS at Bluehost (A 185.199.108.153; www has no working HTTPS). Its chart images are served by the Firebase Hosting site `threddit-297417` (`threddit-297417.web.app/Category-*.png`, 89 PNG/GIF, last deployed 2021) and its photos from Storage; do not deploy to that site either |
-| New app | Hosting site `wardrobediary` → https://wardrobediary.web.app (deploy target `app`) |
+| wardrobediary.io (since 2026-10-17) | Served by the Firebase Hosting site `wardrobediary` (custom domain + `www` redirect, certificates by Google Trust Services, auto-renewed). DNS at Bluehost (ns1/ns2.bluehost.com): `@` A `199.36.158.100`, TXT `hosting-site=wardrobediary`, TXT `_acme-challenge` (keep both), TXT `google-site-verification` (Search Console), `www` CNAME `wardrobediary.io`. Bluehost publishes `@` changes slowly (an hour or more). The old GitHub Pages repo `hoverfalt/hoverfalt.github.io` stays (its CNAME keeps hoverfalt.github.io links redirecting); the old Firebase site `threddit-297417` stays (old chart images that articles may embed): never deploy to it |
+| New app | Hosting site `wardrobediary` → https://wardrobediary.io and https://wardrobediary.web.app (deploy target `app`) |
 | Firestore | `(default)` database, Native mode (switched from empty Datastore mode), location `eur3` |
 | Storage buckets | `threddit-297417.appspot.com`: garment photos `<photoId>.png` (228 × 228 PNG; always use these originals, not the `thumbs/` copies) and category images, shared with the live site. `threddit-plots`: the live site's chart images. Rules are versioned here (`storage.rules`, `storage-plots.rules`, deploy targets `photos` / `plots`): everything publicly readable; only the owner may upload, and only `<Photo id>.png` or `Comparison-<Name>.png`; no deletes. Deploy deliberately with `cd web && npx firebase deploy --only storage` and re-check that the live site's images still load |
 | Owner uid | `0q0I90W7W3RAcgFN1c1JX6pZupG3` |
@@ -296,7 +295,7 @@ cd mcp && npm run evals -- run             # AI evaluation (needs ANTHROPIC_API_
 cd web && npm run deploy                   # build + deploy hosting:app (wardrobediary.web.app) + Firestore rules/indexes
 ```
 
-Never run a bare `firebase deploy` or `--only hosting` without the `:app` target: the default site is the live one.
+Never run a bare `firebase deploy` or `--only hosting` without the `:app` target: the default site `threddit-297417` holds the old chart images.
 
 ## Conventions
 
