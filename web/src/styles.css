@@ -238,3 +238,4 @@ th.num .sort-header { justify-content: flex-end; }
 .app-footer { margin: 40px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
   display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .app-footer a { color: inherit; }
+.manage-more { margin-top: 16px; }
