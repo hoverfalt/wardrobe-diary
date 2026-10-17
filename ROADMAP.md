@@ -13,8 +13,8 @@ How this file works:
 ## Where we left off (2026-10-17)
 
 - **wardrobediary.io serves the new app** (R-16, 2026-10-17; Olof added the auth domain, submitted the sitemap and
-  checked GA4), and **the public MCP server is live at https://wardrobediary.io/mcp** (R-29 phase 2). Suggested
-  for Olof: a budget alert in Google Cloud Billing (e.g. €5/month) now that a Cloud Function is public. The old
+  checked GA4), and **the public MCP server is live at https://wardrobediary.io/mcp** (R-29 phase 2). A budget
+  alert in Google Cloud Billing is set (Olof, 2026-10-17). The old
   2021 image-resize extension (Node 10 function) was removed 2026-10-17; its 443 `thumbs/` files are kept.
 - **Done 2026-10-13 … 16:** local emulator testing of the signed-in UI (R-39); code splitting and Python 3.12
   (R-18); the new site's landing page, redirects and sitemap, ready for the switch (R-16 steps 1–2); the repo

@@ -36,6 +36,7 @@ old page, the sitemap. The public MCP server runs at https://wardrobediary.io/mc
 | Sheet | id `1IQgCth6qPDHv_mqh8wSg9MaphLPR5dlTv0pi2QgAJLM`, tab `Threddit`, shared read-only with the Admin SDK service account |
 | Service-account key | `tools/threddit-297417-firebase-adminsdk-*.json` (git-ignored) |
 | Web config | `web/.env.local` (git-ignored), from the registered web app "Wardrobe Diary" |
+| Google Cloud billing | Blaze plan; a monthly budget alert (email only) covers project `threddit-297417` |
 | GitHub | Repo public. Actions: `Tests` (`.github/workflows/ci.yml`, every push) and `Data quality` (`data-quality.yml`, nightly 03:30 UTC). Secret scanning + push protection, Dependabot alerts + security updates, malware alerts on. **The stored git token lacks the `workflow` scope**: changes under `.github/workflows/` must be made by Olof in GitHub's web editor (then `git fetch` and fast-forward) |
 | AI evaluation | Olof's own Anthropic API account (prepaid credits), used only by `mcp/evals` runs he starts with `ANTHROPIC_API_KEY` set via `read -s` (never stored in files) |
 | Toolchain | Node 24 (≥ 20.19 required); `firebase-tools` is a devDependency of `web/` (use `npx firebase`, not the stale global one); Python 3.12 venv in `tools/.venv`, built from the user-local standalone Python in `~/.local/share/python-3.12.*` (the system's 3.9 is end of life; recreate with `~/.local/share/python-3.12.15/bin/python3 -m venv tools/.venv && tools/.venv/bin/pip install -r tools/requirements.txt`); the nightly backup job also runs 3.12 |
