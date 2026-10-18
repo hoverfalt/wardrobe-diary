@@ -31,7 +31,7 @@
   "@type": "dct:PeriodOfTime",
   "dcat:startDate": "2018-01-01"
  },
- "owl:versionInfo": "0.3.0",
+ "owl:versionInfo": "0.3.1",
  "dcat:dataset": [
   {
    "@id": "https://wardrobediary.io/data#garments",
@@ -565,6 +565,14 @@
      "schema:name": "rank",
      "schema:description": "The chosen garment's position in the proposals (0 = best).",
      "schema:valueReference": "integer",
+     "required": false
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.mode",
+     "@type": "schema:PropertyValue",
+     "schema:name": "mode",
+     "schema:description": "match (best matches) or browse (only a garment type was said: that type's garments by photo, most worn lately first).",
+     "schema:valueReference": "text",
      "required": false
     },
     {

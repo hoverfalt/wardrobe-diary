@@ -8,7 +8,7 @@ import { photoUrl } from "../firebase";
 import { lastWornBefore, matchGarment, type MatchResult } from "../lib/voiceMatch";
 import type { Day, Garment, IsoDate } from "../types";
 
-export const MATCHER = "voiceMatch v1 (words, no AI)";
+export const MATCHER = "voiceMatch v1.1 (words + browse by type, no AI)";
 
 export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
   uid: string;
@@ -30,7 +30,7 @@ export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
     const query = text.trim();
     if (!query) return;
     const r = matchGarment(query, candidates, lastWorn, recent);
-    const logId = logVoiceQuery(uid, { at: new Date().toISOString(), date, text: query, proposals: r.candidates.map((c) => c.garment.id), matcher: MATCHER });
+    const logId = logVoiceQuery(uid, { at: new Date().toISOString(), date, text: query, proposals: r.candidates.map((c) => c.garment.id), mode: r.mode, matcher: MATCHER });
     setResult({ ...r, query, logId });
     setAdded(null);
     input.current?.blur(); // hide the keyboard so the match is visible
@@ -69,7 +69,23 @@ export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
       {added && !result && <p className="voice-added">✓ Added {added}. Describe the next item, or tap 🎤 on the keyboard.</p>}
       {result && (
         <div className="voice-result" aria-live="polite">
-          {best ? (
+          {result.mode === "browse" && result.candidates.length > 0 ? (
+            <>
+              <p className="muted voice-browse-note">
+                {result.unplaced.length > 0 && <>Couldn't place “{result.unplaced.join(" ")}”. </>}
+                Most worn lately first; tap the one you wore.
+              </p>
+              <div className="voice-grid">
+                {result.candidates.map((c, i) => (
+                  <button key={c.garment.id} className="tile" onClick={() => add(c.garment, i)}>
+                    {photoUrl(c.garment) && <img src={photoUrl(c.garment)!} alt="" loading="lazy" />}
+                    <span>{c.garment.item}</span>
+                    {c.groupSize > 1 && <small className="muted">1 of {c.groupSize} identical</small>}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : best ? (
             <>
               <div className="voice-best">
                 {photoUrl(best.garment) && <img src={photoUrl(best.garment)!} alt="" />}

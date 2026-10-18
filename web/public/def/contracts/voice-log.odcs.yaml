@@ -3,7 +3,7 @@ apiVersion: v3.0.2
 kind: DataContract
 id: wardrobe-diary-voice-log
 name: Dictation log
-version: 0.3.0
+version: 0.3.1
 status: active
 domain: wardrobe-diary
 dataProduct: The Wardrobe Diary Project
@@ -54,6 +54,11 @@ schema:
         physicalType: integer
         required: false
         description: The chosen garment's position in the proposals (0 = best).
+      - name: mode
+        logicalType: string
+        physicalType: text
+        required: false
+        description: "match (best matches) or browse (only a garment type was said: that type's garments by photo, most worn lately first)."
       - name: matcher
         logicalType: string
         physicalType: text

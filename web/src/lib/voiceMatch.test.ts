@@ -44,6 +44,9 @@ describe("voice matching", () => {
     expect(normalise("Jack & Jones boxers")).toEqual(["jackjone", "boxer"]);
     expect(spokenNumbers(normalise("jockey white zero four"))).toEqual([4]);
     expect(spokenNumbers(normalise("jockey white number 4"))).toEqual([4]);
+    expect(spokenNumbers(normalise("jacket, the quilted one"))).toEqual([]);
+    expect(spokenNumbers(normalise("jockey white number one"))).toEqual([1]);
+    expect(spokenNumbers(normalise("jockey white zero one"))).toEqual([1]);
   });
 
   it("finds garments from brand, colour and type", () => {
@@ -100,5 +103,28 @@ describe("voice matching", () => {
     expect(r.candidates[0].garment.category).toBe("Pants");
     expect(matchGarment("umbrella", W, last).candidates).toEqual([]);
     expect(matchGarment("", W, last).candidates).toEqual([]);
+  });
+
+  it("browses a type said on its own: most worn lately first, identical items as one", () => {
+    const recent = new Map([[byName("Crivit black hoodie").id, 9], [byName("Haglöfs LIM GTX Jacket").id, 4]]);
+    const r = matchGarment("Jacket", W, last, recent);
+    expect(r.mode).toBe("browse");
+    expect(r.candidates.map((c) => c.garment.item).slice(0, 2)).toEqual(["Crivit black hoodie", "Haglöfs LIM GTX Jacket"]);
+    expect(r.candidates.every((c) => c.garment.category === "Jackets and hoodies")).toBe(true);
+    const shirts = matchGarment("undershirts", W, last);
+    expect(shirts.mode).toBe("browse");
+    expect(shirts.candidates[0]).toMatchObject({ groupSize: 6 });
+    expect(shirts.candidates[0].garment.item).toBe("Jockey white 03"); // worn longest ago
+  });
+
+  it("browses when the other words fit nothing of the type, and says which", () => {
+    const r = matchGarment("Jacket, the cozy one", W, last);
+    expect(r.mode).toBe("browse");
+    expect(r.unplaced).toEqual(["cozy"]);
+  });
+
+  it("still matches directly when a word narrows the type down", () => {
+    expect(matchGarment("Jacket, Haglöfs", W, last)).toMatchObject({ mode: "match" });
+    expect(matchGarment("Jacket, Haglöfs", W, last).candidates[0].garment.item).toBe("Haglöfs LIM GTX Jacket");
   });
 });

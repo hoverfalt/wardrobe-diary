@@ -33,6 +33,19 @@ try {
   const afterVoice = await page.$eval(".log-outfit strong", (e) => e.textContent);
   check("adding the proposal logs the wear", beforeVoice !== afterVoice, `${beforeVoice} → ${afterVoice}`);
 
+  // Browse by type (R-44): only a category said → photos of that type, tap to add.
+  await page.type('.voice-form input', "Jacket");
+  await page.click('.voice-form button[type="submit"]');
+  await page.waitForSelector(".voice-grid .tile", { timeout: 10000 });
+  const tiles = await page.$$eval(".voice-grid .tile", (t) => t.length);
+  check("a category alone shows a photo grid", tiles > 1, `${tiles} jackets`);
+  await shot(page, "voice-browse");
+  const beforeBrowse = await page.$eval(".log-outfit strong", (e) => e.textContent);
+  await page.click(".voice-grid .tile");
+  await page.waitForFunction((b) => document.querySelector(".log-outfit strong")?.textContent !== b, { timeout: 10000 }, beforeBrowse).catch(() => {});
+  const afterBrowse = await page.$eval(".log-outfit strong", (e) => e.textContent);
+  check("tapping a photo in the grid logs it", beforeBrowse !== afterBrowse, `${beforeBrowse} → ${afterBrowse}`);
+
   await clickText(page, "button", "Filters");
   await clickText(page, ".tag-toggle", "Hanko"); // neutral → include
   await clickText(page, ".tag-toggle", "Hanko"); // include → exclude

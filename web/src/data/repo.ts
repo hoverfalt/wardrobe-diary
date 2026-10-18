@@ -219,6 +219,8 @@ export interface VoiceLogEntry {
   chosen: string | null;
   /** Position of the chosen garment in the proposals (0 = best), or null. */
   rank: number | null;
+  /** "match" (best matches) or "browse" (a type's garments by photo). */
+  mode: "match" | "browse";
   matcher: string;
 }
 

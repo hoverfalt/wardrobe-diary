@@ -125,6 +125,7 @@ datasets:
       - {name: proposals, type: "list of garment ids", required: true, definition: "The proposed garments, best first."}
       - {name: chosen, type: text, required: false, definition: "The garment added from the proposals, or empty if none was."}
       - {name: rank, type: integer, required: false, definition: "The chosen garment's position in the proposals (0 = best)."}
+      - {name: mode, type: text, required: false, definition: "match (best matches) or browse (only a garment type was said: that type's garments by photo, most worn lately first)."}
       - {name: matcher, type: text, required: true, definition: "Which matcher made the proposals, e.g. voiceMatch v1."}
 
   - id: public-data

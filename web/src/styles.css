@@ -252,3 +252,6 @@ th.num .sort-header { justify-content: flex-end; }
 .voice-alternatives { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .voice-added { margin: 6px 0 0; color: var(--ok, #1f7a3d); font-size: 14px; }
 .link-button { align-self: flex-start; border: 0; padding: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }
+.voice-browse-note { margin: 0; font-size: 13px; }
+.voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.voice-grid .tile small { font-size: 11px; }

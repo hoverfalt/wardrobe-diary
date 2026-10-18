@@ -177,6 +177,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   are represented by the one worn longest ago (Olof's rotation rule; the recent-wear nudge never overrides it).
   Each description, the proposals and the choice are recorded in `voiceLog` (owner-only, in the catalog and the
   nightly backup) to measure accuracy. Decisions by Olof: English, one item at a time first.
+  Then (same day, Olof's idea): saying the category first works as a filter ("Jacket, Barbour"), and a category
+  said alone ("Jacket") or with words that fit nothing of it shows that category's garments as photos, most worn
+  in the last 60 days first (identical items as one, shown by the one worn longest ago); "one" counts as a number
+  only as "number one" / "zero one". Materials left out of matching (Olof: not how he describes garments).
 
 - **R-29 phase 2 / R-40 phase 5** 2026-10-17 Public MCP server at `https://wardrobediary.io/mcp`: the same server
   definition over MCP Streamable HTTP (stateless, read-only, public data, semantic layer and provenance on), as a

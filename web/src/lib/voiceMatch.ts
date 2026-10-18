@@ -18,6 +18,11 @@ export interface MatchCandidate {
 export interface MatchResult {
   /** Normalised words of the description, as matched. */
   words: string[];
+  /** "match": the best matches for a specific description. "browse": only a garment type was said (or the other
+   *  words fit nothing of that type), so the candidates are that type's garments, most worn lately first. */
+  mode: "match" | "browse";
+  /** Browse mode: the spoken words that fit no garment of the type (e.g. ["cozy"]). */
+  unplaced: string[];
   candidates: MatchCandidate[];
 }
 
@@ -77,7 +82,8 @@ export function spokenNumbers(words: string[]): number[] {
     else if (w in NUMBER_WORDS) {
       // "zero four" / "oh four" → 4 (the zero is a leading zero); a lone "oh"/"zero" means 0 only at the end.
       if ((w === "zero" || w === "oh") && words[i + 1] in NUMBER_WORDS) continue;
-      if (w === "one" && i === 0) continue; // "one black…" is an article here, not a number
+      // "one" is usually a pronoun ("the quilted one"): a number only as "number one", "zero one" or "oh one".
+      if (w === "one" && !["number", "zero", "oh", "no"].includes(words[i - 1] ?? "")) continue;
       out.push(NUMBER_WORDS[w]);
     }
   }
@@ -131,6 +137,7 @@ export function matchGarment(
   lastWorn: Map<string, IsoDate>,
   recent: Map<string, number> = new Map(),
   limit = 4,
+  browseLimit = 8,
 ): MatchResult {
   const all = normalise(description);
   const numbers = spokenNumbers(all);
@@ -151,6 +158,13 @@ export function matchGarment(
   const typeWords = words.filter((q) => q in TYPE_CATEGORY || categoryWords.has(q));
   const ofType = (d: Doc) => typeWords.every((q) => hits(d, q));
   const typed = typeWords.length && docs.some(ofType) ? docs.filter(ofType) : docs;
+
+  // Browse: a type was said and nothing else narrows it down (no other words, or none that fit this type).
+  const otherWords = words.filter((q) => !typeWords.includes(q));
+  const unplaced = otherWords.filter((q) => !typed.some((d) => hits(d, q)));
+  if (typeWords.length && typed !== docs && unplaced.length === otherWords.length) {
+    return { words, mode: "browse", unplaced, candidates: browse(typed, lastWorn, recent, browseLimit) };
+  }
 
   const scored = typed
     .map((d) => {
@@ -200,7 +214,25 @@ export function matchGarment(
     .sort((a, b) => b.score - a.score || a.d.g.item.localeCompare(b.d.g.item))
     .slice(0, limit)
     .map((x) => ({ garment: x.d.g, score: Math.round(x.score * 100) / 100, groupSize: x.size }));
-  return { words, candidates: candidatesOut };
+  return { words, mode: "match", unplaced: [], candidates: candidatesOut };
+}
+
+/** A garment type's garments for picking by photo: identical groups collapsed (shown by the one worn longest ago,
+ *  for the rotation), groups ordered by how often they were worn lately (a group's wears added up). */
+function browse(docs: Doc[], lastWorn: Map<string, IsoDate>, recent: Map<string, number>, limit: number): MatchCandidate[] {
+  const groups = new Map<string, Doc[]>();
+  for (const d of docs) groups.set(d.group, [...(groups.get(d.group) ?? []), d]);
+  const lastOf = (d: Doc) => lastWorn.get(d.g.id) ?? "";
+  return [...groups.values()]
+    .map((members) => ({
+      pick: [...members].sort((a, b) => lastOf(a).localeCompare(lastOf(b)) || a.g.item.localeCompare(b.g.item))[0],
+      wears: members.reduce((s, m) => s + (recent.get(m.g.id) ?? 0), 0),
+      latest: members.map(lastOf).sort().pop() ?? "",
+      size: members.length,
+    }))
+    .sort((a, b) => b.wears - a.wears || b.latest.localeCompare(a.latest) || a.pick.g.item.localeCompare(b.pick.g.item))
+    .slice(0, limit)
+    .map((x) => ({ garment: x.pick.g, score: x.wears, groupSize: x.size }));
 }
 
 /** Each garment's last wear before `date` (for the rotation rule). */
