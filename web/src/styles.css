@@ -239,3 +239,16 @@ th.num .sort-header { justify-content: flex-end; }
   display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .app-footer a { color: inherit; }
 .manage-more { margin-top: 16px; }
+/* "Describe an item" on the Log page (R-44). */
+.voice-find { margin-top: 12px; }
+.voice-form { display: flex; gap: 8px; }
+.voice-form input { flex: 1; min-width: 0; }
+.voice-result { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
+.voice-best { display: flex; align-items: center; gap: 10px; }
+.voice-best img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex: none; }
+.voice-best div { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.voice-best .muted { font-size: 13px; }
+.voice-best button { flex: none; }
+.voice-alternatives { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.voice-added { margin: 6px 0 0; color: var(--ok, #1f7a3d); font-size: 14px; }
+.link-button { align-self: flex-start; border: 0; padding: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }

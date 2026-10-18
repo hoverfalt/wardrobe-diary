@@ -1,5 +1,5 @@
-"""Back up the owner's Firestore data to JSON: garments (with their history), days, deleted garments and
-settings. The public data document is left out (it is derived; restore.py rebuilds it).
+"""Back up the owner's Firestore data to JSON: garments (with their history), days, deleted garments,
+settings and the dictation log. The public data document is left out (it is derived; restore.py rebuilds it).
 
 Since 2026-10-09 Firestore is the only copy of the wear log. A GitHub Actions job runs this script nightly
 in the private repo hoverfalt/wardrobe-diary-backups with a read-only service account (ROADMAP R-28); the
@@ -49,6 +49,7 @@ def backup(db, uid: str) -> dict:
         "days": {d.id: d.to_dict()["worn"] for d in user.collection("days").stream()},
         "deletedGarments": {d.id: d.to_dict() for d in user.collection("deletedGarments").stream()},
         "settings": {d.id: d.to_dict() for d in user.collection("settings").stream()},
+        "voiceLog": {d.id: d.to_dict() for d in user.collection("voiceLog").stream()},
     }
 
 

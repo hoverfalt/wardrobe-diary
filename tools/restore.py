@@ -21,7 +21,7 @@ from backup import backup, firestore_client, to_json
 from sheet_transform import Garment, SheetData, public_document
 
 BATCH_SIZE = 400
-COLLECTIONS = ("garments", "days", "deletedGarments", "settings")
+COLLECTIONS = ("garments", "days", "deletedGarments", "settings", "voiceLog")
 
 
 def comparable(snapshot: dict) -> Dict[str, Dict[str, object]]:

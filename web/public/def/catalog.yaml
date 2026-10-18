@@ -109,6 +109,24 @@ datasets:
       - {name: monthlyCost, type: money-eur, required: true, definition: Monthly cost (entered)., constraints: "≥ 0"}
       - {name: useFrequency, type: share, required: true, definition: Share of days used (entered)., constraints: "0–1", term: term:use-frequency}
 
+  - id: voice-log
+    title: Dictation log
+    description: >-
+      Every item description dictated or typed on the Log page ("Describe an item"), the garments the matcher
+      proposed and the one the owner added (if any), to measure how well matching works and compare matchers.
+    location: "Firestore users/{uid}/voiceLog/{autoId}"
+    classification: owner-only
+    lineage:
+      - {from: owner, activity: "dictated on the Log page; proposals by web/src/lib/voiceMatch.ts", since: 2026-10-18}
+    fields:
+      - {name: at, type: text, required: true, definition: "When it was entered (ISO time)."}
+      - {name: date, type: date, required: true, definition: The day being logged.}
+      - {name: text, type: text, required: true, definition: "The description as dictated or typed."}
+      - {name: proposals, type: "list of garment ids", required: true, definition: "The proposed garments, best first."}
+      - {name: chosen, type: text, required: false, definition: "The garment added from the proposals, or empty if none was."}
+      - {name: rank, type: integer, required: false, definition: "The chosen garment's position in the proposals (0 = best)."}
+      - {name: matcher, type: text, required: true, definition: "Which matcher made the proposals, e.g. voiceMatch v1."}
+
   - id: public-data
     title: Public wardrobe data
     description: >-
@@ -143,7 +161,7 @@ datasets:
     classification: private
     update_frequency: daily at 02:17 UTC
     lineage:
-      - {from: [dataset:garments, dataset:garment-history, dataset:days, dataset:deleted-garments, dataset:settings], activity: "tools/backup.py with a read-only service account", decision: decision:R-28}
+      - {from: [dataset:garments, dataset:garment-history, dataset:days, dataset:deleted-garments, dataset:settings, dataset:voice-log], activity: "tools/backup.py with a read-only service account", decision: decision:R-28}
     fields: []
 
   - id: legacy-sheet

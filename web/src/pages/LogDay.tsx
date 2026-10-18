@@ -9,6 +9,7 @@ import { compareCategories } from "../lib/categories";
 import { addDays, todayIso } from "../lib/dates";
 import { dayLabel, nextTagState, passesTagFilter, recentWears, toggleWorn, type TagFilter } from "../lib/logging";
 import { isActive } from "../lib/metrics";
+import { VoiceFind } from "../components/VoiceFind";
 import type { Wardrobe } from "../lib/publicData";
 import type { Garment } from "../types";
 
@@ -46,6 +47,13 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
       items.sort((a, b) => (recent.get(b.id) ?? 0) - (recent.get(a.id) ?? 0) || a.item.localeCompare(b.item));
     return { categories: [...map.entries()].sort(([a], [b]) => compareCategories(a, b)), hidden };
   }, [wardrobe, date, search, worn, tagFilter]);
+
+  // Garments the "Describe an item" field can propose: active on the day, not yet logged, within the filters.
+  const voiceCandidates = useMemo(
+    () => (wardrobe ? wardrobe.garments.filter((g) => isActive(g, date) && !worn.has(g.id) && passesTagFilter(g, tagFilter)) : []),
+    [wardrobe, date, worn, tagFilter],
+  );
+  const recent = useMemo(() => (wardrobe ? recentWears(wardrobe.days, date) : new Map<string, number>()), [wardrobe, date]);
 
   if (!wardrobe) return <p>Loading…</p>;
 
@@ -86,6 +94,8 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
           })}
         </div>
       </div>
+
+      <VoiceFind uid={uid} date={date} candidates={voiceCandidates} days={wardrobe.days} recent={recent} onAdd={(id) => toggle(id, true)} />
 
       <input type="search" className="log-search" placeholder="Search garments" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search garments" />
 

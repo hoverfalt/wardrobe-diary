@@ -3,7 +3,7 @@ apiVersion: v3.0.2
 kind: DataContract
 id: wardrobe-diary-public-data
 name: Public wardrobe data
-version: 0.2.2
+version: 0.3.0
 status: active
 domain: wardrobe-diary
 dataProduct: The Wardrobe Diary Project

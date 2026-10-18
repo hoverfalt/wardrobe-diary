@@ -87,7 +87,7 @@ def main() -> int:
         for h in g.get("_history", []):
             ops.append((ref.collection("history").document(), {**h, "savedAt": parse_time(h.get("savedAt"))}))
     target = comparable(snapshot)
-    for name in ("days", "deletedGarments", "settings"):
+    for name in ("days", "deletedGarments", "settings", "voiceLog"):
         for doc_id, value in target[name].items():
             if name == "deletedGarments":
                 value = {**value, "deletedAt": parse_time(value.get("deletedAt"))}

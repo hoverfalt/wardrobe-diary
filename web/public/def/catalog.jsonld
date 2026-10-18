@@ -31,7 +31,7 @@
   "@type": "dct:PeriodOfTime",
   "dcat:startDate": "2018-01-01"
  },
- "owl:versionInfo": "0.2.2",
+ "owl:versionInfo": "0.3.0",
  "dcat:dataset": [
   {
    "@id": "https://wardrobediary.io/data#garments",
@@ -498,6 +498,86 @@
    ]
   },
   {
+   "@id": "https://wardrobediary.io/data#voice-log",
+   "@type": "dcat:Dataset",
+   "dct:title": "Dictation log",
+   "dct:description": "Every item description dictated or typed on the Log page (\"Describe an item\"), the garments the matcher proposed and the one the owner added (if any), to measure how well matching works and compare matchers.",
+   "dct:accessRights": {
+    "@id": "http://publications.europa.eu/resource/authority/access-right/RESTRICTED"
+   },
+   "classification": "owner-only",
+   "location": "Firestore users/{uid}/voiceLog/{autoId}",
+   "prov:wasDerivedFrom": [],
+   "prov:qualifiedDerivation": [
+    {
+     "@type": "prov:Derivation",
+     "prov:entity": [
+      "owner"
+     ],
+     "prov:hadActivity": "dictated on the Log page; proposals by web/src/lib/voiceMatch.ts",
+     "since": "2026-10-18"
+    }
+   ],
+   "schema:variableMeasured": [
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.at",
+     "@type": "schema:PropertyValue",
+     "schema:name": "at",
+     "schema:description": "When it was entered (ISO time).",
+     "schema:valueReference": "text",
+     "required": true
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.date",
+     "@type": "schema:PropertyValue",
+     "schema:name": "date",
+     "schema:description": "The day being logged.",
+     "schema:valueReference": "date",
+     "required": true
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.text",
+     "@type": "schema:PropertyValue",
+     "schema:name": "text",
+     "schema:description": "The description as dictated or typed.",
+     "schema:valueReference": "text",
+     "required": true
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.proposals",
+     "@type": "schema:PropertyValue",
+     "schema:name": "proposals",
+     "schema:description": "The proposed garments, best first.",
+     "schema:valueReference": "list of garment ids",
+     "required": true
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.chosen",
+     "@type": "schema:PropertyValue",
+     "schema:name": "chosen",
+     "schema:description": "The garment added from the proposals, or empty if none was.",
+     "schema:valueReference": "text",
+     "required": false
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.rank",
+     "@type": "schema:PropertyValue",
+     "schema:name": "rank",
+     "schema:description": "The chosen garment's position in the proposals (0 = best).",
+     "schema:valueReference": "integer",
+     "required": false
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log.matcher",
+     "@type": "schema:PropertyValue",
+     "schema:name": "matcher",
+     "schema:description": "Which matcher made the proposals, e.g. voiceMatch v1.",
+     "schema:valueReference": "text",
+     "required": true
+    }
+   ]
+  },
+  {
    "@id": "https://wardrobediary.io/data#public-data",
    "@type": "dcat:Dataset",
    "dct:title": "Public wardrobe data",
@@ -627,6 +707,9 @@
     },
     {
      "@id": "https://wardrobediary.io/data#settings"
+    },
+    {
+     "@id": "https://wardrobediary.io/data#voice-log"
     }
    ],
    "prov:qualifiedDerivation": [
@@ -647,6 +730,9 @@
       },
       {
        "@id": "https://wardrobediary.io/data#settings"
+      },
+      {
+       "@id": "https://wardrobediary.io/data#voice-log"
       }
      ],
      "prov:hadActivity": "tools/backup.py with a read-only service account",

@@ -17,7 +17,7 @@
   {
    "@id": "https://wardrobediary.io/def/metrics",
    "rdfs:label": "Wardrobe Diary semantic model (metrics)",
-   "owl:versionInfo": "0.2.2",
+   "owl:versionInfo": "0.3.0",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    }

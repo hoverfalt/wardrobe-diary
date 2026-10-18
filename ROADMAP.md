@@ -37,7 +37,11 @@ _(nothing in progress)_
 
 ## Next
 
-1. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
+1. **R-44 step 2: measure, then several items per dictation.** After a couple of weeks of use, measure from
+   `voiceLog` how often the top proposal was chosen (rank 0) and where it failed; tune the matcher or compare an
+   AI matcher on the same records; then allow several items in one dictation ("…, … and …").
+
+2. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
    condition, more interpretation-heavy questions; a comparison tool in the MCP server (comparison questions
    were left out of the evaluation for lack of one).
 
@@ -162,6 +166,17 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-44 (step 1)** 2026-10-18 "Describe an item" on the Log page: type or dictate (iPhone keyboard microphone)
+  e.g. "black Diesel boxers" or "Jockey white number four"; the best match among the day's loggable garments
+  (active, not yet logged, within the Filters) is shown with up to three alternatives and logged only on a tap.
+  Matcher `lib/voiceMatch.ts` (no AI, offline): normalised words (diacritics, plurals, brand spellings such as
+  H&M / G-Star / Jack & Jones, synonyms such as tee, trainers), rare words weigh more, fuzzy matching only for
+  words not in the wardrobe (so "black" never matches "blank"), spoken garment types filter by category
+  ("boxers" never proposes a belt), a spoken number picks that garment ("4" = "04"), otherwise identical garments
+  are represented by the one worn longest ago (Olof's rotation rule; the recent-wear nudge never overrides it).
+  Each description, the proposals and the choice are recorded in `voiceLog` (owner-only, in the catalog and the
+  nightly backup) to measure accuracy. Decisions by Olof: English, one item at a time first.
 
 - **R-29 phase 2 / R-40 phase 5** 2026-10-17 Public MCP server at `https://wardrobediary.io/mcp`: the same server
   definition over MCP Streamable HTTP (stateless, read-only, public data, semantic layer and provenance on), as a

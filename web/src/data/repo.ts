@@ -8,7 +8,9 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  setDoc,
   Timestamp,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -203,4 +205,30 @@ export async function updateComparison(uid: string, update: (items: ComparisonIt
     tx.set(ref, { items });
     if (pub.exists()) tx.update(publicRef, { comparison: items });
   });
+}
+
+/** One dictated description on the Log page (R-44): what was said, what the matcher proposed, and what the owner
+ *  chose. Kept (owner-only) to measure how well the matching works and to compare matchers later. */
+export interface VoiceLogEntry {
+  at: string; // ISO time
+  date: IsoDate; // the day being logged
+  text: string;
+  /** Proposed garment ids, best first. */
+  proposals: string[];
+  /** The garment added, or null if none was. */
+  chosen: string | null;
+  /** Position of the chosen garment in the proposals (0 = best), or null. */
+  rank: number | null;
+  matcher: string;
+}
+
+/** Records a dictation and returns its id at once; the write is queued (works offline, like logging). */
+export function logVoiceQuery(uid: string, entry: Omit<VoiceLogEntry, "chosen" | "rank">): string {
+  const ref = doc(collection(db, "users", uid, "voiceLog"));
+  void setDoc(ref, { ...entry, chosen: null, rank: null }).catch(() => {});
+  return ref.id;
+}
+
+export function recordVoiceChoice(uid: string, id: string, chosen: string, rank: number): void {
+  void updateDoc(doc(db, "users", uid, "voiceLog", id), { chosen, rank }).catch(() => {});
 }

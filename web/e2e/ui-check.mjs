@@ -15,9 +15,23 @@ try {
   await shot(page, "log");
   const before = await page.$eval(".log-outfit strong", (e) => e.textContent);
   await page.click(".tile:not(.on)");
-  await waitForText(page, "All changes saved");
+  await page.waitForFunction((b) => document.querySelector(".log-outfit strong")?.textContent !== b, { timeout: 10000 }, before).catch(() => {});
   const after = await page.$eval(".log-outfit strong", (e) => e.textContent);
   check("logging a wear updates the count", before !== after, `${before} → ${after}`);
+
+  // Describe an item (R-44): find by description, add, and the dictation is recorded.
+  await page.type('.voice-form input', "black Diesel boxers");
+  await page.click('.voice-form button[type="submit"]');
+  await page.waitForSelector(".voice-best strong", { timeout: 10000 });
+  const proposed = await page.$eval(".voice-best strong", (e) => e.textContent);
+  check("describe an item proposes a garment", /Diesel/.test(proposed ?? ""), proposed ?? "");
+  await shot(page, "voice-find");
+  const beforeVoice = await page.$eval(".log-outfit strong", (e) => e.textContent);
+  await clickText(page, ".voice-best button", "Add");
+  await waitForText(page, "✓ Added");
+  await page.waitForFunction((b) => document.querySelector(".log-outfit strong")?.textContent !== b, { timeout: 10000 }, beforeVoice).catch(() => {});
+  const afterVoice = await page.$eval(".log-outfit strong", (e) => e.textContent);
+  check("adding the proposal logs the wear", beforeVoice !== afterVoice, `${beforeVoice} → ${afterVoice}`);
 
   await clickText(page, "button", "Filters");
   await clickText(page, ".tag-toggle", "Hanko"); // neutral → include
