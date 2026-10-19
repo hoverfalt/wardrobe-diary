@@ -22,6 +22,11 @@
 .image-row img { width: 100%; border-radius: 8px; }
 .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
 .media-grid img { width: 100%; border-radius: 6px; }
+/* The logos are dark text on transparent PNGs: in dark mode they sit on light tiles so they stay readable. */
+@media (prefers-color-scheme: dark) {
+  .media-grid a { display: flex; align-items: center; justify-content: center; padding: 6px; background: #fff; border-radius: 8px; }
+  .contacts li img { background: #fff; border-radius: 6px; padding: 2px; box-sizing: border-box; }
+}
 
 .contacts { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
 .contacts ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
