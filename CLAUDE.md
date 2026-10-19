@@ -173,6 +173,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 
 - **Worn together** (`lib/combinations.ts`): days two garments were both worn (each owned that day) in the range;
   for a category, days any of its garments was worn with the other garment, each day once.
+  The Dashboard diagram leaves out Sportswear and, per category, draws one line per companion (all pairs fill the circle).
 - Daily cost (`dailyCost`) = Σ lifetime cost per wear of the garments worn (and owned) that day; "final"
   when all of them are divested; `average` = 30-day rolling mean centred on the day (values i−14 … i+15).
 - **Materials** (`lib/materials.ts`, R-30): `parseMaterials` reads the free-text Materials field into fibre
@@ -322,7 +323,7 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   never as many coloured lines or stacked areas in one chart; category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
 - `/` is the **static landing page** (`web/index.html` + `src/landing.css`, the old site's project page, R-16:
-  crawlable, preview tags, no JavaScript); the app is `web/app.html`, served for every other path (Firebase
+  crawlable, preview tags, no JavaScript; images from Storage, logos on white tiles in dark mode); the app is `web/app.html`, served for every other path (Firebase
   rewrite `**` → `/app.html`; the `appFallback` plugin in `vite.config.ts` does the same in dev/preview).
   `firebase.json` has 301 redirects for every old wardrobediary.io page (`*.html`); check them with
   `node web/e2e/redirect-check.mjs [base]`. GA4 (G-HYJZNEMFV0, the old site's) loads only on wardrobediary.io.

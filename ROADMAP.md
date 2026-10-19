@@ -10,8 +10,11 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-17)
+## Where we left off (2026-10-19)
 
+- **Done 2026-10-18 … 19:** "Describe an item" on the Log page, with category-first browsing by photo (R-44 step 1;
+  step 2 waits for a couple of weeks of `voiceLog` data); "Worn together" on the Dashboard (R-45); landing page
+  media logos readable in dark mode and two higher-resolution images.
 - **wardrobediary.io serves the new app** (R-16, 2026-10-17; Olof added the auth domain, submitted the sitemap and
   checked GA4), and **the public MCP server is live at https://wardrobediary.io/mcp** (R-29 phase 2). A budget
   alert in Google Cloud Billing is set (Olof, 2026-10-17). The old
@@ -167,6 +170,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **Landing page** 2026-10-19: in dark mode the media logos (dark text on transparent PNGs) and contact icons sit on
+  white tiles; "Making data-supported consumption choices" and the Reaktor blog post use Olof's 1,700 px uploads
+  (`Making_data-supported_consumption_choices-large.jpg`, `Reaktor_blog_post.png`).
 - **R-45** 2026-10-19 "Worn together" on the Dashboard (above the monthly cost comparison): a ring of every garment
   worn in the date range, grouped into category arcs (most worn first). Sportswear left out (as in the other Dashboard charts over time). Pick a category: one line per companion
   garment, as strong as the days worn with the category, ending at the category's garment it is most often worn
