@@ -268,9 +268,9 @@ export function Dashboard({
             Which garments are worn on the same days. Each garment worn in the date range sits on the ring, grouped by
             category, most worn first. Each line joins a garment to the chosen category (at the category's garment it is
             most often worn with); the stronger the line, the more days together. Hover a garment to see only its lines; tap or click it to choose
-            it, or pick one from the list.
+            it, or pick one from the list. Sportswear not included.
           </p>
-          <WornTogetherChart garments={garments} days={days} range={range} />
+          <WornTogetherChart garments={charts.notSportswear} days={days} range={range} />
           <HowCalculated refs={["metric:worn-together"]} />
           {rangeControl}
 

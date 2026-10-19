@@ -157,6 +157,7 @@ terms:
     label: Worn together
     alt_labels: [combination, outfit companion]
     definition: Two garments are worn together on a day when both are logged as worn that day.
+    note: The Dashboard leaves Sportswear out of its worn together diagram.
     metric: metric:worn-together
 
   - id: final-daily-cost

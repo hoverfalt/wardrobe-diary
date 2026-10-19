@@ -168,7 +168,7 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 ## Done
 
 - **R-45** 2026-10-19 "Worn together" on the Dashboard (above the monthly cost comparison): a ring of every garment
-  worn in the date range, grouped into category arcs (most worn first). Pick a category: one line per companion
+  worn in the date range, grouped into category arcs (most worn first). Sportswear left out (as in the other Dashboard charts over time). Pick a category: one line per companion
   garment, as strong as the days worn with the category, ending at the category's garment it is most often worn
   with (drawing every pair, ~4,700 lines, filled the circle). Hover a garment for only its lines; tap or click it
   (or a list entry) to choose it. A list under the ring shows the top 12 companions with photos, days together and

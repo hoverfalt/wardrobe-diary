@@ -691,6 +691,10 @@
     "@value": "Two garments are worn together on a day when both are logged as worn that day.",
     "@language": "en"
    },
+   "skos:scopeNote": {
+    "@value": "The Dashboard leaves Sportswear out of its worn together diagram.",
+    "@language": "en"
+   },
    "rdfs:seeAlso": {
     "@id": "https://wardrobediary.io/model#metric-worn-together"
    }
