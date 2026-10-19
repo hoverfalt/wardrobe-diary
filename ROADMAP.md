@@ -167,6 +167,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-45** 2026-10-19 "Worn together" on the Dashboard (above the monthly cost comparison): a ring of every garment
+  worn in the date range, grouped into category arcs (most worn first). Pick a category: one line per companion
+  garment, as strong as the days worn with the category, ending at the category's garment it is most often worn
+  with (drawing every pair, ~4,700 lines, filled the circle). Hover a garment for only its lines; tap or click it
+  (or a list entry) to choose it. A list under the ring shows the top 12 companions with photos, days together and
+  share of their wears. `lib/combinations.ts` (`wornTogether`, `companions`, tested); semantic layer 0.4.0
+  adds the metric and term "worn together".
 - **R-44 (step 1)** 2026-10-18 "Describe an item" on the Log page: type or dictate (iPhone keyboard microphone)
   e.g. "black Diesel boxers" or "Jockey white number four"; the best match among the day's loggable garments
   (active, not yet logged, within the Filters) is shown with up to three alternatives and logged only on a tap.

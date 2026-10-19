@@ -14,7 +14,7 @@ export function PlotFigure({ options }: { options: (width: number) => Plot.PlotO
   return <div ref={ref} className="plot" />;
 }
 
-function useWidth(ref: React.RefObject<HTMLElement | null>): number {
+export function useWidth(ref: React.RefObject<HTMLElement | null>): number {
   const [width, setWidth] = useState(0);
   useEffect(() => {
     if (!ref.current) return;

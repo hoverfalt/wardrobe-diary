@@ -261,6 +261,22 @@ metrics:
       - web/src/lib/metrics.test.ts › centres a 30-value window on values i-14 … i+15
     note: With "as of" a date (animations), cost per wear counts only wears up to that date.
 
+  - id: worn-together
+    label: Worn together
+    term: term:worn-together
+    grain: garment pair
+    unit: days
+    definition: >-
+      For two garments, the number of logged days in the range on which both were worn, counting a day only while
+      each garment is owned. For a category, the days on which any of its garments was worn together with the other
+      garment (each day once). Share of its wears - those days / the other garment's own days worn in the range.
+    formula: "|{d in range : a worn on d and b worn on d}|"
+    range_rule: range
+    implementation: web/src/lib/combinations.ts#wornTogether
+    tests:
+      - web/src/lib/combinations.test.ts › counts days worn and pairs symmetrically, within ownership
+      - web/src/lib/combinations.test.ts › lists companions of a set, counting each day once and leaving out the set's own garments
+
   # --- Materials
   - id: fibre-mass
     label: Fibre mass

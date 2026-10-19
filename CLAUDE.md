@@ -171,6 +171,8 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   `tools/sync.sh --dump ../reference/sheet.json`). Known live-site errors and deliberate differences
   are listed in ROADMAP.md and in the test.
 
+- **Worn together** (`lib/combinations.ts`): days two garments were both worn (each owned that day) in the range;
+  for a category, days any of its garments was worn with the other garment, each day once.
 - Daily cost (`dailyCost`) = Σ lifetime cost per wear of the garments worn (and owned) that day; "final"
   when all of them are divested; `average` = 30-day rolling mean centred on the day (values i−14 … i+15).
 - **Materials** (`lib/materials.ts`, R-30): `parseMaterials` reads the free-text Materials field into fibre
@@ -195,7 +197,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 |---|---|
 | `../index.html`, `landing.css`, `../app.html` | Static landing page at `/`; the app's HTML shell for every other path |
 | `App.tsx` | Shell: routing, public data (`usePublicWardrobe`) and the shared date range (`useDateRange`); every page is lazy-loaded (`page(...)`, R-18) |
-| `pages/Dashboard.tsx` | Portfolio page: category listing table + 7 charts |
+| `pages/Dashboard.tsx` | Portfolio page: category listing table + 8 charts |
 | `pages/CategoryPage.tsx` | `/category/<slug>`: item listing table + 6 charts, generic for all categories |
 | `pages/GarmentPage.tsx` | `/garment/<id>` (public): photo, all fields, composition bar, stats, wears per month; Edit for the owner |
 | `pages/MaterialsPage.tsx`, `components/MaterialsCharts.tsx` | `/materials` (public): fibre mass owned/worn, fibre mix per category (small multiples), monthly outfit weight and synthetic share |
@@ -213,6 +215,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 | `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter (optionally with grey `others`, e.g. the comparison), number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
+| `components/WornTogetherChart.tsx`, `lib/combinations.ts` | Dashboard "Worn together" ring (custom SVG, not Plot): garments worn on the same days (R-45) |
 | `components/DateRangeControl.tsx`, `AsOfControl.tsx`, `PlotFigure.tsx` | Date range (slider + boxes), "as of" player, Plot wrapper |
 
 ## Semantic layer (`semantics/`, R-40)

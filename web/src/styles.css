@@ -255,3 +255,22 @@ th.num .sort-header { justify-content: flex-end; }
 .voice-browse-note { margin: 0; font-size: 13px; }
 .voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
 .voice-grid .tile small { font-size: 11px; }
+
+/* Worn together (R-45) */
+.wt-categories { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.wt-categories button { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 3px 10px; border-radius: 999px; }
+.wt-categories button[aria-pressed="true"] { border: 2px solid var(--fg); color: inherit; font-weight: 600; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.wt-categories .swatch { margin-right: 0; }
+.wt-chart { position: relative; width: 100%; }
+.wt-chart svg { display: block; touch-action: manipulation; }
+.wt-label { font-size: 12px; fill: var(--fg); }
+.wt-tip { position: absolute; z-index: 2; width: 220px; display: flex; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2); font-size: 13px; pointer-events: none; }
+.wt-tip div { display: flex; flex-direction: column; gap: 2px; }
+.wt-tip img, .wt-companions img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none; }
+.wt-tip img.divested, .wt-companions img.divested { box-shadow: 0 0 0 2px #3CB371; }
+.wt-companions { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.wt-companions button { width: 100%; display: grid; grid-template-columns: 48px 1fr; grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: left; padding: 6px; font-size: 13px; border-radius: 8px; }
+.wt-companions img { grid-row: span 2; }
+.wt-companions .name { align-self: end; }
+.wt-companions .muted { align-self: start; font-size: 12px; }

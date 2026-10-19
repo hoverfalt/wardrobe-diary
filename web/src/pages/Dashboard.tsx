@@ -20,6 +20,7 @@ import { DefinitionLinks, HowCalculated } from "../components/Definitions";
 import { comparisonPhotoUrl } from "../firebase";
 import { costPerUse } from "../lib/comparison";
 import { Link } from "../components/Link";
+import { WornTogetherChart } from "../components/WornTogetherChart";
 import {
   activeItemsOverTime,
   categoryListing,
@@ -260,6 +261,17 @@ export function Dashboard({
           </p>
           <DailyCostAnimation garments={charts.notSportswear} days={days!} range={range} />
           <HowCalculated refs={["metric:daily-cost"]} />
+          {rangeControl}
+
+          <h2>Worn together</h2>
+          <p className="muted">
+            Which garments are worn on the same days. Each garment worn in the date range sits on the ring, grouped by
+            category, most worn first. Each line joins a garment to the chosen category (at the category's garment it is
+            most often worn with); the stronger the line, the more days together. Hover a garment to see only its lines; tap or click it to choose
+            it, or pick one from the list.
+          </p>
+          <WornTogetherChart garments={garments} days={days} range={range} />
+          <HowCalculated refs={["metric:worn-together"]} />
           {rangeControl}
 
           <h2>Monthly cost compared with other spending</h2>

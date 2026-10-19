@@ -1,5 +1,5 @@
 {
- "version": "0.3.1",
+ "version": "0.4.0",
  "term": {
   "garment": {
    "label": "Garment",
@@ -96,6 +96,10 @@
   "daily-cost": {
    "label": "Daily cost",
    "definition": "For a day, the sum of the cost per wear of the garments worn that day (and owned then)."
+  },
+  "worn-together": {
+   "label": "Worn together",
+   "definition": "Two garments are worn together on a day when both are logged as worn that day."
   },
   "final-daily-cost": {
    "label": "Final (daily cost)",
@@ -255,6 +259,11 @@
    "label": "Daily cost",
    "definition": "For each logged day in the range with wears: the sum of the lifetime cost per wear of the garments worn and owned that day (unknown prices count 0); \"final\" when all of them are divested. Average - the mean of 30 consecutive logged days centred on the day (days i−14 … i+15), so days without wears are skipped.",
    "formula": "Σ garment-cost-per-wear over garments worn on d; average(i) = mean(cost[i−14 .. i+15])"
+  },
+  "worn-together": {
+   "label": "Worn together",
+   "definition": "For two garments, the number of logged days in the range on which both were worn, counting a day only while each garment is owned. For a category, the days on which any of its garments was worn together with the other garment (each day once). Share of its wears - those days / the other garment's own days worn in the range.",
+   "formula": "|{d in range : a worn on d and b worn on d}|"
   },
   "fibre-mass": {
    "label": "Fibre mass",

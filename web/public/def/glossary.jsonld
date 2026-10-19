@@ -21,7 +21,7 @@
     "@value": "Wardrobe Diary glossary",
     "@language": "en"
    },
-   "owl:versionInfo": "0.3.1",
+   "owl:versionInfo": "0.4.0",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    },
@@ -102,6 +102,9 @@
     },
     {
      "@id": "https://wardrobediary.io/glossary#daily-cost"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#worn-together"
     },
     {
      "@id": "https://wardrobediary.io/glossary#final-daily-cost"
@@ -662,6 +665,34 @@
    },
    "dct:references": {
     "@id": "https://wardrobediary.io/model#decision-Q-1"
+   }
+  },
+  {
+   "@id": "https://wardrobediary.io/glossary#worn-together",
+   "@type": "skos:Concept",
+   "skos:inScheme": {
+    "@id": "https://wardrobediary.io/glossary"
+   },
+   "skos:prefLabel": {
+    "@value": "Worn together",
+    "@language": "en"
+   },
+   "skos:altLabel": [
+    {
+     "@value": "combination",
+     "@language": "en"
+    },
+    {
+     "@value": "outfit companion",
+     "@language": "en"
+    }
+   ],
+   "skos:definition": {
+    "@value": "Two garments are worn together on a day when both are logged as worn that day.",
+    "@language": "en"
+   },
+   "rdfs:seeAlso": {
+    "@id": "https://wardrobediary.io/model#metric-worn-together"
    }
   },
   {

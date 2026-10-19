@@ -153,6 +153,12 @@ terms:
     metric: metric:daily-cost
     decision: decision:Q-1
 
+  - id: worn-together
+    label: Worn together
+    alt_labels: [combination, outfit companion]
+    definition: Two garments are worn together on a day when both are logged as worn that day.
+    metric: metric:worn-together
+
   - id: final-daily-cost
     label: Final (daily cost)
     alt_labels: [all divested]
