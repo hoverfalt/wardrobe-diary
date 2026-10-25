@@ -156,7 +156,8 @@ th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
 .chips { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border-radius: 999px; font-size: 13px; }
 .chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
-.log-search { width: 100%; margin: 12px 0 0; }
+.log-search { display: flex; gap: 8px; margin: 12px 0 0; }
+.log-search input { flex: 1; min-width: 0; }
 /* Log page tag toggles: neutral (plain), include (green, ✓), exclude (red, ✕). */
 .tag-toggles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 /* "Filters" button and popup on the Log page's sticky outfit bar (the bar is the popup's containing block). */

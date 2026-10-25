@@ -17,6 +17,7 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
   const today = todayIso();
   const [date, setDate] = useState(today);
   const [search, setSearch] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const [tagFilter, setTagFilter] = useStoredTagFilter();
   const [error, setError] = useState("");
   const pending = usePendingWrites(uid);
@@ -97,7 +98,11 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
 
       <VoiceFind uid={uid} date={date} candidates={voiceCandidates} days={wardrobe.days} recent={recent} onAdd={(id) => toggle(id, true)} />
 
-      <input type="search" className="log-search" placeholder="Search garments" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search garments" />
+      <div className="log-search">
+        <input ref={searchRef} type="search" placeholder="Search garments" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search garments" />
+        {/* Clears the box and keeps the keyboard up for the next garment (handy on a phone). */}
+        <button type="button" onClick={() => { setSearch(""); searchRef.current?.focus(); }}>Clear</button>
+      </div>
 
       {byCategory.categories.map(([category, items]) => (
         <div key={category}>
