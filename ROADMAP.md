@@ -10,8 +10,12 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-19)
+## Where we left off (2026-10-28)
 
+- **Done 2026-10-25 … 28:** a Clear button next to the Log page's search box; **rotation series** on the Log page
+  (R-46): identical garments marked "Rotate as a series" log from one tile, next in line = fewest lifetime wears,
+  then lowest number ("Describe an item" proposes the same one, matcher v1.2); semantic layer 0.4.1.
+- **Open for Olof:** mark the series on the live site (e.g. a SOC U 4P Black sock → Manage → "Rotate as a series").
 - **Done 2026-10-18 … 19:** "Describe an item" on the Log page, with category-first browsing by photo (R-44 step 1;
   step 2 waits for a couple of weeks of `voiceLog` data); "Worn together" on the Dashboard (R-45); landing page
   media logos readable in dark mode and two higher-resolution images.
@@ -41,7 +45,8 @@ _(nothing in progress)_
 ## Next
 
 1. **R-44 step 2: measure, then several items per dictation.** After a couple of weeks of use, measure from
-   `voiceLog` how often the top proposal was chosen (rank 0) and where it failed; tune the matcher or compare an
+   `voiceLog` how often the top proposal was chosen (rank 0) and where it failed (records name their `matcher`:
+   v1.2 since 2026-10-28 proposes the next in line for rotation series); tune the matcher or compare an
    AI matcher on the same records; then allow several items in one dictation ("…, … and …").
 
 2. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
@@ -64,26 +69,6 @@ _(nothing in progress)_
   what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the
   time spent there.
-- **R-16 Domain switch:** point wardrobediary.io at the new app, keeping every old link working.
-  Findings (2026-10-13): wardrobediary.io is GitHub Pages (repo `hoverfalt/hoverfalt.github.io`, DNS at
-  Bluehost), not Firebase; hoverfalt.github.io 301s to it. 16 real pages: `index.html` (project, media
-  coverage, contacts; og/Twitter preview tags; GA4 G-HYJZNEMFV0), `portfolio.html`, 13 category pages
-  (`jackets`, `blazers`, `knits`, `shirts`, `t-shirts`, `pants`, `shorts`, `belts`, `socks`, `shoes`, `uw_shirts`,
-  `uw_boxers`, `sportswear`.html), `track_your_wardrobe.html`, `data.html`, `development.html` (an old Shoes
-  draft); no robots.txt or sitemap. Chart images live on `threddit-297417.web.app` (may be embedded by
-  articles: keep that site as is). Plan: (1) landing page as pre-rendered static HTML at `/` (crawlable, with
-  preview tags), app Dashboard moved to `/dashboard`, `track_your_wardrobe` ported; (2) 301 redirects in
-  `firebase.json` for every old `.html` path (incl. `index.html`, fragments → `/`), tested by a script;
-  (3) add wardrobediary.io (+ www) as a custom domain of Hosting site `wardrobediary`, switch the Bluehost
-  A records (lower the TTL a day before); (4) keep the GitHub Pages repo and its CNAME so hoverfalt.github.io
-  keeps redirecting; (5) Search Console: verify, submit a sitemap, watch for 404s.
-  **Status 2026-10-13:** steps (1) and (2) done and live on wardrobediary.web.app: landing page at `/`
-  (ported content, preview tags, GA4 only on the real domain), Dashboard at `/dashboard`, 23 redirects incl.
-  `track_your_wardrobe.html` → `/#track-your-own-wardrobe`, a "Page not found" page, robots.txt and sitemap;
-  `redirect-check.mjs` all OK. Search Console's sampled links (18 sites) all point to `/` or `/index.html`.
-  Remaining (Olof, with Claude's checklist): (3) custom domain + Bluehost DNS, (4) keep the GitHub Pages repo,
-  (5) Search Console sitemap; then rerun `redirect-check.mjs https://wardrobediary.io` and update the landing
-  page text.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 
 ## Decisions needed
@@ -109,6 +94,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-10-28 Pre-tracking wears stay allowed for later purchases (Olof):** "Times used before tracking" is mainly
+  for garments owned when tracking began, but four garments bought after 2018 (found after tracking began, with
+  estimated purchase dates) keep their values, and other users may need it too. No rule or form restriction.
 
 - **2026-10-17 R-10 closed (Olof):** no further golden data exported from the R pipeline. The live site's tables
   (snapshot 2026-09-03) already validate the port in `metrics.reference.test.ts`, and the deliberate differences

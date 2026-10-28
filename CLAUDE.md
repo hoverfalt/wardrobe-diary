@@ -7,6 +7,19 @@ Repo: github.com/hoverfalt/wardrobe-diary (**public** since 2026-10-16; code MIT
 **Roadmap, status and open decisions live in [ROADMAP.md](ROADMAP.md).** Read it at the start of a
 session; update it when work is finished, started, or newly identified (see its header for the rules).
 
+**Wrapping up a session** (standard procedure whenever Olof asks to wrap up):
+1. `ROADMAP.md`: a new "Where we left off (<date>)" bullet with what was done, what is open for Olof, and next steps;
+   finished items to Done with the date (new IDs for unlisted work); decisions made in the session to Decisions made
+   (with why); stale or finished entries removed from Now / Next / Later.
+2. `CLAUDE.md`: everything a future session needs that the code doesn't say plainly: data model (Firestore fields,
+   settings), code map, conventions, metric rules, environment and commands that changed.
+3. Other places that must stay in step: `semantics/` (then `cd web && npm run semantics`, version + changelog when a
+   definition changed), `README.md` and `mcp/README.md` when user-facing features or setup changed, memory for
+   personal preferences only.
+4. Check that nothing is left uncommitted or undeployed (`git status`; deploy hosting / the MCP function if their code
+   changed since the last deploy), and that local servers started in the session are stopped.
+5. Run the tests touched by the changes, commit (`Docs: wrap up <date> (<topics>)`) and push.
+
 ## Goal
 
 Replace "Google Sheet → R scripts → static PNG/GIF on Firebase Hosting" with:
@@ -61,7 +74,8 @@ Python is not used for the core metrics.
 ```
 users/{uid}/garments/{garmentId}          // source of truth for garment details (D-4)
   category, item, details, photo, price, purchased (YYYY-MM-DD), divested (YYYY-MM-DD|null),
-  timesUsedInit, materials, weightG, photoVersion? (set when the photo is replaced),
+  timesUsedInit (wears before tracking: mainly garments owned on 2018-01-01, but also allowed for garments found
+  later, e.g. 4 bought 2018–2023), materials, weightG, photoVersion? (set when the photo is replaced),
   detailsUnavailable? (divested only: missing details can't be filled in; left out of the review list),
   tags? (string[] from the fixed vocabulary in web/src/lib/tags.ts: "second-hand", "hanko", "bicycle", "motorcycle", "winter", "summer")
 users/{uid}/garments/{garmentId}/history/{autoId}
