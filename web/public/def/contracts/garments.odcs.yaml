@@ -3,7 +3,7 @@ apiVersion: v3.0.2
 kind: DataContract
 id: wardrobe-diary-garments
 name: Garments
-version: 0.4.0
+version: 0.4.1
 status: active
 domain: wardrobe-diary
 dataProduct: The Wardrobe Diary Project

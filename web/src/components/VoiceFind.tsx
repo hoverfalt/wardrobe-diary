@@ -8,15 +8,17 @@ import { photoUrl } from "../firebase";
 import { lastWornBefore, matchGarment, type MatchResult } from "../lib/voiceMatch";
 import type { Day, Garment, IsoDate } from "../types";
 
-export const MATCHER = "voiceMatch v1.1 (words + browse by type, no AI)";
+export const MATCHER = "voiceMatch v1.2 (words + browse by type + rotation series, no AI)";
 
-export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
+export function VoiceFind({ uid, date, candidates, days, recent, rotation, onAdd }: {
   uid: string;
   date: IsoDate;
   /** Garments that can be logged now: active on the day, not yet logged, within the Log filters. */
   candidates: Garment[];
   days: Day[];
   recent: Map<string, number>;
+  /** Garments of marked rotation series → place in line (0 = next), from lib/rotation.ts. */
+  rotation: Map<string, number>;
   onAdd: (garmentId: string) => void;
 }) {
   const [text, setText] = useState("");
@@ -29,7 +31,7 @@ export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
     e.preventDefault();
     const query = text.trim();
     if (!query) return;
-    const r = matchGarment(query, candidates, lastWorn, recent);
+    const r = matchGarment(query, candidates, lastWorn, recent, rotation);
     const logId = logVoiceQuery(uid, { at: new Date().toISOString(), date, text: query, proposals: r.candidates.map((c) => c.garment.id), mode: r.mode, matcher: MATCHER });
     setResult({ ...r, query, logId });
     setAdded(null);
@@ -93,7 +95,7 @@ export function VoiceFind({ uid, date, candidates, days, recent, onAdd }: {
                   <strong>{best.garment.item}</strong>
                   <span className="muted">
                     {best.garment.category}
-                    {best.groupSize > 1 && ` · 1 of ${best.groupSize} identical, worn longest ago`}
+                    {best.groupSize > 1 && ` · 1 of ${best.groupSize} identical, ${rotation.has(best.garment.id) ? "next in rotation" : "worn longest ago"}`}
                   </span>
                 </div>
                 <button className="primary" onClick={() => add(best.garment, 0)}>Add</button>

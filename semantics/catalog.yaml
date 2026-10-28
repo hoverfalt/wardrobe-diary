@@ -82,11 +82,12 @@ datasets:
 
   - id: settings
     title: Settings
-    description: "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced."
+    description: "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced, and the rotation series marked for the Log page."
     location: "Firestore users/{uid}/settings/app"
     classification: owner-only
     fields:
       - {name: sheetRetired, type: date, required: false, definition: Cut-over date (2026-10-09).}
+      - {name: rotationSeries, type: "string[]", required: false, definition: "Rotation series marked by the owner, each as category|name without the number, e.g. Socks|SOC U 4P Black (39-42).", term: term:rotation-series}
 
   - id: comparison
     title: Comparison items

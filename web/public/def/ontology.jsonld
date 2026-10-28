@@ -18,7 +18,7 @@
    "@id": "https://wardrobediary.io/def/ontology",
    "@type": "owl:Ontology",
    "rdfs:label": "Wardrobe Diary ontology",
-   "owl:versionInfo": "0.4.0",
+   "owl:versionInfo": "0.4.1",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    },

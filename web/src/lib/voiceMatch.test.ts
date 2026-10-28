@@ -97,6 +97,13 @@ describe("voice matching", () => {
     expect(matchGarment("jockey white", W, last, recent).candidates[0].garment.item).toBe("Jockey white 03");
   });
 
+  it("in a marked rotation series, picks the next in line instead (as the Log tile does)", () => {
+    // Jockey 05 is next in line (e.g. fewest wears), although 03 was worn longest ago.
+    const rotation = new Map(W.filter((x) => x.item.startsWith("Jockey")).map((x) => [x.id, x.item.endsWith("05") ? 0 : 1]));
+    expect(matchGarment("jockey white", W, last, new Map(), rotation).candidates[0].garment.item).toBe("Jockey white 05");
+    expect(matchGarment("undershirt", W, last, new Map(), rotation)).toMatchObject({ mode: "browse", candidates: [{ garment: { item: "Jockey white 05" } }] });
+  });
+
   it("offers alternatives and nothing for unrelated words", () => {
     const r = matchGarment("black jeans", W, last);
     expect(r.candidates.length).toBeGreaterThan(1);

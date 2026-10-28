@@ -21,7 +21,7 @@
     "@value": "Wardrobe Diary glossary",
     "@language": "en"
    },
-   "owl:versionInfo": "0.4.0",
+   "owl:versionInfo": "0.4.1",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    },
@@ -126,6 +126,9 @@
     },
     {
      "@id": "https://wardrobediary.io/glossary#season-tags"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#rotation-series"
     },
     {
      "@id": "https://wardrobediary.io/glossary#materials"
@@ -832,6 +835,39 @@
    "skos:related": [
     {
      "@id": "https://wardrobediary.io/glossary#tag"
+    }
+   ]
+  },
+  {
+   "@id": "https://wardrobediary.io/glossary#rotation-series",
+   "@type": "skos:Concept",
+   "skos:inScheme": {
+    "@id": "https://wardrobediary.io/glossary"
+   },
+   "skos:prefLabel": {
+    "@value": "Rotation series",
+    "@language": "en"
+   },
+   "skos:altLabel": [
+    {
+     "@value": "identical garments",
+     "@language": "en"
+    }
+   ],
+   "skos:definition": {
+    "@value": "Identical garments named alike apart from a number, e.g. SOC U 4P Black 01 … 08 (39-42), which the owner keeps as one heap and wears in turn. A series the owner marks is logged as one tile, which logs the next in line: the garment with the fewest lifetime wears, then the lowest number.",
+    "@language": "en"
+   },
+   "skos:scopeNote": {
+    "@value": "Only changes how wears are entered; each wear is still recorded for the one garment worn, and no metric changes.",
+    "@language": "en"
+   },
+   "skos:related": [
+    {
+     "@id": "https://wardrobediary.io/glossary#garment"
+    },
+    {
+     "@id": "https://wardrobediary.io/glossary#wear"
     }
    ]
   },

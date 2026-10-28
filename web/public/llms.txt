@@ -2,7 +2,7 @@
 
 > One person's daily log, since 1 January 2018, of every garment worn, with what each garment cost, and the
 > real cost and use of a wardrobe derived from it. All data is open (CC BY 4.0) and every figure is defined in a
-> machine-readable semantic layer (version 0.4.0). Use these definitions when interpreting the data.
+> machine-readable semantic layer (version 0.4.1). Use these definitions when interpreting the data.
 
 ## Definitions and metadata
 - [Glossary](https://wardrobediary.io/glossary): every term (cost per wear, days used, ownership, wears…); SKOS JSON-LD: https://wardrobediary.io/def/glossary.jsonld

@@ -1,4 +1,6 @@
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
   deleteField,
   doc,
@@ -205,6 +207,25 @@ export async function updateComparison(uid: string, update: (items: ComparisonIt
     tx.set(ref, { items });
     if (pub.exists()) tx.update(publicRef, { comparison: items });
   });
+}
+
+/** The rotation series the owner has marked (users/{uid}/settings/app.rotationSeries, keys from lib/rotation.ts);
+ *  [] when none or while loading. */
+export function useRotationSeries(uid: string): string[] {
+  const [keys, setKeys] = useState<string[]>([]);
+  useEffect(
+    () =>
+      onSnapshot(doc(db, "users", uid, "settings", "app"), (snap) =>
+        setKeys(snap.exists() ? ((snap.data().rotationSeries ?? []) as string[]) : []),
+      ),
+    [uid],
+  );
+  return keys;
+}
+
+/** Marks or unmarks a rotation series (queued offline, like logging). */
+export function setRotationSeries(uid: string, key: string, on: boolean): Promise<void> {
+  return setDoc(doc(db, "users", uid, "settings", "app"), { rotationSeries: on ? arrayUnion(key) : arrayRemove(key) }, { merge: true });
 }
 
 /** One dictated description on the Log page (R-44): what was said, what the matcher proposed, and what the owner

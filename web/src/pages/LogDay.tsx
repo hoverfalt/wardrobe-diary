@@ -3,12 +3,13 @@
 // 60 days first in each category. Works offline (the SDK queues writes).
 import { TAG_IDS, TAGS, tagSearchText } from "../lib/tags";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { setDayWorn, usePendingWrites } from "../data/repo";
+import { setDayWorn, usePendingWrites, useRotationSeries } from "../data/repo";
 import { photoUrl } from "../firebase";
 import { compareCategories } from "../lib/categories";
 import { addDays, todayIso } from "../lib/dates";
 import { dayLabel, nextTagState, passesTagFilter, recentWears, toggleWorn, type TagFilter } from "../lib/logging";
-import { isActive } from "../lib/metrics";
+import { isActive, wearIndex } from "../lib/metrics";
+import { logEntries, rotationRanks, seriesOf, type LogEntry } from "../lib/rotation";
 import { VoiceFind } from "../components/VoiceFind";
 import type { Wardrobe } from "../lib/publicData";
 import type { Garment } from "../types";
@@ -26,12 +27,15 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
   const wornIds = useMemo(() => wardrobe?.days.find((d) => d.date === date)?.worn ?? [], [wardrobe, date]);
   const worn = useMemo(() => new Set(wornIds), [wornIds]);
   const byId = useMemo(() => new Map((wardrobe?.garments ?? []).map((g) => [g.id, g])), [wardrobe]);
+  const rotationKeys = useRotationSeries(uid);
+  const marked = useMemo(() => new Set(rotationKeys), [rotationKeys]);
+  const wears = useMemo(() => wearIndex(wardrobe?.days ?? []), [wardrobe]);
 
   const byCategory = useMemo(() => {
     if (!wardrobe) return { categories: [], hidden: 0 };
     const recent = recentWears(wardrobe.days, date);
     const q = search.trim().toLowerCase();
-    const map = new Map<string, Garment[]>();
+    const listed: Garment[] = [];
     let hidden = 0;
     for (const g of wardrobe.garments) {
       if (!isActive(g, date) && !worn.has(g.id)) continue;
@@ -40,14 +44,21 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
         hidden++;
         continue;
       }
-      // Tags count too, so "motorcycle" or "bike" lists that gear.
-      if (q && !`${g.item} ${g.details} ${tagSearchText(g)}`.toLowerCase().includes(q)) continue;
-      map.set(g.category, [...(map.get(g.category) ?? []), g]);
+      listed.push(g);
     }
-    for (const items of map.values())
-      items.sort((a, b) => (recent.get(b.id) ?? 0) - (recent.get(a.id) ?? 0) || a.item.localeCompare(b.item));
+    // Tags count too, so "motorcycle" or "bike" lists that gear.
+    const matches = (g: Garment) => !q || `${g.item} ${g.details} ${tagSearchText(g)}`.toLowerCase().includes(q);
+    const map = new Map<string, LogEntry[]>();
+    for (const e of logEntries(listed, matches, worn, marked, wears)) {
+      const category = e.kind === "garment" ? e.garment.category : e.members[0].category;
+      map.set(category, [...(map.get(category) ?? []), e]);
+    }
+    // A series counts its garments' recent wears together.
+    const recentOf = (e: LogEntry) => (e.kind === "garment" ? recent.get(e.garment.id) ?? 0 : e.members.reduce((n, m) => n + (recent.get(m.id) ?? 0), 0));
+    const nameOf = (e: LogEntry) => (e.kind === "garment" ? e.garment.item : e.name);
+    for (const items of map.values()) items.sort((a, b) => recentOf(b) - recentOf(a) || nameOf(a).localeCompare(nameOf(b)));
     return { categories: [...map.entries()].sort(([a], [b]) => compareCategories(a, b)), hidden };
-  }, [wardrobe, date, search, worn, tagFilter]);
+  }, [wardrobe, date, search, worn, tagFilter, marked, wears]);
 
   // Garments the "Describe an item" field can propose: active on the day, not yet logged, within the filters.
   const voiceCandidates = useMemo(
@@ -55,6 +66,8 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
     [wardrobe, date, worn, tagFilter],
   );
   const recent = useMemo(() => (wardrobe ? recentWears(wardrobe.days, date) : new Map<string, number>()), [wardrobe, date]);
+  // Marked series: the field proposes the next in line, as the series tile does.
+  const rotation = useMemo(() => rotationRanks(voiceCandidates, marked, wears), [voiceCandidates, marked, wears]);
 
   if (!wardrobe) return <p>Loading…</p>;
 
@@ -96,7 +109,7 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
         </div>
       </div>
 
-      <VoiceFind uid={uid} date={date} candidates={voiceCandidates} days={wardrobe.days} recent={recent} onAdd={(id) => toggle(id, true)} />
+      <VoiceFind uid={uid} date={date} candidates={voiceCandidates} days={wardrobe.days} recent={recent} rotation={rotation} onAdd={(id) => toggle(id, true)} />
 
       <div className="log-search">
         <input ref={searchRef} type="search" placeholder="Search garments" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search garments" />
@@ -108,7 +121,27 @@ export function LogDay({ uid, wardrobe }: { uid: string; wardrobe: Wardrobe | nu
         <div key={category}>
           <h3>{category}</h3>
           <div className="grid">
-            {items.map((g) => {
+            {items.map((e) => {
+              if (e.kind === "series") {
+                // One tile for a marked series: logs the next in line, or removes the one worn that day.
+                const shown = e.worn ?? e.next;
+                const src = shown && photoUrl(shown);
+                const number = (x: Garment | null) => (x && seriesOf(x)?.number) ?? "";
+                return (
+                  <button
+                    key={e.key}
+                    className={e.worn ? "tile on" : "tile"}
+                    aria-pressed={!!e.worn}
+                    disabled={!e.worn && !e.next}
+                    onClick={() => (e.worn ? toggle(e.worn.id, false) : e.next && toggle(e.next.id, true))}
+                  >
+                    {src && <img src={src} alt="" loading="lazy" />}
+                    <span>{e.name}</span>
+                    <small className="muted">{e.worn ? `${number(e.worn)} worn` : `next: ${number(e.next)}`} · {e.members.length} in rotation</small>
+                  </button>
+                );
+              }
+              const g = e.garment;
               const on = worn.has(g.id);
               const src = photoUrl(g);
               return (

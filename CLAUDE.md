@@ -72,6 +72,7 @@ users/{uid}/days/{YYYY-MM-DD}
   worn: string[]            // garmentIds worn that day; days with nothing worn have no doc
 users/{uid}/settings/app
   sheetRetired: "2026-10-09"   // cut-over date; the Sheet sync refuses to write while this is set
+  rotationSeries?: string[]    // marked rotation series, "category|name without number" (lib/rotation.ts)
 users/{uid}/settings/comparison  // other spending for the monthly cost comparison (R-26), edited at /manage/comparison
   items: [{ id, type, item, details, photo, photoVersion?, monthlyCost, useFrequency (0…1) }]
 users/{uid}/public/data     // world-readable copy for public pages (D-1), kept in step by every app write:
@@ -203,7 +204,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 | `pages/GarmentPage.tsx` | `/garment/<id>` (public): photo, all fields, composition bar, stats, wears per month; Edit for the owner |
 | `pages/MaterialsPage.tsx`, `components/MaterialsCharts.tsx` | `/materials` (public): fibre mass owned/worn, fibre mix per category (small multiples), monthly outfit weight and synthetic share |
 | `components/VoiceFind.tsx`, `lib/voiceMatch.ts` | "Describe an item" on `/log` (R-44): dictated/typed description → one garment (brand/colour/type words with synonyms, numbers for identical items, else the one worn longest ago; spoken types filter by category; a type said alone, or with words that fit nothing of that type, browses that type as photos, most worn in 60 days first); proposals, mode and the choice recorded in `voiceLog` (owner-only, backed up) |
-| `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, a "Filters" popup next to the save status (highlighted with the count when active) with tag toggles (neutral / green = only these / red = hide; kept in localStorage per device; garments worn that day always listed), search, recent-first order, offline status |
+| `pages/LogDay.tsx`, `lib/logging.ts` | `/log` (owner only): daily logging, the source of truth for wears; day navigation, outfit chips, a "Filters" popup next to the save status (highlighted with the count when active) with tag toggles (neutral / green = only these / red = hide; kept in localStorage per device; garments worn that day always listed), search with a Clear button, recent-first order, offline status; **rotation series** (`lib/rotation.ts`): identical garments the owner marks on the edit page ("Rotate as a series") show as one tile that logs the next in line (fewest lifetime wears, then lowest number; "Describe an item" proposes the same one); a search matching only some of them lists those one by one |
 | `pages/ManagePage.tsx`, `pages/GarmentEditPage.tsx`, `pages/AddGarmentPage.tsx` | `/manage` (owner only): garment list with filters and bulk changes; `/manage/<id>` edit, divest, replace photo, delete (never worn), history; `/manage/new` add with photo upload |
 | `components/GarmentFormFields.tsx`, `components/PhotoPicker.tsx` | The garment form fields (columns A–K) and the PNG picker, shared by edit and add |
 | `lib/garmentForm.ts` | Garment form ↔ stored fields: validation, normalisation, next Photo id, photo checks (tested) |

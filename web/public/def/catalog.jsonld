@@ -31,7 +31,7 @@
   "@type": "dct:PeriodOfTime",
   "dcat:startDate": "2018-01-01"
  },
- "owl:versionInfo": "0.4.0",
+ "owl:versionInfo": "0.4.1",
  "dcat:dataset": [
   {
    "@id": "https://wardrobediary.io/data#garments",
@@ -370,7 +370,7 @@
    "@id": "https://wardrobediary.io/data#settings",
    "@type": "dcat:Dataset",
    "dct:title": "Settings",
-   "dct:description": "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced.",
+   "dct:description": "App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced, and the rotation series marked for the Log page.",
    "dct:accessRights": {
     "@id": "http://publications.europa.eu/resource/authority/access-right/RESTRICTED"
    },
@@ -384,6 +384,17 @@
      "schema:description": "Cut-over date (2026-10-09).",
      "schema:valueReference": "date",
      "required": false
+    },
+    {
+     "@id": "https://wardrobediary.io/data#settings.rotationSeries",
+     "@type": "schema:PropertyValue",
+     "schema:name": "rotationSeries",
+     "schema:description": "Rotation series marked by the owner, each as category|name without the number, e.g. Socks|SOC U 4P Black (39-42).",
+     "schema:valueReference": "string[]",
+     "required": false,
+     "dct:subject": {
+      "@id": "https://wardrobediary.io/glossary#rotation-series"
+     }
     }
    ]
   },

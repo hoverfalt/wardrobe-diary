@@ -16,7 +16,7 @@ title: Wardrobe Diary semantic layer
 description: >-
   Meaning, definitions, lineage and quality of the Wardrobe Diary data: one person's daily log of every garment
   worn since 1 January 2018, with purchase prices, dates, materials and weights, and the metrics derived from it.
-version: 0.4.0
+version: 0.4.1
 status: draft
 base_iri: https://wardrobediary.io/def/
 language: en
@@ -25,7 +25,7 @@ publisher: Olof Hoverfält
 contact: https://www.linkedin.com/in/hoverfalt/
 steward: Olof Hoverfält
 created: 2026-10-16
-modified: 2026-10-16
+modified: 2026-10-28
 standards:
   - {prefix: schema, iri: "https://schema.org/", use: "garments as products, prices, dates"}
   - {prefix: skos, iri: "http://www.w3.org/2004/02/skos/core#", use: glossary}
@@ -41,3 +41,4 @@ changelog:
   - {version: 0.3.0, date: 2026-10-18, change: "New dataset: the dictation log of the Log page's Describe an item field (R-44)."}
   - {version: 0.3.1, date: 2026-10-18, change: "Dictation log: mode field (match or browse by garment type)."}
   - {version: 0.4.0, date: 2026-10-19, change: "New metric and term: worn together (garments worn on the same day, R-45)."}
+  - {version: 0.4.1, date: 2026-10-28, change: "New term and setting: rotation series (identical garments logged in turn from one Log tile)."}

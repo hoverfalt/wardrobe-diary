@@ -5,7 +5,8 @@
 // plurals, brand spellings, synonyms such as tee = t-shirt). Each spoken word scores by how distinctive the
 // garment word it matches is (rare words like brands count more than "black"), allowing small dictation errors.
 // Numbers: a spoken number picks the garment with that number ("4" = "04"). Without one, a group of identical
-// garments (same name apart from the number) is represented by the one worn longest ago, to keep the rotation.
+// garments (same name apart from the number) is represented by the one worn longest ago, to keep the rotation;
+// in a rotation series the owner has marked (lib/rotation.ts), by the next in line instead, as on its Log tile.
 import type { Garment, IsoDate } from "../types";
 
 export interface MatchCandidate {
@@ -129,13 +130,15 @@ interface Doc {
 /**
  * Ranks the candidate garments for a description. `candidates` are the garments that can be logged (active that
  * day, not yet logged, within the Log filters); `lastWorn` gives each garment's last wear before the day (for the
- * rotation rule); `recent` how often each was worn lately (a small nudge towards everyday garments).
+ * rotation rule); `recent` how often each was worn lately (a small nudge towards everyday garments); `rotation`
+ * each garment of a marked rotation series → its place in line (0 = next), which takes precedence over `lastWorn`.
  */
 export function matchGarment(
   description: string,
   candidates: Garment[],
   lastWorn: Map<string, IsoDate>,
   recent: Map<string, number> = new Map(),
+  rotation: Map<string, number> = new Map(),
   limit = 4,
   browseLimit = 8,
 ): MatchResult {
@@ -163,7 +166,7 @@ export function matchGarment(
   const otherWords = words.filter((q) => !typeWords.includes(q));
   const unplaced = otherWords.filter((q) => !typed.some((d) => hits(d, q)));
   if (typeWords.length && typed !== docs && unplaced.length === otherWords.length) {
-    return { words, mode: "browse", unplaced, candidates: browse(typed, lastWorn, recent, browseLimit) };
+    return { words, mode: "browse", unplaced, candidates: browse(typed, lastWorn, inTurn(lastWorn, rotation), recent, browseLimit) };
   }
 
   const scored = typed
@@ -202,12 +205,10 @@ export function matchGarment(
     const key = numbers.length ? x.d.g.id : x.d.group;
     groups.set(key, [...(groups.get(key) ?? []), x]);
   }
-  const lastOf = (d: Doc) => lastWorn.get(d.g.id) ?? ""; // never worn sorts first
+  const order = inTurn(lastWorn, rotation);
   const best = [...groups.values()].map((members) => {
     const top = Math.max(...members.map((m) => m.score));
-    const pick = members
-      .filter((m) => m.score >= top - 0.5)
-      .sort((a, b) => lastOf(a.d).localeCompare(lastOf(b.d)) || a.d.g.item.localeCompare(b.d.g.item))[0];
+    const pick = members.filter((m) => m.score >= top - 0.5).sort((a, b) => order(a.d.g, b.d.g))[0];
     return { d: pick.d, score: Math.max(...members.map((m) => m.nudged)), size: members.length };
   });
   const candidatesOut = best
@@ -219,13 +220,19 @@ export function matchGarment(
 
 /** A garment type's garments for picking by photo: identical groups collapsed (shown by the one worn longest ago,
  *  for the rotation), groups ordered by how often they were worn lately (a group's wears added up). */
-function browse(docs: Doc[], lastWorn: Map<string, IsoDate>, recent: Map<string, number>, limit: number): MatchCandidate[] {
+function browse(
+  docs: Doc[],
+  lastWorn: Map<string, IsoDate>,
+  order: (a: Garment, b: Garment) => number,
+  recent: Map<string, number>,
+  limit: number,
+): MatchCandidate[] {
   const groups = new Map<string, Doc[]>();
   for (const d of docs) groups.set(d.group, [...(groups.get(d.group) ?? []), d]);
   const lastOf = (d: Doc) => lastWorn.get(d.g.id) ?? "";
   return [...groups.values()]
     .map((members) => ({
-      pick: [...members].sort((a, b) => lastOf(a).localeCompare(lastOf(b)) || a.g.item.localeCompare(b.g.item))[0],
+      pick: [...members].sort((a, b) => order(a.g, b.g))[0],
       wears: members.reduce((s, m) => s + (recent.get(m.g.id) ?? 0), 0),
       latest: members.map(lastOf).sort().pop() ?? "",
       size: members.length,
@@ -233,6 +240,15 @@ function browse(docs: Doc[], lastWorn: Map<string, IsoDate>, recent: Map<string,
     .sort((a, b) => b.wears - a.wears || b.latest.localeCompare(a.latest) || a.pick.g.item.localeCompare(b.pick.g.item))
     .slice(0, limit)
     .map((x) => ({ garment: x.pick.g, score: x.wears, groupSize: x.size }));
+}
+
+/** Which of two identical garments comes first in turn: a marked rotation series' next in line, otherwise the one
+ *  worn longest ago (never worn first), then the name. */
+function inTurn(lastWorn: Map<string, IsoDate>, rotation: Map<string, number>) {
+  return (a: Garment, b: Garment) =>
+    (rotation.get(a.id) ?? Infinity) - (rotation.get(b.id) ?? Infinity) ||
+    (lastWorn.get(a.id) ?? "").localeCompare(lastWorn.get(b.id) ?? "") ||
+    a.item.localeCompare(b.item);
 }
 
 /** Each garment's last wear before `date` (for the rotation rule). */

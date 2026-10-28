@@ -170,6 +170,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-46** 2026-10-28 Rotation series on the Log page (Olof's idea): identical garments kept as one heap and worn in
+  turn (e.g. SOC U 4P Black 01 … 08 (39-42)) can be marked on a garment's edit page ("Rotate as a series", stored in
+  `settings/app.rotationSeries`). A marked series shows on `/log` as one tile that logs the next in line, i.e. the
+  fewest lifetime wears, then the lowest number; the day's chip shows the actual garment, and tapping the tile again
+  removes it. A search matching only some of the series (e.g. "Black 05") lists those one by one. "Describe an item"
+  proposes the same garment for marked series (matcher v1.2); unmarked identical garments keep "worn longest ago".
+  Also a Clear button next to the Log search box (2026-10-25). Semantic layer 0.4.1: term and setting "rotation series".
 - **Landing page** 2026-10-19: in dark mode the media logos (dark text on transparent PNGs) and contact icons sit on
   white tiles; "Making data-supported consumption choices" and the Reaktor blog post use Olof's 1,700 px uploads
   (`Making_data-supported_consumption_choices-large.jpg`, `Reaktor_blog_post.png`).

@@ -255,7 +255,7 @@ th.num .sort-header { justify-content: flex-end; }
 .link-button { align-self: flex-start; border: 0; padding: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }
 .voice-browse-note { margin: 0; font-size: 13px; }
 .voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
-.voice-grid .tile small { font-size: 11px; }
+.tile small { font-size: 11px; }
 
 /* Worn together (R-45) */
 .wt-categories { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }

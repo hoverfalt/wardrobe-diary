@@ -1,5 +1,5 @@
 {
- "version": "0.4.0",
+ "version": "0.4.1",
  "term": {
   "garment": {
    "label": "Garment",
@@ -128,6 +128,10 @@
   "season-tags": {
    "label": "Winter / Summer (tags)",
    "definition": "Worn mainly in winter or in summer; used to narrow the logging list by season."
+  },
+  "rotation-series": {
+   "label": "Rotation series",
+   "definition": "Identical garments named alike apart from a number, e.g. SOC U 4P Black 01 … 08 (39-42), which the owner keeps as one heap and wears in turn. A series the owner marks is logged as one tile, which logs the next in line: the garment with the fewest lifetime wears, then the lowest number."
   },
   "materials": {
    "label": "Materials",

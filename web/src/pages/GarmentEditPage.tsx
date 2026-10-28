@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEur2 } from "../components/CategoryCharts";
 import { Link } from "../components/Link";
 import { PhotoPicker, type PickedPhoto } from "../components/PhotoPicker";
-import { deleteGarment, saveGarment, useGarment, useGarmentHistory } from "../data/repo";
+import { deleteGarment, saveGarment, setRotationSeries, useGarment, useGarmentHistory, useRotationSeries } from "../data/repo";
 import { photoUrl, uploadGarmentPhoto } from "../firebase";
 import { navigate } from "../lib/route";
 import { formatFi, todayIso } from "../lib/dates";
 import { GarmentFormFields, LABELS } from "../components/GarmentFormFields";
 import { changedFields, parseGarmentForm, toForm, type FormErrors, type GarmentForm } from "../lib/garmentForm";
-import { itemListing, TRACKING_START } from "../lib/metrics";
+import { isActive, itemListing, TRACKING_START, wearIndex } from "../lib/metrics";
+import { rotationOrder, seriesOf } from "../lib/rotation";
 import type { Wardrobe } from "../lib/publicData";
 
 
@@ -127,6 +128,8 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
         </div>
       </form>
 
+      {wardrobe && <RotationSetting uid={uid} item={stored.item} category={stored.category} wardrobe={wardrobe} />}
+
       <h3>Photo</h3>
       <div className="field photo-replace">
         <PhotoPicker key={pickerKey} onChange={setNewPhoto} />
@@ -183,6 +186,45 @@ export function GarmentEditPage({ uid, id, wardrobe }: { uid: string; id: string
         <p className="muted">Garments that have been worn can't be deleted, since their wears are part of the history. Divest it instead.</p>
       )}
     </section>
+  );
+}
+
+/** "Rotate as a series" (lib/rotation.ts): offered for a garment whose name ends in a number when other active
+ *  garments share the name. Applies to the whole series at once (settings/app.rotationSeries). */
+function RotationSetting({ uid, item, category, wardrobe }: { uid: string; item: string; category: string; wardrobe: Wardrobe }) {
+  const keys = useRotationSeries(uid);
+  const [error, setError] = useState("");
+  const series = seriesOf({ item, category });
+  const members = useMemo(() => {
+    if (!series) return [];
+    const today = todayIso();
+    const active = wardrobe.garments.filter((g) => seriesOf(g)?.key === series.key && isActive(g, today));
+    return rotationOrder(active, wearIndex(wardrobe.days));
+  }, [series?.key, wardrobe]);
+  if (!series || members.length < 2) return null;
+  const on = keys.includes(series.key);
+  return (
+    <>
+      <h3>Logging</h3>
+      <label className="field checkbox-field">
+        <span>Rotate as a series</span>
+        <span className="row">
+          <input
+            type="checkbox"
+            checked={on}
+            onChange={(e) => {
+              setError("");
+              setRotationSeries(uid, series.key, e.target.checked).catch((err) => setError(err instanceof Error ? err.message : String(err)));
+            }}
+          />
+          <small className="muted">
+            On the Log page, the {members.length} active “{series.name}” garments show as one tile that logs the next in
+            line: the fewest wears, then the lowest number{on && members[0] ? ` (now ${seriesOf(members[0])?.number})` : ""}.
+          </small>
+        </span>
+      </label>
+      {error && <p className="error">Not saved: {error}</p>}
+    </>
   );
 }
 

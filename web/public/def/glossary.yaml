@@ -195,6 +195,17 @@ terms:
     definition: Worn mainly in winter or in summer; used to narrow the logging list by season.
     related: [term:tag]
 
+  # --- Logging
+  - id: rotation-series
+    label: Rotation series
+    alt_labels: [identical garments]
+    definition: >-
+      Identical garments named alike apart from a number, e.g. SOC U 4P Black 01 … 08 (39-42), which the owner keeps
+      as one heap and wears in turn. A series the owner marks is logged as one tile, which logs the next in line: the
+      garment with the fewest lifetime wears, then the lowest number.
+    note: Only changes how wears are entered; each wear is still recorded for the one garment worn, and no metric changes.
+    related: [term:garment, term:wear]
+
   # --- Materials
   - id: materials
     label: Materials

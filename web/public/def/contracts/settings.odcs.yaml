@@ -3,12 +3,12 @@ apiVersion: v3.0.2
 kind: DataContract
 id: wardrobe-diary-settings
 name: Settings
-version: 0.4.0
+version: 0.4.1
 status: active
 domain: wardrobe-diary
 dataProduct: The Wardrobe Diary Project
 description:
-  purpose: App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced.
+  purpose: App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced, and the rotation series marked for the Log page.
   usage: Not public (owner-only); described for transparency.
 team:
   - username: hoverfalt
@@ -22,13 +22,21 @@ schema:
   - name: settings
     physicalName: Firestore users/{uid}/settings/app
     logicalType: object
-    description: App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced.
+    description: App settings, e.g. settings/app.sheetRetired, the cut-over date after which the retired Sheet may no longer be synced, and the rotation series marked for the Log page.
     properties:
       - name: sheetRetired
         logicalType: date
         physicalType: date
         required: false
         description: Cut-over date (2026-10-09).
+      - name: rotationSeries
+        logicalType: object
+        physicalType: string[]
+        required: false
+        description: Rotation series marked by the owner, each as category|name without the number, e.g. Socks|SOC U 4P Black (39-42).
+        authoritativeDefinitions:
+          - type: businessDefinition
+            url: https://wardrobediary.io/glossary#rotation-series
 slaProperties:
   - property: frequency
     value: daily (logged in the app)
