@@ -32,6 +32,66 @@
         "destination": "/evals.html"
       },
       {
+        "source": "/dashboard",
+        "destination": "/pages/dashboard.html"
+      },
+      {
+        "source": "/materials",
+        "destination": "/pages/materials.html"
+      },
+      {
+        "source": "/category/jackets-and-hoodies",
+        "destination": "/pages/category/jackets-and-hoodies.html"
+      },
+      {
+        "source": "/category/blazers-and-vests",
+        "destination": "/pages/category/blazers-and-vests.html"
+      },
+      {
+        "source": "/category/knits",
+        "destination": "/pages/category/knits.html"
+      },
+      {
+        "source": "/category/shirts",
+        "destination": "/pages/category/shirts.html"
+      },
+      {
+        "source": "/category/t-shirts-and-tanks",
+        "destination": "/pages/category/t-shirts-and-tanks.html"
+      },
+      {
+        "source": "/category/pants",
+        "destination": "/pages/category/pants.html"
+      },
+      {
+        "source": "/category/shorts",
+        "destination": "/pages/category/shorts.html"
+      },
+      {
+        "source": "/category/belts",
+        "destination": "/pages/category/belts.html"
+      },
+      {
+        "source": "/category/socks",
+        "destination": "/pages/category/socks.html"
+      },
+      {
+        "source": "/category/shoes",
+        "destination": "/pages/category/shoes.html"
+      },
+      {
+        "source": "/category/underwear-shirts",
+        "destination": "/pages/category/underwear-shirts.html"
+      },
+      {
+        "source": "/category/underwear-boxers",
+        "destination": "/pages/category/underwear-boxers.html"
+      },
+      {
+        "source": "/category/sportswear",
+        "destination": "/pages/category/sportswear.html"
+      },
+      {
         "source": "**",
         "destination": "/app.html"
       }
@@ -210,6 +270,11 @@
       {
         "source": "/hero-image.html",
         "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/bit.ly/:code",
+        "destination": "https://bit.ly/:code",
         "type": 301
       }
     ]

@@ -1,25 +1,57 @@
-import { defineConfig, type Connect, type Plugin } from "vite";
+import { defineConfig, type Connect, type Plugin, type ResolvedConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { headTags, pageMeta, prerenderBody, prerenderFile, PRERENDERED } from "./src/lib/pageMeta";
 
 /** Two pages (R-16): index.html = the static landing page at "/", app.html = the app for every other path.
  *  Firebase Hosting does this with a rewrite (firebase.json); this plugin does the same in dev and preview. */
 function appFallback(): Plugin {
-  const rewrite: Connect.NextHandleFunction = (req, _res, next) => {
+  const rewrite = (outDir?: string): Connect.NextHandleFunction => (req, _res, next) => {
     const path = (req.url ?? "/").split("?")[0];
     const isFile = /\.[a-z0-9]+$/i.test(path) || path.startsWith("/@") || path.startsWith("/src/") || path.startsWith("/node_modules/");
     if (["/glossary", "/model", "/data", "/evals"].includes(path)) req.url = `${path}.html`; // generated semantic pages
+    else if (outDir && !isFile && existsSync(resolve(outDir, prerenderFile(path)))) req.url = `/${prerenderFile(path)}`; // preview: built pages
     else if (path !== "/" && !isFile) req.url = "/app.html";
     next();
   };
   return {
     name: "app-fallback",
-    configureServer: (server) => void server.middlewares.use(rewrite),
-    configurePreviewServer: (server) => void server.middlewares.use(rewrite),
+    configureServer: (server) => void server.middlewares.use(rewrite()),
+    configurePreviewServer: (server) => void server.middlewares.use(rewrite(server.config.build.outDir)),
+  };
+}
+
+/** One HTML file per public app page (lib/pageMeta.ts): the app shell with the page's own title, description and
+ *  canonical address, and a short text in #root until the app has loaded. Without them search engines see the
+ *  same empty shell on every page (Search Console: "Discovered - currently not indexed", "Duplicate"). */
+function prerenderPages(): Plugin {
+  let config: ResolvedConfig;
+  return {
+    name: "prerender-pages",
+    apply: "build",
+    configResolved: (c) => void (config = c),
+    closeBundle() {
+      const outDir = resolve(config.root, config.build.outDir);
+      const shell = readFileSync(resolve(outDir, "app.html"), "utf8");
+      if (!shell.includes("<title>Wardrobe Diary</title>") || !shell.includes('<div id="root"></div>')) {
+        throw new Error("prerender-pages: app.html no longer has the expected <title> and #root");
+      }
+      for (const route of PRERENDERED) {
+        const meta = pageMeta(route);
+        const html = shell
+          .replace("<title>Wardrobe Diary</title>", headTags(meta))
+          .replace('<div id="root"></div>', `<div id="root">${prerenderBody(route)}</div>`);
+        const file = resolve(outDir, prerenderFile(meta.canonical!));
+        mkdirSync(dirname(file), { recursive: true });
+        writeFileSync(file, html);
+      }
+    },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), appFallback()],
+  plugins: [react(), appFallback(), prerenderPages()],
   appType: "mpa",
   build: {
     // The firebase chunk (~625 kB, ~185 kB gzipped: Auth + Firestore) is needed by every visit, so splitting it

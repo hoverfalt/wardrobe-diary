@@ -1,4 +1,6 @@
 User-agent: *
 Disallow: /log
 Disallow: /manage
+Disallow: /mcp
+Disallow: /pages/
 Sitemap: https://wardrobediary.io/sitemap.xml

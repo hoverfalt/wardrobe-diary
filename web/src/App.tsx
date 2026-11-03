@@ -3,7 +3,8 @@ import { lazy, Suspense, useEffect, useState, type ComponentType } from "react";
 import { useDateRange } from "./components/DateRangeControl";
 import { usePublicWardrobe } from "./data/repo";
 import { auth, EMULATORS, OWNER_UID, signIn, signOutUser } from "./firebase";
-import { navigate, useRoute } from "./lib/route";
+import { pageMeta, SITE } from "./lib/pageMeta";
+import { navigate, useRoute, type Route } from "./lib/route";
 
 /** A page loaded only when first shown (R-18: the charts and the owner-only pages are separate files). If the
  *  file is gone because a new version was deployed while the page was open, reload once to get the new one. */
@@ -42,6 +43,8 @@ export function App() {
   const wardrobe = usePublicWardrobe(OWNER_UID);
   const { range, control } = useDateRange();
   const isOwner = user?.uid === OWNER_UID;
+  const garmentName = route.page === "garment" ? wardrobe?.garments.find((g) => g.id === route.id)?.item : undefined;
+  useEffect(() => applyPageMeta(route, garmentName), [route, garmentName]);
   const signInPrompt = user === null ? <button onClick={signIn}>Sign in with Google</button> : null;
 
   return (
@@ -111,3 +114,19 @@ export function App() {
     </main>
   );
 }
+
+/** Title, description and canonical address of the page shown (lib/pageMeta.ts; the build writes the same into the
+ *  public pages' HTML), kept in step when moving between pages. */
+function applyPageMeta(route: Route, garmentName?: string) {
+  const meta = pageMeta(route, garmentName);
+  document.title = meta.title;
+  const set = (selector: string, make: () => HTMLElement, attr: string, value: string | undefined) => {
+    let el = document.head.querySelector<HTMLElement>(selector);
+    if (value === undefined) return el?.remove();
+    if (!el) document.head.appendChild((el = make()));
+    el.setAttribute(attr, value);
+  };
+  set('meta[name="description"]', () => Object.assign(document.createElement("meta"), { name: "description" }), "content", meta.description);
+  set('link[rel="canonical"]', () => Object.assign(document.createElement("link"), { rel: "canonical" }), "href", meta.canonical && `${SITE}${meta.canonical}`);
+}
+

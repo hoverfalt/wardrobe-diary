@@ -340,8 +340,14 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - `/` is the **static landing page** (`web/index.html` + `src/landing.css`, the old site's project page, R-16:
   crawlable, preview tags, no JavaScript; images from Storage, logos on white tiles in dark mode); the app is `web/app.html`, served for every other path (Firebase
   rewrite `**` → `/app.html`; the `appFallback` plugin in `vite.config.ts` does the same in dev/preview).
-  `firebase.json` has 301 redirects for every old wardrobediary.io page (`*.html`); check them with
-  `node web/e2e/redirect-check.mjs [base]`. GA4 (G-HYJZNEMFV0, the old site's) loads only on wardrobediary.io.
+  `firebase.json` has 301 redirects for every old wardrobediary.io page (`*.html`) and `/bit.ly/:code` → bit.ly
+  (relative links on the old site); check them with `node web/e2e/redirect-check.mjs [base]`.
+  **Search engines (R-47):** the public app pages in `web/public/sitemap.xml` (Dashboard, Materials, the 13 category
+  pages) are built as their own HTML files (`dist/pages/…`, the `prerenderPages` plugin in `vite.config.ts`) with
+  their own title, description, canonical address and a short text in `#root` (`lib/pageMeta.ts`), served by explicit
+  rewrites in `firebase.json`; `App.tsx` sets the same tags on every page change (garment pages included).
+  `pageMeta.test.ts` checks the sitemap, `PRERENDERED` and the rewrites agree: a new public page needs all three.
+  `robots.txt` keeps crawlers off `/log`, `/manage`, `/mcp` and `/pages/`. GA4 (G-HYJZNEMFV0, the old site's) loads only on wardrobediary.io.
 - App pages: `/dashboard` Dashboard, `/category/<slug>`, `/garment/<id>`, `/materials`, `/log`, `/manage` (owner = `VITE_OWNER_UID`); routing in `web/src/lib/route.ts` (no library).
   The top nav (Dashboard, Log, Manage, Sign in/out) must fit a phone; sub-pages such as `/materials` are linked
   from the Dashboard instead, with Dashboard highlighted.

@@ -10,8 +10,13 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-10-28)
+## Where we left off (2026-11-03)
 
+- **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
+  title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
+  redirect to bit.ly.
+- **Open for Olof:** after the deploy, "Validate fix" on each row in Search Console (Page indexing); Google re-checks
+  over days to weeks.
 - **Done 2026-10-25 … 28:** a Clear button next to the Log page's search box; **rotation series** on the Log page
   (R-46): identical garments marked "Rotate as a series" log from one tile, next in line = fewest lifetime wears,
   then lowest number ("Describe an item" proposes the same one, matcher v1.2); semantic layer 0.4.1.
@@ -159,6 +164,13 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-47** 2026-11-03 Search Console reported 25 unindexed pages after the domain switch. Cause: every app page served
+  the same empty shell (title "Wardrobe Diary", no description or canonical; content only with JavaScript), so
+  Google queued them ("Discovered / Crawled - currently not indexed", 20) or took them as duplicates (1). Now the
+  15 sitemap app pages are built as their own HTML (title, description, canonical, link-preview tags, a short text
+  with links in `#root`), and the app keeps the tags in step when navigating. `/mcp` (405 to a browser, "other 4xx")
+  is disallowed in robots.txt, as is `/pages/`; the one 404, `/bit.ly/3aQqZsb` (a relative link on the old GitHub
+  Pages site), and any such link now redirect to bit.ly. "Page with redirect" (2) is expected (old addresses).
 - **R-46** 2026-10-28 Rotation series on the Log page (Olof's idea): identical garments kept as one heap and worn in
   turn (e.g. SOC U 4P Black 01 … 08 (39-42)) can be marked on a garment's edit page ("Rotate as a series", stored in
   `settings/app.rotationSeries`). A marked series shows on `/log` as one tile that logs the next in line, i.e. the
