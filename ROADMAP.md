@@ -15,8 +15,10 @@ How this file works:
 - **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
   title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
   redirect to bit.ly.
-- **Open for Olof:** after the deploy, "Validate fix" on each row in Search Console (Page indexing); Google re-checks
-  over days to weeks.
+- Search Console: "Validate fix" clicked on every row (2026-11-03); Google re-checks over days to weeks.
+- **Done 2026-11-03:** Dependabot alerts after the R-47 push (19): `npm audit fix` in `web/`, `mcp/` and
+  `functions/` (body-parser in the public MCP server, re2js in the browser bundle, zod, undici, qs …); functions and
+  mcp now 0, web 11 moderate accepted (see R-42). Redeployed app and MCP function.
 - **Done 2026-10-25 … 28:** a Clear button next to the Log page's search box; **rotation series** on the Log page
   (R-46): identical garments marked "Rotate as a series" log from one tile, next in line = fewest lifetime wears,
   then lowest number ("Describe an item" proposes the same one, matcher v1.2); semantic layer 0.4.1.
@@ -247,6 +249,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   `@opentelemetry/core` 2.12 (verified: tests, build, emulators + signed-in checks, deploy, live checks).
   **Accepted:** `braces` ≤ 3.0.3 (stack-exhaustion DoS on crafted glob patterns) via firebase-tools' file watcher -
   no fixed version exists yet; dev-only, no untrusted input. Revisit when a fix ships.
+  2026-11-03: also accepted 11 moderate `glob` / `minimatch` alerts in `web/` via firebase-tools 15.34.2 (the
+  latest) and google-gax → rimraf; npm's only fix downgrades firebase-tools to 13. Dev-only (deploys, tests), our own
+  patterns only. Revisit when firebase-tools updates.
 
 - **R-18b** 2026-10-13 Python 3.12 for `tools/` (3.9 is end of life): standalone CPython 3.12.15 installed
   user-locally (`~/.local/share/python-3.12.15`, checksum verified), `tools/.venv` rebuilt (firebase-admin 7.7,
