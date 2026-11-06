@@ -191,7 +191,7 @@ export function CategoryScatter({
   tipLabels: [string, string];
 }) {
   const dark = useDarkMode();
-  const [showTrails, setShowTrails] = useState(true);
+  const [showTrails, setShowTrails] = useState(false);
   const options = useCallback(
     (width: number): Plot.PlotOptions => {
       const r = Math.round(Math.min(26, Math.max(14, width / 40)));
@@ -224,6 +224,8 @@ export function CategoryScatter({
             y: "y",
             z: "category",
             stroke: (d) => categoryColor(d.category, dark),
+            // A curve through the monthly points (it still passes through each one, year-end dots included).
+            curve: "catmull-rom",
             strokeWidth: 2,
             strokeOpacity: 0.6,
           }),
@@ -258,7 +260,7 @@ export function CategoryScatter({
             [
               ...points.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
               ...others,
-              ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(as known then)` })),
+              ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(3-month average, as known then)` })),
             ],
             Plot.pointer({ x: "x", y: "y", title: "tip" }),
           ),

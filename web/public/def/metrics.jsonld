@@ -17,7 +17,7 @@
   {
    "@id": "https://wardrobediary.io/def/metrics",
    "rdfs:label": "Wardrobe Diary semantic model (metrics)",
-   "owl:versionInfo": "0.5.0",
+   "owl:versionInfo": "0.5.1",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    }
@@ -319,8 +319,8 @@
    "@id": "https://wardrobediary.io/model#metric-category-trail",
    "@type": "Metric",
    "rdfs:label": "Category trail",
-   "skos:definition": "Where a category stood at every month end from the range start to the range end, as known then: days used, cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged by then and only garments bought by then. The last point is the listing itself (lifetime cost per wear), so each trail ends at the category's point. Drawn as the trails in the Dashboard's cost per wear and yearly cost charts, with a dot at each year end.",
-   "formula": "for each month end t < range.to: category listing over (range.from .. t) as of t; then the listing over the range",
+   "skos:definition": "Where a category stood at every month end from the range start to the range end, as known then: days used, cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged by then and only garments bought by then, each averaged with the neighbouring month ends (3 months) to damp seasonal swings. The last point is the listing itself (lifetime cost per wear, not averaged), so each trail ends at the category's point. Drawn as curves in the Dashboard's cost per wear and yearly cost charts (shown with \"Show trails\"), with a dot at each year end.",
+   "formula": "for each month end t < range.to: mean of the category listing over (range.from .. u) as of u, u = t and its neighbouring month ends; then the listing over the range",
    "grain": "category × month end",
    "unit": "share and EUR",
    "rangeRule": "each month end, as of that date",
@@ -348,6 +348,7 @@
    },
    "test": [
     "web/src/lib/metrics.test.ts › has a point at every month end before the range end, as known then (only wears logged by then)",
+    "web/src/lib/metrics.test.ts › averages each month end with its neighbours (3 months)",
     "web/src/lib/metrics.test.ts › ends at the listing itself (lifetime cost per wear, D-2)",
     "web/src/lib/metrics.test.ts › leaves out garments not yet bought"
    ]

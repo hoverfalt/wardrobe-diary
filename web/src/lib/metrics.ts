@@ -245,8 +245,9 @@ export interface TrailPoint {
 }
 
 /** How each category's listing values developed over the range: one point per month end before range.to,
- *  each as known on that date (only wears logged by then count), and a last point equal to the listing itself
- *  (D-2). For the Dashboard's trails; categories in the standard order. */
+ *  each as known on that date (only wears logged by then count) and averaged over 3 months (the month end and its
+ *  neighbours) to damp seasonal swings, and a last point equal to the listing itself (D-2), not averaged. For the
+ *  Dashboard's trails; categories in the standard order. */
 export function categoryTrails(garments: Garment[], days: Day[], range: DateRange): Map<string, TrailPoint[]> {
   const wears = wearIndex(days);
   const trails = new Map<string, TrailPoint[]>();
@@ -260,8 +261,18 @@ export function categoryTrails(garments: Garment[], days: Day[], range: DateRang
   for (let date = monthEnd(range.from); date < range.to; date = monthEnd(nextDay(date))) {
     add(date, listCategories(garments, wears, { from: range.from, to: date }, date));
   }
+  for (const [category, points] of trails) trails.set(category, threeMonthMean(points));
   add(range.to, listCategories(garments, wears, range, FOREVER));
   return new Map([...trails].sort(([a], [b]) => compareCategories(a, b)));
+}
+
+/** Each point's values averaged with its neighbours' (two at the ends). */
+function threeMonthMean(points: TrailPoint[]): TrailPoint[] {
+  return points.map((p, i) => {
+    const near = points.slice(Math.max(0, i - 1), i + 2);
+    const mean = (f: (q: TrailPoint) => number) => sum(near.map(f)) / near.length;
+    return { date: p.date, costPerWear: mean((q) => q.costPerWear), daysUsed: mean((q) => q.daysUsed), yearlyCost: mean((q) => q.yearlyCost) };
+  });
 }
 
 /** Last day of the date's month. */

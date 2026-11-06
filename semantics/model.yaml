@@ -16,7 +16,7 @@ title: Wardrobe Diary semantic layer
 description: >-
   Meaning, definitions, lineage and quality of the Wardrobe Diary data: one person's daily log of every garment
   worn since 1 January 2018, with purchase prices, dates, materials and weights, and the metrics derived from it.
-version: 0.5.0
+version: 0.5.1
 status: draft
 base_iri: https://wardrobediary.io/def/
 language: en
@@ -43,3 +43,4 @@ changelog:
   - {version: 0.4.0, date: 2026-10-19, change: "New metric and term: worn together (garments worn on the same day, R-45)."}
   - {version: 0.4.1, date: 2026-10-28, change: "New term and setting: rotation series (identical garments logged in turn from one Log tile)."}
   - {version: 0.5.0, date: 2026-11-06, change: "New metric: category trail (where a category stood at each month end, as known then)."}
+  - {version: 0.5.1, date: 2026-11-06, change: "Category trail: each month end averaged over 3 months."}

@@ -231,8 +231,9 @@ export function Dashboard({
           <h2>Average cost per wear and category frequency of use</h2>
           <p className="muted">
             Average cost per wear by category. Category frequency of use is the share of all days in which any
-            item in the category was used. The trails show how each category got here: its position at every month
-            end, as known then (counting only the wears logged by then), with a dot at each year end.
+            item in the category was used. “Show trails” draws how each category got here: its position at every
+            month end, as known then (counting only the wears logged by then) and averaged over 3 months, with a dot at
+            each year end.
           </p>
           <CategoryScatter
             points={costVsUse}
@@ -249,8 +250,8 @@ export function Dashboard({
           <h2>Average yearly cost and category frequency of use</h2>
           <p className="muted">
             Yearly cost of using the items in a particular category. Frequency of use is the share of all days in
-            which any item in the category was used. The trails show each category's earlier positions at every month
-            end, as known then, with a dot at each year end.
+            which any item in the category was used. “Show trails” draws each category's earlier positions at every month
+            end, as known then and averaged over 3 months, with a dot at each year end.
           </p>
           <CategoryScatter
             points={yearlyVsUse}

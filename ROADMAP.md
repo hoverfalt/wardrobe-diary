@@ -13,8 +13,9 @@ How this file works:
 ## Where we left off (2026-11-03)
 
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
-  category's position at every month end, as known then, with year-end dots and a "Show trails" toggle; semantic
-  layer 0.5.0 (metric `category-trail`).
+  category's position at every month end, as known then and averaged over 3 months, drawn as curves, with year-end
+  dots and a "Show trails" toggle (off by default); semantic
+  layer 0.5.1 (metric `category-trail`).
 - **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
   title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
   redirect to bit.ly.
@@ -173,7 +174,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   "Average yearly cost and category frequency of use", a category-coloured trail behind each category's photo shows
   where it stood at every month end of the range (`categoryTrails` = `categoryListing` with `asOf`, month by month;
   the last point is the listing itself). Olof chose "as known then" (only wears logged by then): a second "as of"
-  exception to D-2, recorded in decisions.yaml. Year-end dots with tooltips; a "Show trails" checkbox per chart, since
+  exception to D-2, recorded in decisions.yaml. Year-end dots with tooltips; curves (catmull-rom) through 3-month means
+  of the month-end points (the last point exact), to damp seasonal swings (Olof, after weekly points were ruled out:
+  ~4× slower and more jagged, not smoother); a "Show trails" checkbox per chart, off by default (Olof), since
   early values stretch the y axis (yearly cost up to ~1 450 € in 2018 against ≤ 370 € now). Deliberately coloured
   lines in one chart (not D-3 small multiples): a trail belongs to its photo. ~0.15 s to compute; the range is
   deferred so the slider stays responsive. Verified: tests, build, headless Chrome screenshots, local preview by Olof.
