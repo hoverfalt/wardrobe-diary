@@ -172,9 +172,16 @@ export interface CategoryRow {
   secondHandShare: number | null;
 }
 
-/** The live site's category listing, plus a Total row first. */
-export function categoryListing(garments: Garment[], days: Day[], range: DateRange): CategoryRow[] {
-  const wears = wearIndex(days);
+/** The live site's category listing, plus a Total row first.
+ *
+ *  With `asOf`, everything is as it was known on that date (for the trails): the range ends at `asOf` at the
+ *  latest and cost per wear counts only wears up to then. */
+export function categoryListing(garments: Garment[], days: Day[], range: DateRange, asOf: IsoDate = FOREVER): CategoryRow[] {
+  return listCategories(garments, wearIndex(days), { from: range.from, to: min(range.to, asOf) }, asOf);
+}
+
+function listCategories(garments: Garment[], wears: WearIndex, range: DateRange, asOf: IsoDate): CategoryRow[] {
+  const known: DateRange = { from: TRACKING_START, to: asOf };
   const byCategory = new Map<string, Garment[]>();
   for (const g of garments) {
     if (!ownedDuring(g, range)) continue;
@@ -190,7 +197,7 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
       // Pooled lifetime cost per wear (D-2 amended): what the garments cost over all the use they get.
       const priced = items.filter((g) => g.price != null);
       const prices = sum(priced.map((g) => g.price!));
-      const lifetime = sum(priced.map((g) => lifetimeWears(g, wears)));
+      const lifetime = sum(priced.map((g) => timesWorn(g, wears, known)));
       const avgCostPerWear = priced.length > 0 ? prices / Math.max(1, lifetime) : null;
 
       // Category days counted from when the category's first garment was owned (as in R).
@@ -228,6 +235,39 @@ export function categoryListing(garments: Garment[], days: Day[], range: DateRan
     })(),
   };
   return [total, ...rows];
+}
+
+export interface TrailPoint {
+  date: IsoDate;
+  costPerWear: number;
+  daysUsed: number;
+  yearlyCost: number;
+}
+
+/** How each category's listing values developed over the range: one point per month end before range.to,
+ *  each as known on that date (only wears logged by then count), and a last point equal to the listing itself
+ *  (D-2). For the Dashboard's trails; categories in the standard order. */
+export function categoryTrails(garments: Garment[], days: Day[], range: DateRange): Map<string, TrailPoint[]> {
+  const wears = wearIndex(days);
+  const trails = new Map<string, TrailPoint[]>();
+  const add = (date: IsoDate, rows: CategoryRow[]) => {
+    for (const r of rows) {
+      if (r.category === "Total" || r.costPerWear == null || r.daysUsed == null || r.yearlyCost == null) continue;
+      const point = { date, costPerWear: r.costPerWear, daysUsed: r.daysUsed, yearlyCost: r.yearlyCost };
+      trails.set(r.category, [...(trails.get(r.category) ?? []), point]);
+    }
+  };
+  for (let date = monthEnd(range.from); date < range.to; date = monthEnd(nextDay(date))) {
+    add(date, listCategories(garments, wears, { from: range.from, to: date }, date));
+  }
+  add(range.to, listCategories(garments, wears, range, FOREVER));
+  return new Map([...trails].sort(([a], [b]) => compareCategories(a, b)));
+}
+
+/** Last day of the date's month. */
+function monthEnd(date: IsoDate): IsoDate {
+  const [y, m] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
 }
 
 function sum(values: number[]): number {

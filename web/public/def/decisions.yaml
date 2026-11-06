@@ -27,7 +27,7 @@ decisions:
       with unworn garments included. Raises categories with unused garments (e.g. Socks +43 % in 2025) and changes
       Yearly cost, Turnover and the monthly cost comparison with it.
     affects: [metric:garment-cost-per-wear, metric:category-cost-per-wear, metric:daily-cost]
-    exception: Animations show values "as of" a date (only wears up to then).
+    exception: Animations and the Dashboard's category trails show values "as of" a date (only wears up to then).
 
   - id: D-3
     date: 2026-10-09

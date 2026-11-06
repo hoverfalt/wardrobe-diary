@@ -10,6 +10,7 @@ import {
   totalInventoryValueOverTime,
   valueOn,
   categoryListing,
+  categoryTrails,
   costPerWear,
   daysOwned,
   isActive,
@@ -126,6 +127,39 @@ describe("categoryListing", () => {
     expect(total.category).toBe("Total");
     expect(total.activeItems).toBe(1);
     expect(total.yearlyCost).toBe(jackets.yearlyCost);
+  });
+});
+
+describe("categoryTrails", () => {
+  // Bought 2018-01-01 for 120 €: worn twice in January and once in March.
+  const coat = garment({ id: "coat", price: 120 });
+  const log: Day[] = [
+    { date: "2018-01-10", worn: ["coat"] },
+    { date: "2018-01-20", worn: ["coat"] },
+    { date: "2018-03-05", worn: ["coat"] },
+  ];
+  const range = { from: "2018-01-01", to: "2018-03-15" };
+  const trail = categoryTrails([coat], log, range).get("Jackets and hoodies")!;
+
+  it("has a point at every month end before the range end, as known then (only wears logged by then)", () => {
+    expect(trail.map((p) => p.date)).toEqual(["2018-01-31", "2018-02-28", "2018-03-15"]);
+    expect(trail[0].costPerWear).toBe(60); // 120 € / the 2 wears known on 31 January
+    expect(trail[0].daysUsed).toBe(2 / 31);
+    expect(trail[1].daysUsed).toBe(2 / 59);
+    expect(trail[1].yearlyCost).toBe(60 * 365 * (2 / 59));
+  });
+
+  it("ends at the listing itself (lifetime cost per wear, D-2)", () => {
+    const [, row] = categoryListing([coat], log, range);
+    expect(trail.at(-1)).toEqual({ date: "2018-03-15", costPerWear: row.costPerWear, daysUsed: row.daysUsed, yearlyCost: row.yearlyCost });
+    expect(row.costPerWear).toBe(40);
+  });
+
+  it("leaves out garments not yet bought", () => {
+    const later = garment({ id: "later", price: 1000, purchased: "2018-02-15" });
+    const t = categoryTrails([coat, later], log, range).get("Jackets and hoodies")!;
+    expect(t[0].costPerWear).toBe(60);
+    expect(t[1].costPerWear).toBe((120 + 1000) / 2);
   });
 });
 

@@ -67,8 +67,8 @@ terms:
     label: As of
     definition: >-
       A figure computed as it was known on a past date, counting only wears logged up to then. Used by the
-      animated charts.
-    note: The one deliberate exception to the lifetime rule of cost per wear (decision D-2).
+      animated charts and the category trails.
+    note: The deliberate exception to the lifetime rule of cost per wear (decision D-2).
 
   # --- Garment metrics
   - id: times-worn

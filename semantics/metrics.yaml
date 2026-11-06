@@ -162,6 +162,30 @@ metrics:
     tests:
       - web/src/lib/metrics.test.ts › adds a total row
 
+  - id: category-trail
+    label: Category trail
+    term: term:as-of
+    grain: category × month end
+    unit: share and EUR
+    definition: >-
+      Where a category stood at every month end from the range start to the range end, as known then: days used,
+      cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged
+      by then and only garments bought by then. The last point is the listing itself (lifetime cost per wear), so
+      each trail ends at the category's point. Drawn as the trails in the Dashboard's cost per wear and yearly cost
+      charts, with a dot at each year end.
+    formula: "for each month end t < range.to: category listing over (range.from .. t) as of t; then the listing over the range"
+    range_rule: each month end, as of that date
+    depends_on: [metric:category-cost-per-wear, metric:days-used, metric:yearly-cost]
+    decisions: [decision:D-2]
+    implementation: web/src/lib/metrics.ts#categoryTrails
+    tests:
+      - web/src/lib/metrics.test.ts › has a point at every month end before the range end, as known then (only wears logged by then)
+      - web/src/lib/metrics.test.ts › ends at the listing itself (lifetime cost per wear, D-2)
+      - web/src/lib/metrics.test.ts › leaves out garments not yet bought
+    note: >-
+      Like the animations, an "as of" exception to D-2. When the range ends before the last logged day, the last
+      step can jump, as the point itself counts the wears after the range end.
+
   - id: monthly-cost
     label: Monthly cost
     term: term:monthly-cost

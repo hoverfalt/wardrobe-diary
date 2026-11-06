@@ -52,6 +52,7 @@ td.img { width: 28px; padding: 2px 4px; }
 
 /* Charts */
 .chart { margin: 0 0 24px; }
+.chart-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; margin: 0 0 6px; }
 .plot svg { overflow: visible; --plot-background: var(--bg); } /* tooltip box follows light/dark mode */
 .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px 24px; margin-bottom: 24px; }
 .multiple { margin: 0; }

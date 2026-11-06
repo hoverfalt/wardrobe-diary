@@ -1,5 +1,5 @@
 {
- "version": "0.4.1",
+ "version": "0.5.0",
  "term": {
   "garment": {
    "label": "Garment",
@@ -43,7 +43,7 @@
   },
   "as-of": {
    "label": "As of",
-   "definition": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts."
+   "definition": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts and the category trails."
   },
   "times-worn": {
    "label": "Times worn",
@@ -228,6 +228,11 @@
    "label": "Yearly cost",
    "definition": "Category cost per wear × 365 × days used. Total row - the sum over categories.",
    "formula": "category-cost-per-wear × 365 × days-used"
+  },
+  "category-trail": {
+   "label": "Category trail",
+   "definition": "Where a category stood at every month end from the range start to the range end, as known then: days used, cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged by then and only garments bought by then. The last point is the listing itself (lifetime cost per wear), so each trail ends at the category's point. Drawn as the trails in the Dashboard's cost per wear and yearly cost charts, with a dot at each year end.",
+   "formula": "for each month end t < range.to: category listing over (range.from .. t) as of t; then the listing over the range"
   },
   "monthly-cost": {
    "label": "Monthly cost",

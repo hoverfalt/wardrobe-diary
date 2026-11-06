@@ -1,7 +1,7 @@
 // Charts over time. Design pattern (decision D-3): anything shown per category is drawn as small
 // multiples, one chart per category on a shared scale, never as many coloured lines in one chart.
 import * as Plot from "@observablehq/plot";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { categoryImageUrl } from "../firebase";
 import { categoryColor } from "../lib/categories";
 import { formatFi } from "../lib/dates";
@@ -147,6 +147,12 @@ export interface ScatterPoint {
 
 /** A non-wardrobe point drawn with the categories (R-26 comparison): grey, with its photo when there is one
  *  and otherwise its name as a label. */
+/** A category's earlier positions, oldest first; the last one is where its point is now. */
+export interface ScatterTrail {
+  category: string;
+  points: { date: string; x: number; y: number }[];
+}
+
 export interface OtherPoint {
   label: string;
   x: number;
@@ -170,9 +176,12 @@ export function CategoryScatter({
   yTickFormat = yFormat,
   tipLabels,
   others = [],
+  trails = [],
 }: {
   points: ScatterPoint[];
   others?: OtherPoint[];
+  /** Category trails, shown under the points with a "Show trails" toggle. */
+  trails?: ScatterTrail[];
   xLabel: string;
   yLabel: string;
   /** Values in the tooltip. */
@@ -182,12 +191,18 @@ export function CategoryScatter({
   tipLabels: [string, string];
 }) {
   const dark = useDarkMode();
+  const [showTrails, setShowTrails] = useState(true);
   const options = useCallback(
     (width: number): Plot.PlotOptions => {
       const r = Math.round(Math.min(26, Math.max(14, width / 40)));
+      const trail = showTrails
+        ? trails.flatMap((t) => t.points.map((p) => ({ ...p, category: t.category })))
+        : [];
+      // Year-end positions get a small dot (and a tooltip), so the trail shows how fast a category moved.
+      const yearEnds = trail.filter((p) => p.date.endsWith("-12-31"));
       const data = points.map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
       const withPhoto = others.filter((o) => o.src);
-      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), 0);
+      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), ...trail.map((p) => p.y), 0);
       // On narrow charts the low, crowded band would be unreadable: label only the points above it there
       // (all points keep their tooltips).
       const labelled = others.filter((o) => !o.src && (width >= 600 || o.y > yTop * 0.2));
@@ -204,6 +219,15 @@ export function CategoryScatter({
         y: { domain: [0, yTop * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
         marks: [
           Plot.ruleY([0]),
+          Plot.line(trail, {
+            x: "x",
+            y: "y",
+            z: "category",
+            stroke: (d) => categoryColor(d.category, dark),
+            strokeWidth: 2,
+            strokeOpacity: 0.6,
+          }),
+          Plot.dot(yearEnds, { x: "x", y: "y", r: 2.5, fill: (d) => categoryColor(d.category, dark) }),
           Plot.dot(withPhoto, { x: "x", y: "y", r: r + 3, fill: grey }),
           Plot.image(withPhoto, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
           Plot.dot(data, { x: "x", y: "y", r: r + 3, fill: (d) => categoryColor(d.category, dark) }),
@@ -234,17 +258,23 @@ export function CategoryScatter({
             [
               ...points.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
               ...others,
+              ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(as known then)` })),
             ],
             Plot.pointer({ x: "x", y: "y", title: "tip" }),
           ),
         ],
       };
     },
-    [points, others, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
+    [points, others, trails, showTrails, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
   );
   if (points.length === 0) return null;
   return (
     <figure className="chart">
+      {trails.length > 0 && (
+        <label className="chart-toggle">
+          <input type="checkbox" checked={showTrails} onChange={(e) => setShowTrails(e.target.checked)} /> Show trails
+        </label>
+      )}
       <PlotFigure options={options} />
     </figure>
   );

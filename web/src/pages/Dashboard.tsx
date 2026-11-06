@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useDeferredValue, useMemo, useState, type ReactNode } from "react";
 import { SortHeader } from "../components/SortHeader";
 import { nextSort, sortRows, type SortDir } from "../lib/sorting";
 import type { Wardrobe } from "../lib/publicData";
@@ -14,6 +14,7 @@ import {
   TotalChart,
   type OtherPoint,
   type ScatterPoint,
+  type ScatterTrail,
 } from "../components/CategoryCharts";
 import { CategoryLink } from "../components/CategoryLink";
 import { DefinitionLinks, HowCalculated } from "../components/Definitions";
@@ -24,6 +25,7 @@ import { WornTogetherChart } from "../components/WornTogetherChart";
 import {
   activeItemsOverTime,
   categoryListing,
+  categoryTrails,
   inventoryValueOverTime,
   totalInventoryValueOverTime,
   type CategoryRow,
@@ -96,6 +98,18 @@ export function Dashboard({
           : [],
       ),
     [rows],
+  );
+  // Trails: where each category stood at every month end, as known then (computed once for both charts; the
+  // deferred range keeps the date slider responsive while they are recomputed).
+  const trailRange = useDeferredValue(range);
+  const trails = useMemo(() => (garments && days ? categoryTrails(garments, days, trailRange) : null), [garments, days, trailRange]);
+  const costTrails = useMemo(
+    () => [...(trails ?? [])].map(([category, points]): ScatterTrail => ({ category, points: points.map((p) => ({ date: p.date, x: p.daysUsed, y: p.costPerWear })) })),
+    [trails],
+  );
+  const yearlyTrails = useMemo(
+    () => [...(trails ?? [])].map(([category, points]): ScatterTrail => ({ category, points: points.map((p) => ({ date: p.date, x: p.daysUsed, y: p.yearlyCost })) })),
+    [trails],
   );
   const yearlyVsUse = useMemo(
     () =>
@@ -217,32 +231,36 @@ export function Dashboard({
           <h2>Average cost per wear and category frequency of use</h2>
           <p className="muted">
             Average cost per wear by category. Category frequency of use is the share of all days in which any
-            item in the category was used.
+            item in the category was used. The trails show how each category got here: its position at every month
+            end, as known then (counting only the wears logged by then), with a dot at each year end.
           </p>
           <CategoryScatter
             points={costVsUse}
+            trails={costTrails}
             xLabel="Category frequency of use (share of all days)"
             yLabel="Average cost per wear"
             yFormat={formatEur2}
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}
           />
-          <HowCalculated refs={["metric:category-cost-per-wear", "metric:days-used"]} />
+          <HowCalculated refs={["metric:category-cost-per-wear", "metric:days-used", "metric:category-trail"]} />
           {rangeControl}
 
           <h2>Average yearly cost and category frequency of use</h2>
           <p className="muted">
             Yearly cost of using the items in a particular category. Frequency of use is the share of all days in
-            which any item in the category was used.
+            which any item in the category was used. The trails show each category's earlier positions at every month
+            end, as known then, with a dot at each year end.
           </p>
           <CategoryScatter
             points={yearlyVsUse}
+            trails={yearlyTrails}
             xLabel="Category frequency of use (share of all days)"
             yLabel="Average yearly cost"
             yFormat={formatEur}
             tipLabels={YEARLY_VS_USE_TIP}
           />
-          <HowCalculated refs={["metric:yearly-cost", "metric:days-used"]} />
+          <HowCalculated refs={["metric:yearly-cost", "metric:days-used", "metric:category-trail"]} />
           {rangeControl}
 
           <h2>Daily cost</h2>

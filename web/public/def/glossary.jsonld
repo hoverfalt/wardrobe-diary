@@ -21,7 +21,7 @@
     "@value": "Wardrobe Diary glossary",
     "@language": "en"
    },
-   "owl:versionInfo": "0.4.1",
+   "owl:versionInfo": "0.5.0",
    "dct:license": {
     "@id": "https://creativecommons.org/licenses/by/4.0/"
    },
@@ -385,11 +385,11 @@
     "@language": "en"
    },
    "skos:definition": {
-    "@value": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts.",
+    "@value": "A figure computed as it was known on a past date, counting only wears logged up to then. Used by the animated charts and the category trails.",
     "@language": "en"
    },
    "skos:scopeNote": {
-    "@value": "The one deliberate exception to the lifetime rule of cost per wear (decision D-2).",
+    "@value": "The deliberate exception to the lifetime rule of cost per wear (decision D-2).",
     "@language": "en"
    }
   },

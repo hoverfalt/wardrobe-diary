@@ -12,6 +12,9 @@ How this file works:
 
 ## Where we left off (2026-11-03)
 
+- **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
+  category's position at every month end, as known then, with year-end dots and a "Show trails" toggle; semantic
+  layer 0.5.0 (metric `category-trail`).
 - **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
   title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
   redirect to bit.ly.
@@ -165,6 +168,15 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-48** 2026-11-06 Category trails (Olof): in "Average cost per wear and category frequency of use" and
+  "Average yearly cost and category frequency of use", a category-coloured trail behind each category's photo shows
+  where it stood at every month end of the range (`categoryTrails` = `categoryListing` with `asOf`, month by month;
+  the last point is the listing itself). Olof chose "as known then" (only wears logged by then): a second "as of"
+  exception to D-2, recorded in decisions.yaml. Year-end dots with tooltips; a "Show trails" checkbox per chart, since
+  early values stretch the y axis (yearly cost up to ~1 450 € in 2018 against ≤ 370 € now). Deliberately coloured
+  lines in one chart (not D-3 small multiples): a trail belongs to its photo. ~0.15 s to compute; the range is
+  deferred so the slider stays responsive. Verified: tests, build, headless Chrome screenshots, local preview by Olof.
 
 - **R-47** 2026-11-03 Search Console reported 25 unindexed pages after the domain switch. Cause: every app page served
   the same empty shell (title "Wardrobe Diary", no description or canonical; content only with JavaScript), so
