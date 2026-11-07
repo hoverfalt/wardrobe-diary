@@ -12,6 +12,8 @@ How this file works:
 
 ## Where we left off (2026-11-03)
 
+- **Done 2026-11-07:** click a category's picture in the Dashboard's category charts (cost per wear, yearly cost,
+  monthly cost comparison) to show only that category and its trail; a click anywhere else shows all again (R-49).
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
   category's position on every day, as known then and averaged over 30 days, with year-end
   dots and a "Show trails" toggle (off by default); semantic
@@ -169,6 +171,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 - **2026-10-07** Make the default Firestore database Native mode (it was an empty Datastore-mode database).
 
 ## Done
+
+- **R-49** 2026-11-07 Pick out one category (Olof): in the category scatters (`CategoryScatter`), clicking a
+  category's picture shows only it (and its trail); clicking it again or anywhere else on the page shows all.
+  Scales stay fixed; comparison items stay visible; a hint above each chart says what is shown. Pictures and rings
+  carry `data-category` (Plot `render` hook); the click handler uses the element pressed on, since pressing pins
+  Plot's tooltip and the click then lands on the svg. Overlapping pictures (e.g. on phones) pick the one on top.
 
 - **R-48** 2026-11-06 Category trails (Olof): in "Average cost per wear and category frequency of use" and
   "Average yearly cost and category frequency of use", a category-coloured trail behind each category's photo shows

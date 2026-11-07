@@ -1,7 +1,7 @@
 // Charts over time. Design pattern (decision D-3): anything shown per category is drawn as small
 // multiples, one chart per category on a shared scale, never as many coloured lines in one chart.
 import * as Plot from "@observablehq/plot";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { categoryImageUrl } from "../firebase";
 import { categoryColor } from "../lib/categories";
 import { formatFi } from "../lib/dates";
@@ -165,9 +165,22 @@ export interface OtherPoint {
 /** Labels near the left or right edge are anchored inward so they aren't cut off. */
 const labelAnchor = (x: number) => (x > 0.85 ? "end" : x < 0.08 ? "start" : "middle");
 
+/** Render hook that marks each drawn circle or image with its datum's category, so a click can pick it out. */
+const markCategories =
+  (data: { category: string }[]): Plot.RenderFunction =>
+  (index, scales, values, dimensions, context, next) => {
+    const g = next!(index, scales, values, dimensions, context)!;
+    g.querySelectorAll("circle, image").forEach((el, i) => {
+      el.setAttribute("data-category", data[index[i]].category);
+      (el as SVGElement).style.cursor = "pointer";
+    });
+    return g;
+  };
+
 /** One point per category, drawn as its image in a ring of the category colour (as on the live site),
  *  with a tooltip. Identity comes from the image, so colour is never the only cue. `others` are drawn
- *  behind the categories in grey. */
+ *  behind the categories in grey. Clicking a category's image shows only that category (and its trail);
+ *  clicking it again, or anywhere else, shows all again. */
 export function CategoryScatter({
   points,
   xLabel,
@@ -192,17 +205,41 @@ export function CategoryScatter({
 }) {
   const dark = useDarkMode();
   const [showTrails, setShowTrails] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const figureRef = useRef<HTMLElement>(null);
+  // One listener for both: a click on one of this chart's category images picks it (or unpicks it), any other
+  // click on the page shows all categories again. Pressing on a chart pins its tooltip, which changes the elements
+  // under the pointer, so the click lands on the svg: the element pressed on tells what was clicked.
+  useEffect(() => {
+    let pressed: Element | null = null;
+    const onDown = (e: PointerEvent) => (pressed = e.target as Element);
+    const onClick = (e: MouseEvent) => {
+      const target = pressed && (e.target as Node).contains(pressed) ? pressed : (e.target as Element | null);
+      const el = target?.closest?.("[data-category]");
+      const picked = el && figureRef.current?.contains(el) ? el.getAttribute("data-category") : null;
+      setSelected((current) => (picked && picked !== current ? picked : null));
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("click", onClick);
+    };
+  }, []);
   const options = useCallback(
     (width: number): Plot.PlotOptions => {
       const r = Math.round(Math.min(26, Math.max(14, width / 40)));
-      const trail = showTrails
+      const allTrails = showTrails
         ? trails.flatMap((t) => t.points.map((p) => ({ ...p, category: t.category })))
         : [];
+      // The scales use every category, so they stay put when one is picked out.
+      const shown = (d: { category: string }) => !selected || d.category === selected;
+      const trail = allTrails.filter(shown);
       // Year-end positions get a small dot (and a tooltip), so the trail shows how fast a category moved.
       const yearEnds = trail.filter((p) => p.date.endsWith("-12-31"));
-      const data = points.map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
+      const data = points.filter(shown).map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
       const withPhoto = others.filter((o) => o.src);
-      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), ...trail.map((p) => p.y), 0);
+      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), ...allTrails.map((p) => p.y), 0);
       // On narrow charts the low, crowded band would be unreadable: label only the points above it there
       // (all points keep their tooltips).
       const labelled = others.filter((o) => !o.src && (width >= 600 || o.y > yTop * 0.2));
@@ -230,8 +267,8 @@ export function CategoryScatter({
           Plot.dot(yearEnds, { x: "x", y: "y", r: 2.5, fill: (d) => categoryColor(d.category, dark) }),
           Plot.dot(withPhoto, { x: "x", y: "y", r: r + 3, fill: grey }),
           Plot.image(withPhoto, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
-          Plot.dot(data, { x: "x", y: "y", r: r + 3, fill: (d) => categoryColor(d.category, dark) }),
-          Plot.image(data, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice" }),
+          Plot.dot(data, { x: "x", y: "y", r: r + 3, fill: (d) => categoryColor(d.category, dark), render: markCategories(data) }),
+          Plot.image(data, { x: "x", y: "y", src: "src", r, preserveAspectRatio: "xMidYMid slice", render: markCategories(data) }),
           // Others without a photo: a small grey dot and its name, drawn on top with a background halo so the
           // name stays readable over category images; anchored inward near the edges so it isn't cut off.
           Plot.dot([...labelled, ...unlabelled], { x: "x", y: "y", r: 5, fill: grey, stroke: dark ? "#8a8a8a" : "#9a9a9a" }),
@@ -256,7 +293,7 @@ export function CategoryScatter({
           // One tooltip layer for categories and others, so only the nearest point gets a tooltip.
           Plot.tip(
             [
-              ...points.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
+              ...data.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
               ...others,
               ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(30-day average, as known then)` })),
             ],
@@ -265,16 +302,21 @@ export function CategoryScatter({
         ],
       };
     },
-    [points, others, trails, showTrails, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
+    [points, others, trails, showTrails, selected, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
   );
   if (points.length === 0) return null;
   return (
-    <figure className="chart">
-      {trails.length > 0 && (
-        <label className="chart-toggle">
-          <input type="checkbox" checked={showTrails} onChange={(e) => setShowTrails(e.target.checked)} /> Show trails
-        </label>
-      )}
+    <figure className="chart" ref={figureRef}>
+      <div className="chart-controls">
+        {trails.length > 0 && (
+          <label className="chart-toggle">
+            <input type="checkbox" checked={showTrails} onChange={(e) => setShowTrails(e.target.checked)} /> Show trails
+          </label>
+        )}
+        <span className="muted">
+          {selected ? `Showing only ${selected}: click anywhere to show all` : "Click a category's picture to show only it"}
+        </span>
+      </div>
       <PlotFigure options={options} />
     </figure>
   );

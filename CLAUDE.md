@@ -231,7 +231,7 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
 | `lib/tags.ts`, `components/TagBadges.tsx`, `components/photoBadges.ts` | Tag vocabulary and helpers (`hasTag`, "(SH)" in names), badges next to names and on chart photos |
 | `pages/ComparisonPage.tsx`, `lib/comparison.ts` | `/manage/comparison` (owner only, linked from Manage): comparison items, add/edit/delete, photo upload; derived costs (tested) |
 | `lib/sorting.ts`, `components/SortHeader.tsx` | Sortable table state and clickable headers (Dashboard and category pages) |
-| `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter (optionally with grey `others`, e.g. the comparison), number formats |
+| `components/CategoryCharts.tsx` | Small multiples, total chart, category scatter (optionally with grey `others`, e.g. the comparison, and trails behind a "Show trails" toggle; clicking a category's picture shows only it, R-49), number formats |
 | `components/ItemCharts.tsx` | Item scatters with photos on a log scale (explicit tick labels: d3 thins log-axis labels) |
 | `components/TimesWornChart.tsx`, `DailyCostCharts.tsx`, `CategoryAnimations.tsx` | Times worn, daily cost, animated charts |
 | `components/WornTogetherChart.tsx`, `lib/combinations.ts` | Dashboard "Worn together" ring (custom SVG, not Plot): garments worn on the same days (R-45) |
