@@ -224,8 +224,6 @@ export function CategoryScatter({
             y: "y",
             z: "category",
             stroke: (d) => categoryColor(d.category, dark),
-            // A curve through the monthly points (it still passes through each one, year-end dots included).
-            curve: "catmull-rom",
             strokeWidth: 2,
             strokeOpacity: 0.6,
           }),
