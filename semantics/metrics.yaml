@@ -165,28 +165,29 @@ metrics:
   - id: category-trail
     label: Category trail
     term: term:as-of
-    grain: category × month end
+    grain: category × day
     unit: share and EUR
     definition: >-
-      Where a category stood at every month end from the range start to the range end, as known then: days used,
-      cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged
-      by then and only garments bought by then, each averaged with the neighbouring month ends (3 months) to damp
-      seasonal swings. The last point is the listing itself (lifetime cost per wear, not averaged), so each trail
-      ends at the category's point. Drawn as lines in the Dashboard's cost per wear and yearly cost charts (shown
-      with "Show trails"), with a dot at each year end.
-    formula: "for each month end t < range.to: mean of the category listing over (range.from .. u) as of u, u = t and its neighbouring month ends; then the listing over the range"
-    range_rule: each month end, as of that date
+      Where a category stood on every day from the range start to the range end, as known then: days used, cost per
+      wear and yearly cost for the range from its start to that day, counting only the wears logged by then and only
+      garments bought by then, each averaged over 30 days (days i−14 … i+15, fewer at the ends) to damp seasonal
+      swings. A category's first 30 days in the range are left out, as its days used swings between 0 and 100 % over
+      so few days. The last point is the listing itself (lifetime cost per wear, not averaged), so each trail ends at
+      the category's point. Drawn as lines in the Dashboard's cost per wear and yearly cost charts (shown with "Show
+      trails"), with a dot at each year end.
+    formula: "for each day t < range.to from the category's 31st day: mean over u = t−14 .. t+15 of the category listing over (range.from .. u) as of u; then the listing over the range"
+    range_rule: each day, as of that date
     depends_on: [metric:category-cost-per-wear, metric:days-used, metric:yearly-cost]
     decisions: [decision:D-2]
     implementation: web/src/lib/metrics.ts#categoryTrails
     tests:
-      - web/src/lib/metrics.test.ts › has a point at every month end before the range end, as known then (only wears logged by then)
-      - web/src/lib/metrics.test.ts › averages each month end with its neighbours (3 months)
+      - web/src/lib/metrics.test.ts › gives every day the listing as known then, in one pass
+      - web/src/lib/metrics.test.ts › leaves out a category's first 30 days and averages each day over 30 days (i−14 … i+15, fewer at the ends)
       - web/src/lib/metrics.test.ts › ends at the listing itself (lifetime cost per wear, D-2)
-      - web/src/lib/metrics.test.ts › leaves out garments not yet bought
     note: >-
-      Like the animations, an "as of" exception to D-2. When the range ends before the last logged day, the last
-      step can jump, as the point itself counts the wears after the range end.
+      Like the animations, an "as of" exception to D-2. The daily values come from one pass over the days
+      (dailyCategoryListing), tested to equal the category listing as of each day. When the range ends before the last
+      logged day, the last step can jump, as the point itself counts the wears after the range end.
 
   - id: monthly-cost
     label: Monthly cost

@@ -11,6 +11,7 @@ import {
   valueOn,
   categoryListing,
   categoryTrails,
+  dailyCategoryListing,
   costPerWear,
   daysOwned,
   isActive,
@@ -141,31 +142,49 @@ describe("categoryTrails", () => {
   const range = { from: "2018-01-01", to: "2018-03-15" };
   const trail = categoryTrails([coat], log, range).get("Jackets and hoodies")!;
 
-  it("has a point at every month end before the range end, as known then (only wears logged by then)", () => {
-    expect(trail.map((p) => p.date)).toEqual(["2018-01-31", "2018-02-28", "2018-03-15"]);
-    expect(trail[0].costPerWear).toBe(60); // 120 € / the 2 wears known on 31 January (and on 28 February)
-    expect(trail[1].costPerWear).toBe(60);
+  it("gives every day the listing as known then, in one pass", () => {
+    const old = garment({ id: "old", price: 300, purchased: "2016-03-01", timesUsedInit: 10, divested: "2018-02-10" });
+    const gone = garment({ id: "gone", price: 80, purchased: "2016-01-01", divested: "2018-01-02" });
+    const free = garment({ id: "free", price: null, purchased: "2018-01-20" });
+    const later = garment({ id: "later", price: 1000, purchased: "2018-02-15" });
+    const shirt = garment({ id: "shirt", category: "Shirts", price: 40, purchased: "2018-02-01" });
+    const all = [coat, old, gone, free, later, shirt];
+    const worn: Day[] = [
+      { date: "2018-01-01", worn: ["gone", "old"] },
+      { date: "2018-01-06", worn: ["old", "coat"] },
+      { date: "2018-01-10", worn: ["coat", "free"] },
+      { date: "2018-01-25", worn: ["free", "shirt"] }, // the shirt isn't owned yet: ignored
+      { date: "2018-02-12", worn: ["old"] }, // after divesting: ignored
+      { date: "2018-02-20", worn: ["later", "shirt"] },
+      { date: "2018-03-05", worn: ["coat", "later"] },
+    ];
+    const r = { from: "2018-01-05", to: "2018-03-10" };
+    const daily = dailyCategoryListing(all, wearIndex(worn), r);
+    for (const [category, points] of daily) {
+      for (const p of points) {
+        const row = categoryListing(all, worn, { from: r.from, to: p.date }, p.date).find((x) => x.category === category)!;
+        expect([p.costPerWear, p.daysUsed, p.yearlyCost]).toEqual([row.costPerWear, row.daysUsed, row.yearlyCost]);
+      }
+    }
+    expect(daily.get("Jackets and hoodies")!.length).toBe(64); // 5 January … 9 March
+    expect(daily.get("Shirts")![0].date).toBe("2018-02-01");
   });
 
-  it("averages each month end with its neighbours (3 months)", () => {
-    const t = categoryTrails([coat], log, { from: "2018-01-01", to: "2018-04-15" }).get("Jackets and hoodies")!;
-    // Days used as known at the month ends: 2/31, 2/59, 3/90; averaged over the available neighbours.
-    expect(t[0].daysUsed).toBeCloseTo((2 / 31 + 2 / 59) / 2);
-    expect(t[1].daysUsed).toBeCloseTo((2 / 31 + 2 / 59 + 3 / 90) / 3);
-    expect(t[2].costPerWear).toBeCloseTo((60 + 40) / 2);
+  it("leaves out a category's first 30 days and averages each day over 30 days (i−14 … i+15, fewer at the ends)", () => {
+    const daily = dailyCategoryListing([coat], wearIndex(log), range).get("Jackets and hoodies")!.slice(30);
+    expect(trail[0].date).toBe("2018-01-31");
+    const mean = (lo: number, hi: number) => daily.slice(lo, hi).reduce((n, p) => n + p.daysUsed, 0) / (hi - lo);
+    expect(trail.length).toBe(daily.length + 1);
+    expect(daily.length).toBe(43); // 31 January … 14 March
+    expect(trail[0].daysUsed).toBeCloseTo(mean(0, 16), 12);
+    expect(trail[20].daysUsed).toBeCloseTo(mean(6, 36), 12);
+    expect(trail[daily.length - 1].daysUsed).toBeCloseTo(mean(daily.length - 15, daily.length), 12);
   });
 
   it("ends at the listing itself (lifetime cost per wear, D-2)", () => {
     const [, row] = categoryListing([coat], log, range);
     expect(trail.at(-1)).toEqual({ date: "2018-03-15", costPerWear: row.costPerWear, daysUsed: row.daysUsed, yearlyCost: row.yearlyCost });
     expect(row.costPerWear).toBe(40);
-  });
-
-  it("leaves out garments not yet bought", () => {
-    const later = garment({ id: "later", price: 1000, purchased: "2018-02-15" });
-    const t = categoryTrails([coat, later], log, range).get("Jackets and hoodies")!;
-    expect(t[0].costPerWear).toBe((60 + 560) / 2); // 31 January (60 €) averaged with 28 February
-    expect(t[1].costPerWear).toBe((60 + 560) / 2); // (120 + 1000) / 2 wears on 28 February
   });
 });
 

@@ -1,5 +1,5 @@
 {
- "version": "0.5.2",
+ "version": "0.5.3",
  "term": {
   "garment": {
    "label": "Garment",
@@ -231,8 +231,8 @@
   },
   "category-trail": {
    "label": "Category trail",
-   "definition": "Where a category stood at every month end from the range start to the range end, as known then: days used, cost per wear and yearly cost for the range from its start to that month end, counting only the wears logged by then and only garments bought by then, each averaged with the neighbouring month ends (3 months) to damp seasonal swings. The last point is the listing itself (lifetime cost per wear, not averaged), so each trail ends at the category's point. Drawn as lines in the Dashboard's cost per wear and yearly cost charts (shown with \"Show trails\"), with a dot at each year end.",
-   "formula": "for each month end t < range.to: mean of the category listing over (range.from .. u) as of u, u = t and its neighbouring month ends; then the listing over the range"
+   "definition": "Where a category stood on every day from the range start to the range end, as known then: days used, cost per wear and yearly cost for the range from its start to that day, counting only the wears logged by then and only garments bought by then, each averaged over 30 days (days i−14 … i+15, fewer at the ends) to damp seasonal swings. A category's first 30 days in the range are left out, as its days used swings between 0 and 100 % over so few days. The last point is the listing itself (lifetime cost per wear, not averaged), so each trail ends at the category's point. Drawn as lines in the Dashboard's cost per wear and yearly cost charts (shown with \"Show trails\"), with a dot at each year end.",
+   "formula": "for each day t < range.to from the category's 31st day: mean over u = t−14 .. t+15 of the category listing over (range.from .. u) as of u; then the listing over the range"
   },
   "monthly-cost": {
    "label": "Monthly cost",

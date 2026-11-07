@@ -258,7 +258,7 @@ export function CategoryScatter({
             [
               ...points.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}` })),
               ...others,
-              ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(3-month average, as known then)` })),
+              ...yearEnds.map((d) => ({ x: d.x, y: d.y, tip: `${d.category}, end of ${d.date.slice(0, 4)}\n${tipLabels[0]}: ${(d.x * 100).toFixed(0)} %\n${tipLabels[1]}: ${yFormat(d.y)}\n(30-day average, as known then)` })),
             ],
             Plot.pointer({ x: "x", y: "y", title: "tip" }),
           ),

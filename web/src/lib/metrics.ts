@@ -244,41 +244,96 @@ export interface TrailPoint {
   yearlyCost: number;
 }
 
-/** How each category's listing values developed over the range: one point per month end before range.to,
- *  each as known on that date (only wears logged by then count) and averaged over 3 months (the month end and its
- *  neighbours) to damp seasonal swings, and a last point equal to the listing itself (D-2), not averaged. For the
- *  Dashboard's trails; categories in the standard order. */
+/** How each category's listing values developed over the range: one point per day before range.to, each as known
+ *  on that day (only wears logged by then count) and averaged over 30 days (days i−14 … i+15, fewer at the ends)
+ *  to damp seasonal swings, and a last point equal to the listing itself (D-2), not averaged. A category's first
+ *  30 days are left out: with so few days, its days used swings between 0 and 100 %. For the Dashboard's trails;
+ *  categories in the standard order. */
 export function categoryTrails(garments: Garment[], days: Day[], range: DateRange): Map<string, TrailPoint[]> {
   const wears = wearIndex(days);
   const trails = new Map<string, TrailPoint[]>();
-  const add = (date: IsoDate, rows: CategoryRow[]) => {
-    for (const r of rows) {
-      if (r.category === "Total" || r.costPerWear == null || r.daysUsed == null || r.yearlyCost == null) continue;
-      const point = { date, costPerWear: r.costPerWear, daysUsed: r.daysUsed, yearlyCost: r.yearlyCost };
-      trails.set(r.category, [...(trails.get(r.category) ?? []), point]);
-    }
-  };
-  for (let date = monthEnd(range.from); date < range.to; date = monthEnd(nextDay(date))) {
-    add(date, listCategories(garments, wears, { from: range.from, to: date }, date));
+  for (const [category, points] of dailyCategoryListing(garments, wears, range)) trails.set(category, rollingTrail(points.slice(30), 30));
+  for (const r of listCategories(garments, wears, range, FOREVER)) {
+    if (r.category === "Total" || r.costPerWear == null || r.daysUsed == null || r.yearlyCost == null) continue;
+    const point = { date: range.to, costPerWear: r.costPerWear, daysUsed: r.daysUsed, yearlyCost: r.yearlyCost };
+    trails.set(r.category, [...(trails.get(r.category) ?? []), point]);
   }
-  for (const [category, points] of trails) trails.set(category, threeMonthMean(points));
-  add(range.to, listCategories(garments, wears, range, FOREVER));
   return new Map([...trails].sort(([a], [b]) => compareCategories(a, b)));
 }
 
-/** Each point's values averaged with its neighbours' (two at the ends). */
-function threeMonthMean(points: TrailPoint[]): TrailPoint[] {
-  return points.map((p, i) => {
-    const near = points.slice(Math.max(0, i - 1), i + 2);
-    const mean = (f: (q: TrailPoint) => number) => sum(near.map(f)) / near.length;
-    return { date: p.date, costPerWear: mean((q) => q.costPerWear), daysUsed: mean((q) => q.daysUsed), yearlyCost: mean((q) => q.yearlyCost) };
-  });
+/**
+ * The category listing's cost per wear, days used and yearly cost for every day t before range.to, for the range
+ * (range.from .. t) as known on t: the same values as `categoryListing(garments, days, { from, to: t }, t)`, in one
+ * pass over the days instead of one listing per day (metrics.test.ts checks they agree).
+ */
+export function dailyCategoryListing(garments: Garment[], wears: WearIndex, range: DateRange): Map<string, TrailPoint[]> {
+  interface Category {
+    /** First day of the category's span: its first garment's entry. */
+    start: IsoDate;
+    prices: number;
+    priced: number;
+    /** Lifetime wears of its priced garments as known on the day. */
+    lifetime: number;
+    used: number;
+    points: TrailPoint[];
+  }
+  // A garment joins its category on the later of the range start and its first day owned; from then on its price,
+  // its pre-tracking wears and the wears logged so far count, and each later wear counts from its own day.
+  const joins = new Map<IsoDate, Garment[]>();
+  const wearAdds = new Map<IsoDate, Garment[]>();
+  for (const g of garments) {
+    if (ownedUntil(g) < range.from) continue;
+    const join = max(range.from, ownedFrom(g));
+    if (join >= range.to) continue;
+    joins.set(join, [...(joins.get(join) ?? []), g]);
+    if (g.price == null) continue;
+    for (const d of wearDatesIn(g, wears, { from: nextDay(join), to: range.to })) wearAdds.set(d, [...(wearAdds.get(d) ?? []), g]);
+  }
+  // Days on which each category was worn (wears within the garment's ownership).
+  const usedOn = new Map<IsoDate, Set<string>>();
+  for (const g of garments) {
+    for (const d of wearDatesIn(g, wears, { from: range.from, to: range.to })) {
+      if (d >= range.to) continue;
+      usedOn.set(d, (usedOn.get(d) ?? new Set()).add(g.category));
+    }
+  }
+  const categories = new Map<string, Category>();
+  for (let t = range.from; t < range.to; t = nextDay(t)) {
+    for (const g of joins.get(t) ?? []) {
+      const c = categories.get(g.category) ?? { start: t, prices: 0, priced: 0, lifetime: 0, used: 0, points: [] };
+      categories.set(g.category, c);
+      if (g.price == null) continue;
+      c.prices += g.price;
+      c.priced++;
+      c.lifetime += timesWorn(g, wears, { from: TRACKING_START, to: t });
+    }
+    for (const g of wearAdds.get(t) ?? []) categories.get(g.category)!.lifetime++;
+    for (const category of usedOn.get(t) ?? []) categories.get(category)!.used++;
+    for (const c of categories.values()) {
+      if (c.priced === 0) continue;
+      const costPerWear = c.prices / Math.max(1, c.lifetime);
+      const daysUsed = c.used / daysInclusive(c.start, t);
+      c.points.push({ date: t, costPerWear, daysUsed, yearlyCost: costPerWear * 365 * daysUsed });
+    }
+  }
+  return new Map([...categories].map(([category, c]) => [category, c.points]));
 }
 
-/** Last day of the date's month. */
-function monthEnd(date: IsoDate): IsoDate {
-  const [y, m] = date.split("-").map(Number);
-  return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+/** Each point's values averaged over a window of `size` points centred on it (i−14 … i+15 for 30), fewer at the ends. */
+function rollingTrail(points: TrailPoint[], size: number): TrailPoint[] {
+  const back = Math.floor((size - 1) / 2);
+  const sums = { c: [0], d: [0], y: [0] };
+  for (const p of points) {
+    sums.c.push(sums.c[sums.c.length - 1] + p.costPerWear);
+    sums.d.push(sums.d[sums.d.length - 1] + p.daysUsed);
+    sums.y.push(sums.y[sums.y.length - 1] + p.yearlyCost);
+  }
+  return points.map((p, i) => {
+    const lo = Math.max(0, i - back);
+    const hi = Math.min(points.length, i + size - back);
+    const mean = (s: number[]) => (s[hi] - s[lo]) / (hi - lo);
+    return { date: p.date, costPerWear: mean(sums.c), daysUsed: mean(sums.d), yearlyCost: mean(sums.y) };
+  });
 }
 
 function sum(values: number[]): number {

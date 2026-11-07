@@ -199,7 +199,8 @@ data rather than precomputed fixed-period totals. With `from = 2018-01-01` the r
   counts and the average outfit weight. A test checks every materials text in the latest backup parses.
 - **Animations** ("… animated by date") use `asOf` (`dailyCost`, `itemListing`): everything as known on that
   date, i.e. only wears up to then. **Category trails** (`categoryTrails`, R-48: the Dashboard's cost per wear and
-  yearly cost scatters) use `categoryListing` with `asOf` at every month end, ending at the listing itself. These
+  yearly cost scatters) are the listing as known on every day (`dailyCategoryListing`, one pass; equal to `categoryListing` with `asOf`),
+  from a category's 31st day, averaged over 30 days, ending at the listing itself. These
   are the deliberate exceptions to D-2.
 
 - **Comparison** (`lib/comparison.ts`, R-26, R's `Portfolio-Monthly_cost_and_Category_use`): categories' monthly

@@ -13,9 +13,9 @@ How this file works:
 ## Where we left off (2026-11-03)
 
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
-  category's position at every month end, as known then and averaged over 3 months, with year-end
+  category's position on every day, as known then and averaged over 30 days, with year-end
   dots and a "Show trails" toggle (off by default); semantic
-  layer 0.5.2 (metric `category-trail`).
+  layer 0.5.3 (metric `category-trail`).
 - **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
   title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
   redirect to bit.ly.
@@ -174,10 +174,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   "Average yearly cost and category frequency of use", a category-coloured trail behind each category's photo shows
   where it stood at every month end of the range (`categoryTrails` = `categoryListing` with `asOf`, month by month;
   the last point is the listing itself). Olof chose "as known then" (only wears logged by then): a second "as of"
-  exception to D-2, recorded in decisions.yaml. Year-end dots with tooltips; 3-month means of the month-end points (the
-  last point exact), to damp seasonal swings (Olof, after weekly points were ruled out: ~4× slower and more jagged,
-  not smoother); straight lines, no curve (Olof, 2026-11-07: the remaining jumps mostly come from garments bought
-  and divested, which should show); a "Show trails" checkbox per chart, off by default (Olof), since
+  exception to D-2, recorded in decisions.yaml. Year-end dots with tooltips. Tried and replaced: monthly points with
+  3-month means, and curves (Olof, 2026-11-07: the jumps mostly come from garments bought and divested, which should
+  show). Now (2026-11-07): daily points (`dailyCategoryListing`, one pass over the days, ~45 ms, tested equal to the
+  listing as of each day; checked on real data at 117 category-days) with a centred 30-day mean, straight lines, and
+  each category's first 30 days left out (days used swings 0–100 % at first); a "Show trails" checkbox per chart, off by default (Olof), since
   early values stretch the y axis (yearly cost up to ~1 450 € in 2018 against ≤ 370 € now). Deliberately coloured
   lines in one chart (not D-3 small multiples): a trail belongs to its photo. ~0.15 s to compute; the range is
   deferred so the slider stays responsive. Verified: tests, build, headless Chrome screenshots, local preview by Olof.
