@@ -13,7 +13,8 @@ How this file works:
 ## Where we left off (2026-11-03)
 
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
-  photo (R-50 step 1). Next: step 2, an optional in-browser "Remove background".
+  photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
+  For Olof: try it on real phone photos (first use downloads ~40 MB, then cached).
 - **Done 2026-11-07:** click a category's picture in the Dashboard's category charts (cost per wear, yearly cost,
   monthly cost comparison) to show only that category and its trail; a click anywhere else shows all again (R-49).
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
@@ -59,17 +60,12 @@ _(nothing in progress)_
 
 ## Next
 
-1. **R-50 step 2: "Remove background" in the browser (optional button).** Test a permissively licensed segmentation
-   model (BiRefNet: MIT; ISNet/U²-Net: Apache 2.0) via transformers.js on a few of Olof's raw garment photos, loaded
-   only on demand (40–200 MB, cached). Not `@imgly/background-removal` (AGPL) or BRIA RMBG (non-commercial). Until
-   then, a phone or Mac cut-out ("Copy subject" / "Remove Background") is a transparent PNG the picker puts on grey.
-
-2. **R-44 step 2: measure, then several items per dictation.** After a couple of weeks of use, measure from
+1. **R-44 step 2: measure, then several items per dictation.** After a couple of weeks of use, measure from
    `voiceLog` how often the top proposal was chosen (rank 0) and where it failed (records name their `matcher`:
    v1.2 since 2026-10-28 proposes the next in line for rotation series); tune the matcher or compare an
    AI matcher on the same records; then allow several items in one dictation ("…, … and …").
 
-3. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
+2. **R-40 follow-ups (optional):** evaluation repeats (`--repeat 3`), a higher answer limit for the raw-data
    condition, more interpretation-heavy questions; a comparison tool in the MCP server (comparison questions
    were left out of the evaluation for lack of one).
 
@@ -179,6 +175,14 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-50 step 2** 2026-11-08 Tap to select the garment (Olof): "Select the garment" in `PhotoPicker` opens
+  `GarmentSelect`: tap the garment (Add / Remove taps, Undo), and the cut-out is fitted to the circle (`fitFrame`)
+  for the usual framing. SlimSAM (`Xenova/slimsam-77-uniform`, Apache 2.0, q8 ≈ 14 MB) via transformers.js
+  (`components/garmentSegmenter.ts`), loaded on first use: the model from Hugging Face, the ONNX runtime (≈ 27 MB)
+  from jsDelivr, both cached by the browser; photos scaled to 1024 px, encoded once, each tap ≈ 0.3 s. Tested on
+  Olof's samples: automatic background removal (ormbg Apache 2.0, BiRefNet-lite MIT) was as good on product
+  shots but keeps the whole person on worn garments; tap-to-select handles both. Rejected: segformer_b2_clothes
+  (NVIDIA non-commercial), ISNet ONNX (AGPL), `@imgly/background-removal` (AGPL), BRIA RMBG (non-commercial).
 - **R-50 step 1** 2026-11-08 Any photo becomes a standard photo (Olof): `PhotoPicker` accepts any image the browser
   opens (JPEG, PNG; HEIC in Safari), shows it in the circle at 228 px (drag, pinch or scroll to zoom, Zoom and Turn
   sliders, Turn 90°, Reset) and uploads exactly what it shows: a 228 × 228 PNG, #CCCCCC behind the photo's

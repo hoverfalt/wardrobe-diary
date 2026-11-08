@@ -50,6 +50,41 @@ export function zoomAround(frame: Frame, factor: number, at: { x: number; y: num
   return clampFrame({ ...frame, zoom, x: at.x + (frame.x - at.x) * f, y: at.y + (frame.y - at.y) * f }, dims, size);
 }
 
+export interface Bounds {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/** The bounding box of a selection mask (one value per pixel, non-zero = selected); null when nothing is. */
+export function maskBounds(mask: ArrayLike<number>, width: number, height: number): Bounds | null {
+  let x0 = width,
+    y0 = height,
+    x1 = -1,
+    y1 = -1;
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++)
+      if (mask[y * width + x]) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        y1 = y;
+      }
+  return x1 < 0 ? null : { x0, y0, x1, y1 };
+}
+
+/** The frame that centres a selected garment and fits it in the circle: its bounding box's diagonal spans 92 % of
+ *  the circle, so the corners stay just inside. */
+export function fitFrame(bounds: Bounds, dims: Dims, size = PHOTO_SIZE): Frame {
+  const diagonal = Math.max(1, Math.hypot(bounds.x1 - bounds.x0 + 1, bounds.y1 - bounds.y0 + 1));
+  const zoom = (0.92 * Math.min(dims.width, dims.height)) / diagonal;
+  const s = frameScale(dims, zoom, size);
+  const cx = (bounds.x0 + bounds.x1 + 1) / 2;
+  const cy = (bounds.y0 + bounds.y1 + 1) / 2;
+  return clampFrame({ x: (dims.width / 2 - cx) * s, y: (dims.height / 2 - cy) * s, zoom, rotation: 0 }, dims, size);
+}
+
 /** True when a file is already a standard photo and the framing is untouched: it is then uploaded as it is. */
 export function isStandardUnchanged(type: string, dims: Dims, frame: Frame): boolean {
   return (

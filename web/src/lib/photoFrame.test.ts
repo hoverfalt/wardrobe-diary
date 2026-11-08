@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampFrame, DEFAULT_FRAME, frameScale, isStandardUnchanged, MAX_ZOOM, MIN_ZOOM, zoomAround } from "./photoFrame";
+import { clampFrame, DEFAULT_FRAME, fitFrame, frameScale, isStandardUnchanged, maskBounds, MAX_ZOOM, MIN_ZOOM, zoomAround } from "./photoFrame";
 
 const phone = { width: 3024, height: 4032 };
 
@@ -33,5 +33,25 @@ describe("photo framing", () => {
     expect(isStandardUnchanged("image/png", std, { ...DEFAULT_FRAME, zoom: 1.1 })).toBe(false);
     expect(isStandardUnchanged("image/jpeg", std, DEFAULT_FRAME)).toBe(false);
     expect(isStandardUnchanged("image/png", phone, DEFAULT_FRAME)).toBe(false);
+  });
+
+  it("finds the bounding box of a selection", () => {
+    const mask = new Uint8Array(10 * 8);
+    for (const [x, y] of [[2, 1], [5, 2], [3, 6]]) mask[y * 10 + x] = 1;
+    expect(maskBounds(mask, 10, 8)).toEqual({ x0: 2, y0: 1, x1: 5, y1: 6 });
+    expect(maskBounds(new Uint8Array(80), 10, 8)).toBeNull();
+  });
+
+  it("fits a selected garment centred in the circle", () => {
+    const dims = { width: 400, height: 300 };
+    // A 120 × 160 garment in the middle: no offset, its diagonal (200 px) spans 92 % of the circle.
+    const mid = fitFrame({ x0: 140, y0: 70, x1: 259, y1: 229 }, dims);
+    expect(mid.x).toBeCloseTo(0);
+    expect(mid.y).toBeCloseTo(0);
+    expect(200 * frameScale(dims, mid.zoom)).toBeCloseTo(0.92 * 228);
+    // The same garment at the left edge: the photo moves right by its distance from the centre, scaled.
+    const left = fitFrame({ x0: 0, y0: 70, x1: 119, y1: 229 }, dims);
+    expect(left.x).toBeCloseTo(140 * frameScale(dims, left.zoom));
+    expect(left.zoom).toBeCloseTo(mid.zoom);
   });
 });

@@ -18,6 +18,7 @@
     "semantics": "node scripts/semantics.mjs"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.2",
     "@observablehq/plot": "^0.6.17",
     "firebase": "^12.0.0",
     "react": "^19.1.0",

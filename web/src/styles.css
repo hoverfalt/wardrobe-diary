@@ -152,6 +152,20 @@ button.danger { border-color: var(--accent); color: var(--accent); }
 .photo-canvas:active { cursor: grabbing; }
 .photo-frame-controls { display: grid; gap: 10px; min-width: 200px; font-size: 14px; }
 .photo-frame-controls label { display: grid; grid-template-columns: 3.5em 1fr auto; align-items: center; gap: 8px; }
+.photo-frame-controls .row { gap: 8px; }
+/* Tap-to-select (R-50): the photo with the selection, and the Add / Remove switch. */
+.garment-select { margin: 8px 0 4px; max-width: 420px; }
+.garment-select-photo { display: block; width: 100%; height: auto; border-radius: 4px; touch-action: manipulation; }
+.garment-select-photo.ready { cursor: crosshair; }
+.garment-select p { margin: 6px 0; }
+.garment-select .row { gap: 8px; }
+.segmented { display: inline-flex; }
+.segmented button { border-radius: 0; }
+.segmented button:first-child { border-radius: 6px 0 0 6px; }
+.segmented button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+/* Green adds, red removes: the colours of the tap dots. */
+.segmented button.on.add { background: #2e9e5b; border-color: #2e9e5b; color: #fff; }
+.segmented button.on.remove { background: #d64545; border-color: #d64545; color: #fff; }
 .bulk-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; margin-bottom: 8px; border: 1px solid var(--accent); border-radius: 8px; background: var(--bg); }
 .bulk-bar small { flex-basis: 100%; }
 th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }
