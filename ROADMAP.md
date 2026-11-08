@@ -14,7 +14,8 @@ How this file works:
 
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
-  For Olof: try it on real phone photos (first use downloads ~40 MB, then cached).
+  For Olof: try it on the iPhone (the first SlimSAM version crashed Safari; fixed with EdgeTAM, ~0.5 GB peak
+  memory in Chrome, untested on iOS) and on real phone photos (first use downloads ~55 MB, then cached).
 - **Done 2026-11-07:** click a category's picture in the Dashboard's category charts (cost per wear, yearly cost,
   monthly cost comparison) to show only that category and its trail; a click anywhere else shows all again (R-49).
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
@@ -177,12 +178,16 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 - **R-50 step 2** 2026-11-08 Tap to select the garment (Olof): "Select the garment" in `PhotoPicker` opens
   `GarmentSelect`: tap the garment (Add / Remove taps, Undo), and the cut-out is fitted to the circle (`fitFrame`)
-  for the usual framing. SlimSAM (`Xenova/slimsam-77-uniform`, Apache 2.0, q8 ≈ 14 MB) via transformers.js
-  (`components/garmentSegmenter.ts`), loaded on first use: the model from Hugging Face, the ONNX runtime (≈ 27 MB)
-  from jsDelivr, both cached by the browser; photos scaled to 1024 px, encoded once, each tap ≈ 0.3 s. Tested on
-  Olof's samples: automatic background removal (ormbg Apache 2.0, BiRefNet-lite MIT) was as good on product
-  shots but keeps the whole person on worn garments; tap-to-select handles both. Rejected: segformer_b2_clothes
-  (NVIDIA non-commercial), ISNet ONNX (AGPL), `@imgly/background-removal` (AGPL), BRIA RMBG (non-commercial).
+  for the usual framing. EdgeTAM (`onnx-community/EdgeTAM-ONNX`, Apache 2.0, fp32 ≈ 41 MB, a SAM 2 variant made
+  for phones) via transformers.js (`components/garmentSegmenter.ts`) with the plain WASM runtime (≈ 14 MB), both
+  loaded on first use from Hugging Face / jsDelivr and cached by the browser; photos scaled to 1024 px, encoded
+  once (≈ 1.5 s), each tap ≈ 0.2 s. Of the model's three proposals the largest scoring within 0.15 of the best is
+  used (`pickProposal`: whole trousers rather than one leg, but the shirt rather than the person wearing it).
+  First shipped with SlimSAM, which crashed iPhone Safari: peak memory ≈ 1.8 GB (attention over the whole image);
+  EdgeTAM + plain runtime peaks at ≈ 0.5 GB (the default asyncify runtime adds ≈ 0.45 GB; quantized EdgeTAM gives
+  empty masks). Also tested: ormbg (Apache 2.0) and BiRefNet-lite (MIT) remove backgrounds automatically but keep
+  the whole person on worn garments; SAM 2.1-tiny ≈ 1 GB. Rejected for licences: segformer_b2_clothes (NVIDIA
+  non-commercial), ISNet ONNX (AGPL), `@imgly/background-removal` (AGPL), BRIA RMBG (non-commercial).
 - **R-50 step 1** 2026-11-08 Any photo becomes a standard photo (Olof): `PhotoPicker` accepts any image the browser
   opens (JPEG, PNG; HEIC in Safari), shows it in the circle at 228 px (drag, pinch or scroll to zoom, Zoom and Turn
   sliders, Turn 90°, Reset) and uploads exactly what it shows: a 228 × 228 PNG, #CCCCCC behind the photo's

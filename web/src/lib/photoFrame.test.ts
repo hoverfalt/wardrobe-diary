@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampFrame, DEFAULT_FRAME, fitFrame, frameScale, isStandardUnchanged, maskBounds, MAX_ZOOM, MIN_ZOOM, zoomAround } from "./photoFrame";
+import { clampFrame, DEFAULT_FRAME, fitFrame, frameScale, isStandardUnchanged, maskBounds, MAX_ZOOM, pickProposal, MIN_ZOOM, zoomAround } from "./photoFrame";
 
 const phone = { width: 3024, height: 4032 };
 
@@ -53,5 +53,14 @@ describe("photo framing", () => {
     const left = fitFrame({ x0: 0, y0: 70, x1: 119, y1: 229 }, dims);
     expect(left.x).toBeCloseTo(140 * frameScale(dims, left.zoom));
     expect(left.zoom).toBeCloseTo(mid.zoom);
+  });
+
+  it("picks the largest proposal scoring nearly as well as the best (scores measured on sample photos)", () => {
+    // Flat trousers, one tap on a leg: the whole pair (0.58) over the leg (0.67).
+    expect(pickProposal([0.58, 0.67, 0.31], [94243, 47395, 21307])).toBe(0);
+    // A shirt being worn: the shirt (0.95), not the whole person (0.56).
+    expect(pickProposal([0.56, 0.95, 0.35], [106915, 55103, 41931])).toBe(1);
+    // A jacket: the whole jacket scores best anyway.
+    expect(pickProposal([0.93, 0.74, 0.07], [112430, 93900, 4384])).toBe(0);
   });
 });

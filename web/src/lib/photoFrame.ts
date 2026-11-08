@@ -85,6 +85,17 @@ export function fitFrame(bounds: Bounds, dims: Dims, size = PHOTO_SIZE): Frame {
   return clampFrame({ x: (dims.width / 2 - cx) * s, y: (dims.height / 2 - cy) * s, zoom, rotation: 0 }, dims, size);
 }
 
+/** Which of the selection model's proposals (part, larger part, whole object) to use: the largest whose score is
+ *  within `margin` of the best. A garment is usually the whole object, but the model often scores one part (a
+ *  trouser leg) a little higher; a much lower score means the larger proposal goes too far (the whole person
+ *  wearing the shirt). */
+export function pickProposal(scores: ArrayLike<number>, areas: ArrayLike<number>, margin = 0.15): number {
+  const best = Math.max(...Array.from(scores));
+  let pick = -1;
+  for (let i = 0; i < scores.length; i++) if (scores[i] >= best - margin && (pick < 0 || areas[i] > areas[pick])) pick = i;
+  return pick;
+}
+
 /** True when a file is already a standard photo and the framing is untouched: it is then uploaded as it is. */
 export function isStandardUnchanged(type: string, dims: Dims, frame: Frame): boolean {
   return (

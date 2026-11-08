@@ -14,7 +14,7 @@ export function GarmentSelect({ image, onDone, onCancel }: { image: CanvasImageS
   const viewRef = useRef<HTMLCanvasElement>(null);
   const [photo] = useState(() => scaled(image));
   const [segmenter, setSegmenter] = useState<Segmenter | null>(null);
-  const [status, setStatus] = useState("Loading the selection model (about 40 MB the first time)…");
+  const [status, setStatus] = useState("Loading the selection model (about 55 MB the first time)…");
   const [points, setPoints] = useState<Point[]>([]);
   const [mask, setMask] = useState<Uint8Array | null>(null);
   const [adding, setAdding] = useState(true);
