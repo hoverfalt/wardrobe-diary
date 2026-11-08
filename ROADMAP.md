@@ -10,12 +10,13 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-11-03)
+## Where we left off (2026-11-08)
 
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
   Works on Olof's iPhone 13 Pro (Safari) since the switch to EdgeTAM; a waiting indicator shows while the model
-  loads (R-50 step 3).
+  loads (R-50 step 3). Tap-to-select depends at run time on Hugging Face (the model, latest version) and jsDelivr
+  (the ONNX runtime); kept that way for now, and pinning or self-hosting is parked as R-51. Nothing open for Olof.
 - **Done 2026-11-07:** click a category's picture in the Dashboard's category charts (cost per wear, yearly cost,
   monthly cost comparison) to show only that category and its trail; a click anywhere else shows all again (R-49).
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
@@ -86,6 +87,13 @@ _(nothing in progress)_
   what remains is a location filter for the Dashboard and category pages. Open points: whether to record move
   dates (for "ex Hanko" garments), and whether wear statistics for Hanko garments should consider only the
   time spent there.
+- **R-51 Tap-to-select without outside servers** (Olof, 2026-11-08: not now, while there are no external users).
+  "Select the garment" downloads the EdgeTAM model from Hugging Face (`onnx-community/EdgeTAM-ONNX`, the latest
+  version, ~41 MB) and the ONNX runtime's WASM from jsDelivr (pinned to the bundled onnxruntime-web version,
+  ~14 MB). If either is down or the model repository changes or disappears, selection fails (framing, "Use the
+  whole photo" and ready-made PNGs keep working). Options: pin the model to a commit (`revision` in
+  `from_pretrained`, one line), or serve both from Firebase Hosting (~55 MB per deploy, model updates by hand).
+  Worth doing before R-17.
 - **R-17 Multi-user:** sign-up, public profiles, `public/data` written by a Cloud Function.
 
 ## Decisions needed
@@ -111,6 +119,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   item table.
 
 ## Decisions made
+
+- **2026-11-08 Tap-to-select keeps using the latest model from Hugging Face (Olof):** following the latest model
+  version has its advantages, and with no external users an outage or a breaking model change costs little.
+  Pinning or self-hosting is R-51.
 
 - **2026-10-28 Pre-tracking wears stay allowed for later purchases (Olof):** "Times used before tracking" is mainly
   for garments owned when tracking began, but four garments bought after 2018 (found after tracking began, with
