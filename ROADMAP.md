@@ -14,8 +14,8 @@ How this file works:
 
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
-  For Olof: try it on the iPhone (the first SlimSAM version crashed Safari; fixed with EdgeTAM, ~0.5 GB peak
-  memory in Chrome, untested on iOS) and on real phone photos (first use downloads ~55 MB, then cached).
+  Works on Olof's iPhone 13 Pro (Safari) since the switch to EdgeTAM; a waiting indicator shows while the model
+  loads (R-50 step 3).
 - **Done 2026-11-07:** click a category's picture in the Dashboard's category charts (cost per wear, yearly cost,
   monthly cost comparison) to show only that category and its trail; a click anywhere else shows all again (R-49).
 - **Done 2026-11-06:** category **trails** on the Dashboard's cost per wear and yearly cost charts (R-48): each
@@ -176,6 +176,10 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-50 step 3** 2026-11-08 Waiting indicator for tap-to-select (Olof, after trying it on an iPhone 13 Pro): the
+  model runs in a Web Worker (`garmentSegmenter.worker.ts`) so the page stays responsive, and a spinner over the
+  dimmed photo says what is happening (download %, starting, "Looking at the photo…"); "Selecting…" with a small
+  spinner after each tap. Peak memory unchanged (≈ 0.5 GB in Chrome); "Select again" reuses the loaded model.
 - **R-50 step 2** 2026-11-08 Tap to select the garment (Olof): "Select the garment" in `PhotoPicker` opens
   `GarmentSelect`: tap the garment (Add / Remove taps, Undo), and the cut-out is fitted to the circle (`fitFrame`)
   for the usual framing. EdgeTAM (`onnx-community/EdgeTAM-ONNX`, Apache 2.0, fp32 ≈ 41 MB, a SAM 2 variant made

@@ -155,6 +155,13 @@ button.danger { border-color: var(--accent); color: var(--accent); }
 .photo-frame-controls .row { gap: 8px; }
 /* Tap-to-select (R-50): the photo with the selection, and the Add / Remove switch. */
 .garment-select { margin: 8px 0 4px; max-width: 420px; }
+.garment-select-view { position: relative; }
+/* While the model loads: the photo dimmed, a spinner and what is happening. */
+.garment-select-wait { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; text-align: center; border-radius: 4px; background: rgb(0 0 0 / 0.55); color: #fff; font-size: 15px; }
+.spinner { display: inline-block; width: 36px; height: 36px; border: 4px solid rgb(255 255 255 / 0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.9s linear infinite; }
+.spinner.small { width: 12px; height: 12px; border-width: 2px; border-color: color-mix(in srgb, currentColor 30%, transparent); border-top-color: currentColor; vertical-align: -1px; margin-right: 4px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.5s; } }
 .garment-select-photo { display: block; width: 100%; height: auto; border-radius: 4px; touch-action: manipulation; }
 .garment-select-photo.ready { cursor: crosshair; }
 .garment-select p { margin: 6px 0; }

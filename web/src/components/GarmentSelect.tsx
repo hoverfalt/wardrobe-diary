@@ -3,7 +3,7 @@
 // (garmentSegmenter.ts); everything outside the selection is dimmed while selecting.
 import { useEffect, useRef, useState } from "react";
 import { maskBounds, type Bounds } from "../lib/photoFrame";
-import { SEGMENT_SIZE, segmenterFor, type Point, type Segmenter } from "./garmentSegmenter";
+import { SEGMENT_SIZE, segmenterFor, type Point, type Segmenter, type Stage } from "./garmentSegmenter";
 
 export interface Cutout {
   canvas: HTMLCanvasElement;
@@ -14,16 +14,19 @@ export function GarmentSelect({ image, onDone, onCancel }: { image: CanvasImageS
   const viewRef = useRef<HTMLCanvasElement>(null);
   const [photo] = useState(() => scaled(image));
   const [segmenter, setSegmenter] = useState<Segmenter | null>(null);
-  const [status, setStatus] = useState("Loading the selection model (about 55 MB the first time)…");
+  /** Shown over the photo with a spinner until the selection is ready. */
+  const [waiting, setWaiting] = useState<string | null>(stageText({ stage: "start" }));
+  const [selecting, setSelecting] = useState(false);
+  const [error, setError] = useState("");
   const [points, setPoints] = useState<Point[]>([]);
   const [mask, setMask] = useState<Uint8Array | null>(null);
   const [adding, setAdding] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    segmenterFor(photo)
-      .then((s) => !cancelled && (setSegmenter(s), setStatus("")))
-      .catch((e) => !cancelled && setStatus(`The selection model didn't load: ${e instanceof Error ? e.message : String(e)}`));
+    segmenterFor(photo, (stage) => !cancelled && setWaiting(stageText(stage)))
+      .then((s) => !cancelled && (setSegmenter(s), setWaiting(null)))
+      .catch((e) => !cancelled && (setWaiting(null), setError(`The selection model didn't load: ${e instanceof Error ? e.message : String(e)}`)));
     return () => {
       cancelled = true;
     };
@@ -34,11 +37,12 @@ export function GarmentSelect({ image, onDone, onCancel }: { image: CanvasImageS
     if (!segmenter) return;
     if (points.length === 0) return setMask(null);
     let current = true;
-    setStatus("Selecting…");
+    setSelecting(true);
+    setError("");
     segmenter
       .mask(points)
-      .then((m) => current && (setMask(m), setStatus("")))
-      .catch((e) => current && setStatus(`Selecting failed: ${e instanceof Error ? e.message : String(e)}`));
+      .then((m) => current && (setMask(m), setSelecting(false)))
+      .catch((e) => current && (setSelecting(false), setError(`Selecting failed: ${e instanceof Error ? e.message : String(e)}`)));
     return () => {
       current = false;
     };
@@ -101,14 +105,31 @@ export function GarmentSelect({ image, onDone, onCancel }: { image: CanvasImageS
   const empty = !!mask && !maskBounds(mask, photo.width, photo.height);
   return (
     <div className="garment-select">
-      <canvas ref={viewRef} className={segmenter ? "garment-select-photo ready" : "garment-select-photo"} onPointerUp={tap} aria-label="The photo: tap the garment to select it" />
-      <p className="muted">
-        {status ||
-          (points.length === 0
-            ? "Tap the garment."
-            : adding
-              ? "Tap more spots to add parts, or switch to Remove and tap what doesn't belong."
-              : "Tap what doesn't belong to the garment.")}
+      <div className="garment-select-view">
+        <canvas ref={viewRef} className={segmenter ? "garment-select-photo ready" : "garment-select-photo"} onPointerUp={tap} aria-label="The photo: tap the garment to select it" />
+        {waiting && (
+          <div className="garment-select-wait" role="status">
+            <span className="spinner" aria-hidden="true" />
+            <span>{waiting}</span>
+          </div>
+        )}
+      </div>
+      <p className="muted" role={error ? "alert" : undefined}>
+        {error ? (
+          <span className="error">{error}</span>
+        ) : waiting ? (
+          "The first time, the selection model is downloaded (about 55 MB); after that the browser keeps it."
+        ) : selecting ? (
+          <>
+            <span className="spinner small" aria-hidden="true" /> Selecting…
+          </>
+        ) : points.length === 0 ? (
+          "Tap the garment."
+        ) : adding ? (
+          "Tap more spots to add parts, or switch to Remove and tap what doesn't belong."
+        ) : (
+          "Tap what doesn't belong to the garment."
+        )}
       </p>
       <div className="row">
         <span className="segmented" role="group" aria-label="What a tap does">
@@ -116,11 +137,22 @@ export function GarmentSelect({ image, onDone, onCancel }: { image: CanvasImageS
           <button type="button" className={adding ? "remove" : "remove on"} aria-pressed={!adding} onClick={() => setAdding(false)}>Remove</button>
         </span>
         <button type="button" disabled={points.length === 0} onClick={() => setPoints((ps) => ps.slice(0, -1))}>Undo</button>
-        <button type="button" className="primary" disabled={!mask || empty || status !== ""} onClick={use}>Use selection</button>
+        <button type="button" className="primary" disabled={!mask || empty || selecting} onClick={use}>Use selection</button>
         <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
+}
+
+function stageText(s: Stage): string {
+  switch (s.stage) {
+    case "download":
+      return `Downloading the selection model… ${s.percent} %`;
+    case "start":
+      return "Starting the selection model…";
+    case "prepare":
+      return "Looking at the photo…";
+  }
 }
 
 /** The photo on a canvas at most SEGMENT_SIZE px on its long side (all the model uses; plenty for a 228 px photo). */

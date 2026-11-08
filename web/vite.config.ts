@@ -52,6 +52,8 @@ function prerenderPages(): Plugin {
 
 export default defineConfig({
   plugins: [react(), appFallback(), prerenderPages()],
+  // The selection model's worker (R-50) loads transformers.js in parts, which needs module workers.
+  worker: { format: "es" },
   appType: "mpa",
   build: {
     // The firebase chunk (~625 kB, ~185 kB gzipped: Auth + Firestore) is needed by every visit, so splitting it
@@ -69,8 +71,6 @@ export default defineConfig({
           if (/node_modules\/(@firebase|firebase|idb|re2js)\//.test(id)) return "firebase";
           if (/node_modules\/(@observablehq|d3-|d3\/|internmap|delaunator|robust-predicates|interval-tree-1d|isoformat|binary-search-bounds)/.test(id)) return "plot";
           if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return "react";
-          // Tap-to-select (R-50): transformers.js and the ONNX runtime, loaded only when the owner selects a garment.
-          if (/node_modules\/(@huggingface|onnxruntime-web|onnxruntime-common)\//.test(id)) return "segmenter";
           return "vendor";
         },
       },
