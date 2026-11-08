@@ -146,6 +146,12 @@ a.button.primary { border-color: var(--accent); background: var(--accent); color
 button.danger { border-color: var(--accent); color: var(--accent); }
 .photo-replace { max-width: 700px; gap: 8px; }
 .photo-pick.invalid .photo-preview { border-color: var(--accent); }
+.photo-frame { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 8px 0 4px; }
+/* The checkerboard shows what is transparent outside the circle. */
+.photo-canvas { width: 228px; height: 228px; flex: none; touch-action: none; cursor: grab; border-radius: 4px; background: repeating-conic-gradient(var(--line) 0% 25%, transparent 0% 50%) 0 0 / 16px 16px; }
+.photo-canvas:active { cursor: grabbing; }
+.photo-frame-controls { display: grid; gap: 10px; min-width: 200px; font-size: 14px; }
+.photo-frame-controls label { display: grid; grid-template-columns: 3.5em 1fr auto; align-items: center; gap: 8px; }
 .bulk-bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; margin-bottom: 8px; border: 1px solid var(--accent); border-radius: 8px; background: var(--bg); }
 .bulk-bar small { flex-basis: 100%; }
 th.check, td.check { width: 28px; padding-left: 4px; padding-right: 4px; }

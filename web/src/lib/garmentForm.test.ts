@@ -61,11 +61,9 @@ describe("new garment photos", () => {
     expect(`${nextPhotoId("T-shirts and tanks", [])}.png`).toMatch(/^[A-Za-z_-]+-[0-9]{3}[.]png$/);
   });
 
-  it("checks type and size, and warns about non-standard dimensions", () => {
-    expect(checkPhoto({ type: "image/png", size: 70_000 }, { width: 228, height: 228 })).toEqual({ errors: [], warnings: [] });
-    const r = checkPhoto({ type: "image/jpeg", size: 6 * 1024 * 1024 }, { width: 400, height: 300 });
-    expect(r.errors).toHaveLength(2);
-    expect(r.warnings[0]).toContain("cropped");
+  it("checks the type and size of the file to upload", () => {
+    expect(checkPhoto({ type: "image/png", size: 70_000 })).toEqual([]);
+    expect(checkPhoto({ type: "image/jpeg", size: 6 * 1024 * 1024 })).toHaveLength(2);
   });
 });
 

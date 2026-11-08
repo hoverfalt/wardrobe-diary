@@ -44,7 +44,7 @@ export function AddGarmentPage({ uid, wardrobe }: { uid: string; wardrobe: Wardr
     const missingPhoto = !photo;
     if (!r.ok || missingPhoto || photo.errors.length > 0) {
       setErrors(r.ok ? {} : r.errors);
-      if (missingPhoto) setMessage("Choose the garment's PNG photo.");
+      if (missingPhoto) setMessage("Choose the garment's photo.");
       return;
     }
     setErrors({});

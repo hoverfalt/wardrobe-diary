@@ -126,21 +126,14 @@ export function nextPhotoId(category: string, existingIds: string[]): string {
   return `${prefix}${String(Math.max(0, ...used) + 1).padStart(3, "0")}`;
 }
 
-/** The standard garment photo: a 228 × 228 PNG (as all existing photos are). */
-export const PHOTO_SIZE = 228;
 export const PHOTO_MAX_BYTES = 5 * 1024 * 1024; // also enforced by storage.rules
 
-/** Problems that block an upload, and warnings that don't. */
-export function checkPhoto(file: { type: string; size: number }, dims: { width: number; height: number } | null) {
+/** Problems that block uploading a photo file (the framed PNG, see lib/photoFrame.ts). */
+export function checkPhoto(file: { type: string; size: number }): string[] {
   const errors: string[] = [];
-  const warnings: string[] = [];
   if (file.type !== "image/png") errors.push("The photo must be a PNG file.");
   if (file.size >= PHOTO_MAX_BYTES) errors.push("The photo must be smaller than 5 MB.");
-  if (dims && (dims.width !== PHOTO_SIZE || dims.height !== PHOTO_SIZE))
-    warnings.push(
-      `The photo is ${dims.width} × ${dims.height} px; the standard is ${PHOTO_SIZE} × ${PHOTO_SIZE}. It will be scaled${dims.width !== dims.height ? " and cropped to a circle" : ""}.`,
-    );
-  return { errors, warnings };
+  return errors;
 }
 
 export type BulkAction =
