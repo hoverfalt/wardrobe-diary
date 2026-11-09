@@ -608,13 +608,27 @@ ${markdown(readText("mcp/evals/findings.md"))}
       <h2 id="questions">Questions and correct answers</h2>
 ${questions}
       <p class="note">Code: <a href="https://github.com/hoverfalt/wardrobe-diary/tree/main/mcp/evals">mcp/evals</a> (questions, runner, grading). Run it yourself with an Anthropic API key: <code>cd mcp && npm run evals -- run</code>.</p>`;
+  const description = "Does a governed semantic layer make AI answers about data more reliable? The same questions under three conditions, graded against computed answers.";
+  // Google's Dataset rich results require name and description (50–5,000 characters); the rest is recommended.
+  const dataset = {
+    "@context": CONTEXT,
+    "@id": `${SITE}/evals`,
+    "@type": "schema:Dataset",
+    "schema:name": "Wardrobe Diary AI evaluation",
+    "schema:description": `${description} The questions about one person's daily wardrobe log are put to an AI model with the raw data, with MCP tools, and with tools plus the semantic layer; every answer is graded in code against the value computed with the app's own metrics.`,
+    "schema:url": `${SITE}/evals`,
+    "schema:creator": { "@type": "schema:Person", "schema:name": s.model.steward },
+    "schema:license": s.model.license,
+    "schema:isAccessibleForFree": true,
+    "schema:keywords": ["AI evaluation", "semantic layer", "data governance", "Model Context Protocol", "wardrobe"],
+  };
   return page(s, {
     path: "/evals",
     title: "AI evaluation",
-    description: "Does a governed semantic layer make AI answers about data more reliable? The same questions under three conditions, graded against computed answers.",
+    description,
     intro: `<p class="lead">An experiment: how often does an AI assistant answer questions about this data correctly with raw data, with tools, and with tools plus the semantic layer?</p>`,
     body,
-    jsonld: { href: "/def/metrics.jsonld", data: { "@context": CONTEXT, "@id": `${SITE}/evals`, "@type": "schema:Dataset", "schema:name": "Wardrobe Diary AI evaluation", "schema:license": s.model.license } },
+    jsonld: { href: "/def/metrics.jsonld", data: dataset },
   });
 }
 
