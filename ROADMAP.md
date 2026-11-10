@@ -10,8 +10,10 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
-## Where we left off (2026-11-08)
+## Where we left off (2026-11-10)
 
+- **Done 2026-11-10:** Search Console's Datasets issue on `/evals` (R-52) is fixed and confirmed by Google; the
+  earlier issues (R-47) are confirmed fixed too. Nothing open in Search Console.
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
   Works on Olof's iPhone 13 Pro (Safari) since the switch to EdgeTAM; a waiting indicator shows while the model
@@ -26,7 +28,6 @@ How this file works:
 - **Done 2026-11-03:** Search Console's unindexed pages (R-47): the public app pages now have their own HTML with
   title, description and canonical address; `/mcp` kept out of crawling; `/bit.ly/…` links from the old site
   redirect to bit.ly.
-- Search Console: "Validate fix" clicked on every row (2026-11-03); Google re-checks over days to weeks.
 - **Done 2026-11-03:** Dependabot alerts after the R-47 push (19): `npm audit fix` in `web/`, `mcp/` and
   `functions/` (body-parser in the public MCP server, re2js in the browser bundle, zod, undici, qs …); functions and
   mcp now 0, web 11 moderate accepted (see R-42). Redeployed app and MCP function.
@@ -188,6 +189,11 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-52** 2026-11-10 Search Console: "Missing field description" (critical, Datasets) on `/evals`. Its
+  `schema:Dataset` markup had only a name and licence; `semantics.mjs` now adds a description (Google requires
+  50–5,000 characters), url, creator, isAccessibleForFree and keywords. Deployed 2026-11-09, Google confirmed the
+  fix 2026-11-10. `/evals` is the only page marked as a schema.org Dataset (the catalog uses `dcat:Dataset`, which
+  Google ignores); a new one needs at least a name and a description.
 - **R-50 step 3** 2026-11-08 Waiting indicator for tap-to-select (Olof, after trying it on an iPhone 13 Pro): the
   model runs in a Web Worker (`garmentSegmenter.worker.ts`) so the page stays responsive, and a spinner over the
   dimmed photo says what is happening (download %, starting, "Looking at the photo…"); "Selecting…" with a small
