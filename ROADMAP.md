@@ -16,8 +16,10 @@ How this file works:
   earlier issues (R-47) are confirmed fixed too.
 - **2026-11-13:** two category pages were "Crawled – currently not indexed": Google's renderer stopped at
   "Loading…" because the Firestore listener's streaming connection doesn't work there (R-53). The app now also
-  reads the public data with one plain REST request. **Open for Olof after the deploy:** URL Inspection → "Test
-  live URL" on `/category/socks` should show the item table; then "Request indexing" and "Validate fix".
+  reads the public data with one plain REST request. Deployed 2026-11-13; Olof checked the live test (the table
+  shows), requested indexing for both pages and started a new validation. Google re-checks over days to weeks.
+  Same day: `npm audit fix` in web, mcp and functions (hono, @hono/node-server, fast-xml-parser); the MCP function
+  redeployed. Only the `glob` alert in `firebase-tools` (a dev tool) remains.
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
   Works on Olof's iPhone 13 Pro (Safari) since the switch to EdgeTAM; a waiting indicator shows while the model
