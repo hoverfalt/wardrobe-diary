@@ -13,7 +13,11 @@ How this file works:
 ## Where we left off (2026-11-10)
 
 - **Done 2026-11-10:** Search Console's Datasets issue on `/evals` (R-52) is fixed and confirmed by Google; the
-  earlier issues (R-47) are confirmed fixed too. Nothing open in Search Console.
+  earlier issues (R-47) are confirmed fixed too.
+- **2026-11-13:** two category pages were "Crawled – currently not indexed": Google's renderer stopped at
+  "Loading…" because the Firestore listener's streaming connection doesn't work there (R-53). The app now also
+  reads the public data with one plain REST request. **Open for Olof after the deploy:** URL Inspection → "Test
+  live URL" on `/category/socks` should show the item table; then "Request indexing" and "Validate fix".
 - **Done 2026-11-08:** the photo picker takes any photo and frames it as the standard
   photo (R-50 step 1), and "Select the garment" cuts the garment out with a tap, in the browser (R-50 step 2).
   Works on Olof's iPhone 13 Pro (Safari) since the switch to EdgeTAM; a waiting indicator shows while the model
@@ -189,6 +193,12 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
 
 ## Done
 
+- **R-53** 2026-11-13 Public pages render for Google (Search Console: `/category/socks` and
+  `/category/jackets-and-hoodies` crawled, not indexed; the live test's screenshot showed only "Loading…").
+  `usePublicWardrobe` now reads `public/data` once over Firestore REST (`fetchPublicData`, as the MCP server does)
+  next to the live listener, which takes over once it has the server's version or the owner's unsent changes; an
+  empty offline cache's "no document" (first visit, connection blocked) is no longer shown as an empty wardrobe.
+  The REST read is skipped in emulator mode. One extra document read per visit.
 - **R-52** 2026-11-10 Search Console: "Missing field description" (critical, Datasets) on `/evals`. Its
   `schema:Dataset` markup had only a name and licence; `semantics.mjs` now adds a description (Google requires
   50–5,000 characters), url, creator, isAccessibleForFree and keywords. Deployed 2026-11-09, Google confirmed the

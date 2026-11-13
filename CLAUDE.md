@@ -96,7 +96,8 @@ users/{uid}/public/data     // world-readable copy for public pages (D-1), kept 
 
 - `garmentId` = the Sheet's Photo id (e.g. `Jackets_and_hoodies-006`); fallback slug if blank.
 - One doc per day: logging a day = one write; full history ≈ 3,200 docs, cached offline by the SDK.
-- **Public pages read only `public/data`** (one document read), never the raw garments/days collections
+- **Public pages read only `public/data`** (one REST read for the first render, which Google's renderer needs, plus
+  the live listener; R-53), never the raw garments/days collections
   (Firestore bills per doc read). It holds the full day-by-day log so any metric can be computed for any
   time span in the browser. ~435 kB in 2026 of the 1 MiB document limit (grows ~30 kB/year); check its
   size in the backups now and then (`tools/restore.sh` rebuilds it).

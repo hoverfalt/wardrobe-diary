@@ -16,7 +16,8 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
+import { db, EMULATORS } from "../firebase";
+import { fetchPublicData } from "../lib/firestoreRest";
 import type { ComparisonItem } from "../lib/comparison";
 import type { GarmentFields } from "../lib/garmentForm";
 import { decodePublicData, withGarments, withoutGarment, type PublicData, type Wardrobe } from "../lib/publicData";
@@ -47,16 +48,30 @@ export function usePendingWrites(uid: string): boolean {
   return pending;
 }
 
-/** The owner's public wardrobe; null while loading. Readable without signing in. */
+/** The owner's public wardrobe; null while loading. Readable without signing in. The live listener keeps it up to
+ *  date; one plain REST read alongside it gets the data where the listener's streaming connection doesn't work
+ *  (Google's renderer never got past "Loading…", so the pages weren't indexed). An empty offline cache on a first
+ *  visit reports no document: that is not taken as the answer. */
 export function usePublicWardrobe(ownerUid: string): Wardrobe | null {
   const [wardrobe, setWardrobe] = useState<Wardrobe | null>(null);
-  useEffect(
-    () =>
-      onSnapshot(doc(db, "users", ownerUid, "public", "data"), (snap) =>
-        setWardrobe(snap.exists() ? decodePublicData(snap.data() as PublicData) : { garments: [], days: [], comparison: [] }),
-      ),
-    [ownerUid],
-  );
+  useEffect(() => {
+    // Set once the listener has the server's version or the owner's unsent changes: newer than the REST read.
+    let settled = false;
+    let cancelled = false;
+    if (!EMULATORS)
+      fetchPublicData(ownerUid)
+        .then((data) => !cancelled && !settled && setWardrobe(decodePublicData(data)))
+        .catch(() => {}); // the listener still answers (or the cache, offline)
+    const stop = onSnapshot(doc(db, "users", ownerUid, "public", "data"), (snap) => {
+      if (snap.metadata.fromCache && !snap.exists()) return;
+      if (!snap.metadata.fromCache || snap.metadata.hasPendingWrites) settled = true;
+      setWardrobe(snap.exists() ? decodePublicData(snap.data() as PublicData) : { garments: [], days: [], comparison: [] });
+    });
+    return () => {
+      cancelled = true;
+      stop();
+    };
+  }, [ownerUid]);
   return wardrobe;
 }
 
