@@ -10,6 +10,12 @@ How this file works:
 - When an item is finished it moves to **Done** with the date. Decisions record what was chosen and why.
 - IDs (`R-12`) are never reused, so commits and conversations can refer to them.
 
+## Where we left off (2026-11-19)
+
+- **Done 2026-11-19:** R-53 confirmed: `/category/socks`, `/category/jackets-and-hoodies` and the home page are
+  indexed. The validation "failed" only for `http://wardrobediary.io/` and `https://wardrobediary.io/index.html`,
+  which 301 to `https://wardrobediary.io/` as intended (old addresses; they can never pass). Nothing open.
+
 ## Where we left off (2026-11-10)
 
 - **Done 2026-11-10:** Search Console's Datasets issue on `/evals` (R-52) is fixed and confirmed by Google; the
@@ -200,7 +206,8 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   `usePublicWardrobe` now reads `public/data` once over Firestore REST (`fetchPublicData`, as the MCP server does)
   next to the live listener, which takes over once it has the server's version or the owner's unsent changes; an
   empty offline cache's "no document" (first visit, connection blocked) is no longer shown as an empty wardrobe.
-  The REST read is skipped in emulator mode. One extra document read per visit.
+  The REST read is skipped in emulator mode. One extra document read per visit. Google confirmed both pages
+  indexed 2026-11-19; the validation's two failures are the redirecting old home-page addresses (expected).
 - **R-52** 2026-11-10 Search Console: "Missing field description" (critical, Datasets) on `/evals`. Its
   `schema:Dataset` markup had only a name and licence; `semantics.mjs` now adds a description (Google requires
   50–5,000 characters), url, creator, isAccessibleForFree and keywords. Deployed 2026-11-09, Google confirmed the
