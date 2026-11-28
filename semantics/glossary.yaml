@@ -14,7 +14,7 @@ terms:
     label: Category
     definition: >-
       A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies,
-      Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts,
+      Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Shoes, Socks, Underwear shirts,
       Underwear boxers, Sportswear.
     note: Categories are always listed in this order, never alphabetically.
 

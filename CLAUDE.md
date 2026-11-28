@@ -387,7 +387,7 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
   Full-page screenshots sometimes leave large SVGs unpainted; screenshot the element instead.
 - Categories are always listed in the standard order in `web/src/lib/categories.ts` (`compareCategories`),
   never alphabetically: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants,
-  Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear.
+  Shorts, Belts, Shoes, Socks, Underwear shirts, Underwear boxers, Sportswear.
 - Bundle (R-18): pages are lazy-loaded in `App.tsx` (add new pages with `page(...)`), libraries are split into
   `react` / `firebase` / `firebase-storage` (uploads only, imported on demand in `firebase.ts`) / `plot` chunks in
   `vite.config.ts` (transformers.js is bundled only into the tap-to-select worker) (the ONNX runtime's WASM that Vite emits is unused

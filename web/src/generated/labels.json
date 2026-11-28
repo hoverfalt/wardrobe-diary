@@ -1,5 +1,5 @@
 {
- "version": "0.5.3",
+ "version": "0.5.4",
  "term": {
   "garment": {
    "label": "Garment",
@@ -7,7 +7,7 @@
   },
   "category": {
    "label": "Category",
-   "definition": "A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Socks, Shoes, Underwear shirts, Underwear boxers, Sportswear."
+   "definition": "A kind of clothing that groups garments. The 13 categories, in their standard order: Jackets and hoodies, Blazers and vests, Knits, Shirts, T-shirts and tanks, Pants, Shorts, Belts, Shoes, Socks, Underwear shirts, Underwear boxers, Sportswear."
   },
   "tracking-start": {
    "label": "Start of tracking",
