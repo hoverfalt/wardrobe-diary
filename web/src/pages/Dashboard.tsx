@@ -248,6 +248,7 @@ export function Dashboard({
             trails={costTrails}
             xLabel="Category frequency of use (share of all days)"
             yLabel="Average cost per wear"
+            yLog
             yFormat={formatEur2}
             yTickFormat={formatEur}
             tipLabels={COST_VS_USE_TIP}

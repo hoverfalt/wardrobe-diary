@@ -17,6 +17,47 @@ const eur2 = new Intl.NumberFormat("fi-FI", { style: "currency", currency: "EUR"
 export const formatEur: Format = (v) => eur0.format(v);
 export const formatEur2: Format = (v) => eur2.format(v);
 
+// Log scales for cost per wear. Live site: plot_log_breaks (plus 0.01 and 0.02 for the cheapest socks).
+const LOG_TICKS = [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 400, 800];
+const FI = new Intl.NumberFormat("fi-FI");
+const eurTick = (v: number) => (v < 1 ? formatEur2(v) : `${FI.format(v)} €`);
+
+/** Euro axis and grid on a log scale with every LOG_TICKS value inside the domain labelled. The labels are
+ *  drawn as text marks: on log scales the axis' own labels get thinned by d3, even for explicit ticks. */
+export function logAxis(domain: [number, number], label: string): Plot.Markish[] {
+  return [...logGrid(domain, label), logLabels(domain)];
+}
+
+const logTicks = ([lo, hi]: [number, number]) => LOG_TICKS.filter((t) => t >= lo && t <= hi);
+
+/** The grid and tick marks of `logAxis`, for charts that draw its labels later, on top of their points. */
+export function logGrid(domain: [number, number], label: string): Plot.Markish[] {
+  const ticks = logTicks(domain);
+  return [Plot.gridY(ticks), Plot.axisY(ticks, { tickFormat: () => "", label, labelArrow: "none" })];
+}
+
+/** The tick labels of `logAxis`, with a background halo so they stay readable over points near the axis. */
+export function logLabels(domain: [number, number]): Plot.Markish {
+  return Plot.text(logTicks(domain), {
+    y: (d: number) => d,
+    text: eurTick,
+    frameAnchor: "left",
+    textAnchor: "end",
+    dx: -9,
+    fontSize: 10,
+    fill: "currentColor",
+    stroke: "var(--bg)",
+    strokeWidth: 3,
+    paintOrder: "stroke",
+  });
+}
+
+export function logDomain(values: number[]): [number, number] {
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  return [lo / 1.5, hi * 1.5];
+}
+
 interface DayRow {
   date: Date;
   iso: string;
@@ -211,8 +252,11 @@ export function CategoryScatter({
   tipLabels,
   others = [],
   trails = [],
+  yLog = false,
 }: {
   points: ScatterPoint[];
+  /** Log y scale, for values that span several orders of magnitude (cost per wear). Values must be > 0. */
+  yLog?: boolean;
   others?: OtherPoint[];
   /** Category trails, shown under the points with a "Show trails" toggle. */
   trails?: ScatterTrail[];
@@ -260,7 +304,9 @@ export function CategoryScatter({
       const yearEnds = trail.filter((p) => p.date.endsWith("-12-31"));
       const data = points.filter(shown).map((p) => ({ ...p, src: categoryImageUrl(p.category) ?? "" }));
       const withPhoto = others.filter((o) => o.src);
-      const yTop = Math.max(...points.map((p) => p.y), ...others.map((o) => o.y), ...allTrails.map((p) => p.y), 0);
+      const allY = [...points.map((p) => p.y), ...others.map((o) => o.y), ...allTrails.map((p) => p.y)];
+      const yTop = Math.max(...allY, 0);
+      const yDomain = yLog ? logDomain(allY.filter((y) => y > 0)) : null;
       // On narrow charts the low, crowded band would be unreadable: label only the points above it there
       // (all points keep their tooltips).
       const labelled = others.filter((o) => !o.src && (width >= 600 || o.y > yTop * 0.2));
@@ -274,9 +320,11 @@ export function CategoryScatter({
         marginRight: r + 8,
         marginBottom: 44,
         x: { domain: [0, 1], label: xLabel, labelAnchor: "center", labelArrow: "none", tickFormat: ".0%", grid: true },
-        y: { domain: [0, yTop * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
+        y: yDomain
+          ? { type: "log", domain: yDomain }
+          : { domain: [0, yTop * 1.08], nice: true, label: yLabel, labelArrow: "none", tickFormat: yTickFormat, grid: true },
         marks: [
-          Plot.ruleY([0]),
+          ...(yDomain ? logGrid(yDomain, yLabel) : [Plot.ruleY([0])]),
           Plot.line(trail, {
             x: "x",
             y: "y",
@@ -311,6 +359,8 @@ export function CategoryScatter({
               },
             ),
           ),
+          // Log axis labels on top: points near 0 % reach into the axis.
+          ...(yDomain ? [logLabels(yDomain)] : []),
           // One tooltip layer for categories and others, so only the nearest point gets a tooltip.
           Plot.tip(
             [
@@ -323,7 +373,7 @@ export function CategoryScatter({
         ],
       };
     },
-    [points, others, trails, showTrails, selected, xLabel, yLabel, yFormat, yTickFormat, tipLabels, dark],
+    [points, others, trails, showTrails, selected, xLabel, yLabel, yFormat, yTickFormat, tipLabels, yLog, dark],
   );
   if (points.length === 0) return null;
   return (

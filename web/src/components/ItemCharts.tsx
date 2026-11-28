@@ -4,18 +4,16 @@ import * as Plot from "@observablehq/plot";
 import { useCallback, useMemo } from "react";
 import { photoUrl } from "../firebase";
 import { divestedAverages, type ItemRow } from "../lib/metrics";
-import { formatEur2 } from "./CategoryCharts";
+import { formatEur2, logAxis, logDomain } from "./CategoryCharts";
 import { PlotFigure } from "./PlotFigure";
 import { photoBadgeMarks, tagLines } from "./photoBadges";
 import { TagLegendItems } from "./TagBadges";
 
 const DIVESTED = "#3CB371"; // live site: mediumseagreen
 const GUIDE = "#7fb8d6"; // live site: lightblue
-// Live site: plot_log_breaks (plus 0.01 and 0.02 for the cheapest socks) and guides_prices
-const LOG_TICKS = [0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 400, 800];
+// Live site: guides_prices
 const GUIDE_PRICES = [5, 10, 20, 50, 100, 200, 400, 800];
 const FI = new Intl.NumberFormat("fi-FI");
-const eurTick = (v: number) => (v < 1 ? formatEur2(v) : `${FI.format(v)} €`);
 
 interface Point {
   row: ItemRow;
@@ -37,23 +35,6 @@ function itemMarks(points: Point[], r: number, tip: (p: Point) => string): Plot.
     ...photoBadgeMarks(points.map((p) => ({ ...p, garment: p.row.garment })), "x", "y", r),
     Plot.tip(points, Plot.pointer({ x: "x", y: "y", title: (p: Point) => tip(p) + tagLines(p.row.garment) })),
   ];
-}
-
-/** Cost-per-wear axis and grid with every LOG_TICKS value inside the domain labelled. The labels are
- *  drawn as text marks: on log scales the axis' own labels get thinned by d3, even for explicit ticks. */
-function logAxis([lo, hi]: [number, number]): Plot.Markish[] {
-  const ticks = LOG_TICKS.filter((t) => t >= lo && t <= hi);
-  return [
-    Plot.gridY(ticks),
-    Plot.axisY(ticks, { tickFormat: () => "", label: "Cost per wear", labelArrow: "none" }),
-    Plot.text(ticks, { y: (d: number) => d, text: eurTick, frameAnchor: "left", textAnchor: "end", dx: -9, fontSize: 10 }),
-  ];
-}
-
-function logDomain(values: number[]): [number, number] {
-  const lo = Math.min(...values);
-  const hi = Math.max(...values);
-  return [lo / 1.5, hi * 1.5];
 }
 
 const markerRadius = (width: number, n: number) => Math.round(Math.max(9, Math.min(20, width / 45, 600 / Math.sqrt(n * 6))));
@@ -102,7 +83,7 @@ export function CostVsWearsChart({ rows }: { rows: ItemRow[] }) {
         x: { domain: [0, xMax], insetLeft: r + 4, label: "Times worn", labelAnchor: "center", labelArrow: "none", grid: true, tickFormat: (v: number) => FI.format(v) },
         y: { type: "log", domain: [yMin, yMax] },
         marks: [
-          ...logAxis([yMin, yMax]),
+          ...logAxis([yMin, yMax], "Cost per wear"),
           Plot.line(guides, { x: "n", y: "c", z: "id", stroke: GUIDE, strokeWidth: 1.5, strokeOpacity: 0.8 }),
           Plot.text(guideLabels, { x: "n", y: "c", text: "label", fill: GUIDE, textAnchor: "start", dx: 4, fontWeight: 600 }),
           Plot.line(trails, { x: "n", y: "c", z: "id", stroke: "currentColor", strokeOpacity: 0.15, strokeWidth: 2 }),
@@ -159,7 +140,7 @@ export function CostVsFrequencyChart({
         x: { domain: [0, xMax], insetLeft: r + 4, label: "Average times worn per month", labelAnchor: "center", labelArrow: "none", grid: true, tickFormat: fmt1 },
         y: { type: "log", domain: [yMin, yMax] },
         marks: [
-          ...logAxis([yMin, yMax]),
+          ...logAxis([yMin, yMax], "Cost per wear"),
           ...(avg
             ? [
                 Plot.ruleX([avg.wearsPerMonth], { stroke: DIVESTED, strokeDasharray: "2,4", strokeWidth: 2 }),
