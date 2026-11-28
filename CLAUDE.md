@@ -340,7 +340,8 @@ Never run a bare `firebase deploy` or `--only hosting` without the `:app` target
 - Metric logic lives in pure functions in `web/src/lib/metrics.ts`, with tests.
 - Charts use Observable Plot via `web/src/components/PlotFigure.tsx`. **Per-category data is always shown as
   small multiples** (`CategorySmallMultiples` in `web/src/components/CategoryCharts.tsx`, decision D-3),
-  never as many coloured lines or stacked areas in one chart; category colours come from
+  never as many coloured lines or stacked areas in one chart; a group of categories may share a scale of its own
+  (`ownScale`, drawn as a separate group: Socks and underwear on the Active items charts); category colours come from
   `categoryColor()` in `web/src/lib/categories.ts` (the live site's R colours, lighter steps in dark mode).
 - `/` is the **static landing page** (`web/index.html` + `src/landing.css`, the old site's project page, R-16:
   crawlable, preview tags, no JavaScript; images from Storage, logos on white tiles in dark mode); the app is `web/app.html`, served for every other path (Firebase

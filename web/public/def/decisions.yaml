@@ -34,6 +34,10 @@ decisions:
     title: Small multiples for per-category charts
     decision: Charts that show several categories use one small chart per category on a shared scale.
     rationale: The original 12-colour palette fails colour-blind and contrast checks.
+    amended: >-
+      2026-11-28 (Olof): on the Dashboard's Active items charts, Socks, Underwear shirts and Underwear boxers share a
+      scale of their own, drawn as a separate group below the others: their counts (up to 72) flattened the other
+      categories (up to 24). Each group still shares one scale.
     affects: []
 
   - id: D-4

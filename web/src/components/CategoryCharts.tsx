@@ -1,5 +1,6 @@
 // Charts over time. Design pattern (decision D-3): anything shown per category is drawn as small
-// multiples, one chart per category on a shared scale, never as many coloured lines in one chart.
+// multiples, one chart per category on a shared scale (a group may get its own: `ownScale`), never as many
+// coloured lines in one chart.
 import * as Plot from "@observablehq/plot";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { categoryImageUrl } from "../firebase";
@@ -78,25 +79,45 @@ function stepChart(opts: {
   };
 }
 
-/** One small chart per category on a shared scale, with the category image and the value at the end date. */
+/**
+ * One small chart per category on a shared scale, with the category image and the value at the end date.
+ * `ownScale` (D-3 amended): categories whose much larger counts would flatten the others; they share a scale of
+ * their own and are drawn as a separate group below, under `ownScaleNote`.
+ */
 export function CategorySmallMultiples({
   series,
   range,
   format,
+  ownScale = [],
+  ownScaleNote,
 }: {
   series: CategorySeries[];
   range: DateRange;
   format: Format;
+  ownScale?: string[];
+  ownScaleNote?: string;
 }) {
   const points = useMemo(() => series.map((s) => s.points), [series]);
   const rows = useMemo(() => dailyRows(points, range), [points, range]);
-  const yMax = maxOf(points);
+  const groups = [false, true]
+    .map((own) => series.map((s, i) => ({ s, i })).filter(({ s }) => ownScale.includes(s.category) === own))
+    .filter((g) => g.length > 0);
   return (
-    <div className="multiples">
-      {series.map((s, i) => (
-        <SmallMultiple key={s.category} series={s} rows={rows} index={i} yMax={yMax} format={format} />
-      ))}
-    </div>
+    <>
+      {groups.map((group, gi) => {
+        const yMax = maxOf(group.map(({ s }) => s.points));
+        return (
+          <div key={gi}>
+            {gi > 0 && ownScaleNote && <p className="muted multiples-note">{ownScaleNote}</p>}
+            <div className="multiples">
+              {group.map(({ s, i }) => (
+                <SmallMultiple key={s.category} series={s} rows={rows} index={i} yMax={yMax} format={format} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </>
   );
 }
 

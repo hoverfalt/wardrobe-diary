@@ -16,7 +16,7 @@ title: Wardrobe Diary semantic layer
 description: >-
   Meaning, definitions, lineage and quality of the Wardrobe Diary data: one person's daily log of every garment
   worn since 1 January 2018, with purchase prices, dates, materials and weights, and the metrics derived from it.
-version: 0.5.4
+version: 0.5.5
 status: draft
 base_iri: https://wardrobediary.io/def/
 language: en
@@ -47,3 +47,4 @@ changelog:
   - {version: 0.5.2, date: 2026-11-07, change: "Category trail: drawn as straight lines between the points (no curve)."}
   - {version: 0.5.3, date: 2026-11-07, change: "Category trail: daily points averaged over 30 days, from a category's 31st day."}
   - {version: 0.5.4, date: 2026-11-28, change: "Category order: Shoes before Socks, so Socks sit next to the underwear categories."}
+  - {version: 0.5.5, date: 2026-11-28, change: "D-3 amended: Socks and underwear get a scale of their own on the Active items charts."}

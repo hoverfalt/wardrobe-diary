@@ -171,6 +171,9 @@ Reference values: the live site's tables are saved in `reference/live/*.csv` (gi
   category on a shared scale, with its category image and the value at the end date, instead of many
   coloured lines in one chart (the original 12-colour palette fails colour-blind and contrast checks).
   Applies to all current and future multi-category charts.
+  Amended 2026-11-28 (Olof): on the Dashboard's Active items charts Socks, Underwear shirts and Underwear boxers
+  share a scale of their own, as a separate group below the others (`ownScale`): their counts (up to 72) flattened
+  the other categories (up to 24).
 
 - **2026-10-09 D-1** Public pages get the full day-by-day log and compute the metrics from it. The sync
   writes it to the world-readable `users/{uid}/public/data` document; the Dashboard is public.

@@ -57,6 +57,9 @@ const COLUMNS: {
   { key: "secondHandShare", title: "Second hand", format: pct, bar: "var(--bar-green)", fixedMax: 1 },
 ];
 
+/** Active items by category: these share a scale of their own (D-3 amended), or their counts flatten the others. */
+const OWN_SCALE_ITEMS = ["Socks", "Underwear shirts", "Underwear boxers"];
+
 const COST_VS_USE_TIP: [string, string] = ["Frequency of use", "Cost per wear"];
 const YEARLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Yearly cost"];
 const MONTHLY_VS_USE_TIP: [string, string] = ["Frequency of use", "Monthly cost"];
@@ -206,7 +209,12 @@ export function Dashboard({
         <>
           <h2>Active items by category</h2>
           <p className="muted">Number of active items in each category; the number is the count at the end date.</p>
-          <CategorySmallMultiples series={charts.activeItems} range={range} format={formatCount} />
+          <CategorySmallMultiples
+            series={charts.activeItems}
+            range={range}
+            format={formatCount}
+            ownScale={OWN_SCALE_ITEMS}
+            ownScaleNote="Socks and underwear, on a scale of their own: they have many more items than the other categories." />
           <HowCalculated refs={["metric:active-items-over-time"]} />
           {rangeControl}
 
